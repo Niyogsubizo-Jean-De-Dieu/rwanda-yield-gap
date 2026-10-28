@@ -1,0 +1,73 @@
+crop,kg_per_ha,yield_gain_pct
+Bush bean,0,0.0
+Bush bean,10,0.09
+Bush bean,25,1.63
+Bush bean,50,7.08
+Bush bean,75,11.28
+Bush bean,100,12.77
+Bush bean,150,15.42
+Bush bean,200,18.1
+Bush bean,300,19.97
+Cassava,0,0.0
+Cassava,10,0.03
+Cassava,25,0.47
+Cassava,50,0.83
+Cassava,75,0.97
+Cassava,100,1.35
+Cassava,150,2.96
+Cassava,200,3.82
+Cassava,300,5.19
+Climbing bean,0,0.0
+Climbing bean,10,0.15
+Climbing bean,25,1.03
+Climbing bean,50,3.84
+Climbing bean,75,10.79
+Climbing bean,100,14.33
+Climbing bean,150,18.7
+Climbing bean,200,20.61
+Climbing bean,300,24.41
+Irish potato,0,0.0
+Irish potato,10,0.15
+Irish potato,25,0.94
+Irish potato,50,1.91
+Irish potato,75,5.66
+Irish potato,100,8.71
+Irish potato,150,13.02
+Irish potato,200,17.1
+Irish potato,300,22.81
+Maize,0,0.0
+Maize,10,0.26
+Maize,25,7.55
+Maize,50,21.39
+Maize,75,30.76
+Maize,100,38.85
+Maize,150,48.72
+Maize,200,52.27
+Maize,300,58.05
+Sorghum,0,0.0
+Sorghum,10,0.1
+Sorghum,25,3.56
+Sorghum,50,12.59
+Sorghum,75,19.5
+Sorghum,100,22.23
+Sorghum,150,29.29
+Sorghum,200,31.98
+Sorghum,300,35.16
+Soybean,0,0.0
+Soybean,10,0.06
+Soybean,25,1.55
+Soybean,50,5.73
+Soybean,75,7.72
+Soybean,100,10.78
+Soybean,150,13.01
+Soybean,200,15.2
+Soybean,300,17.79
+Sweet potato,0,0.0
+Sweet potato,10,0.03
+Sweet potato,25,0.26
+Sweet potato,50,0.6
+Sweet potato,75,0.78
+Sweet potato,100,1.2
+Sweet potato,150,2.64
+Sweet potato,200,4.42
+Sweet potato,300,8.31

@@ -1,0 +1,91 @@
+year,scenario,season,district,crop,levers,plots,area_ha,current_yield_kg_ha,adoption_pct,yield_gain_pct,current_production_t,extra_production_t,attainable_yield_kg_ha
+2025,package_fert_seed_manure,A,Nyagatare,Maize,inorganic_fert+improved_seed+organic_fert,413,26645.928,3053.389,42.937,18.099,81360.382,14725.556,3606.027
+2025,package_fert_seed_manure,A,Kirehe,Maize,inorganic_fert+improved_seed+organic_fert,502,22153.612,2564.061,67.685,20.486,56803.213,11636.847,3089.341
+2025,package_fert_seed_manure,A,Ngoma,Maize,inorganic_fert+improved_seed+organic_fert,401,15427.554,2283.272,54.715,27.047,35225.296,9527.424,2900.831
+2025,package_fert_seed_manure,A,Gatsibo,Maize,inorganic_fert+improved_seed+organic_fert,434,19997.172,2036.595,53.22,20.074,40726.135,8175.409,2445.423
+2025,fertilizer,A,Nyagatare,Maize,inorganic_fert,413,26645.928,3053.389,76.859,9.82,81360.382,7989.945,3353.245
+2025,fertilizer,A,Kirehe,Maize,inorganic_fert,502,22153.612,2564.061,78.854,10.676,56803.213,6064.507,2837.809
+2025,package_fert_seed_manure,A,Kayonza,Maize,inorganic_fert+improved_seed+organic_fert,301,15179.169,1645.29,42.301,21.604,24974.134,5395.468,2000.742
+2025,fertilizer,A,Ngoma,Maize,inorganic_fert,401,15427.554,2283.272,63.2,14.969,35225.296,5272.851,2625.053
+2025,fertilizer,A,Gatsibo,Maize,inorganic_fert,434,19997.172,2036.595,71.665,10.977,40726.135,4470.374,2260.145
+2025,package_fert_seed_manure,B,Nyagatare,Maize,inorganic_fert+improved_seed+organic_fert,463,26304.24,1874.663,31.767,8.071,49311.581,3979.842,2025.963
+2025,package_fert_seed_manure,A,Bugesera,Maize,inorganic_fert+improved_seed+organic_fert,328,8059.876,1729.297,28.885,26.195,13937.917,3650.973,2182.278
+2025,package_fert_seed_manure,B,Nyabihu,Irish potato,inorganic_fert+improved_seed+organic_fert,193,7457.173,9410.149,4.191,4.956,70173.108,3478.021,9876.549
+2025,fertilizer,A,Kayonza,Maize,inorganic_fert,301,15179.169,1645.29,52.413,13.834,24974.134,3454.933,1872.9
+2025,package_fert_seed_manure,A,Burera,Maize,inorganic_fert+improved_seed+organic_fert,232,9567.491,2116.584,43.524,16.324,20250.401,3305.671,2462.095
+2025,package_fert_seed_manure,B,Rubavu,Irish potato,inorganic_fert+improved_seed+organic_fert,156,6011.263,8312.682,3.531,6.31,49969.714,3153.301,8837.247
+2025,package_fert_seed_manure,A,Rubavu,Irish potato,inorganic_fert+improved_seed+organic_fert,102,4782.979,14145.848,3.435,4.601,67659.291,3113.185,14796.736
+2025,improved_seed,A,Nyagatare,Maize,improved_seed,413,26645.928,3053.389,85.24,3.667,81360.382,2983.77,3165.367
+2025,improved_seed,B,Nyabihu,Irish potato,improved_seed,193,7457.173,9410.149,5.951,4.151,70173.108,2913.06,9800.788
+2025,improved_seed,B,Rubavu,Irish potato,improved_seed,156,6011.263,8312.682,4.284,5.299,49969.714,2647.874,8753.167
+2025,package_fert_seed_manure,B,Gatsibo,Maize,inorganic_fert+improved_seed+organic_fert,320,9030.824,1242.833,31.577,23.581,11223.81,2646.64,1535.901
+2025,package_fert_seed_manure,A,Burera,Irish potato,inorganic_fert+improved_seed+organic_fert,104,4357.382,10696.933,4.913,5.67,46610.621,2643.028,11303.496
+2025,improved_seed,A,Kirehe,Maize,improved_seed,502,22153.612,2564.061,82.092,4.503,56803.213,2557.674,2679.513
+2025,package_fert_seed_manure,A,Rwamagana,Maize,inorganic_fert+improved_seed+organic_fert,340,9712.91,1739.079,61.962,14.488,16891.519,2447.297,1991.043
+2025,improved_seed,A,Rubavu,Irish potato,improved_seed,102,4782.979,14145.848,5.654,3.557,67659.291,2406.917,14649.074
+2025,package_fert_seed_manure,A,Gisagara,Maize,inorganic_fert+improved_seed+organic_fert,286,6264.181,1694.365,50.854,22.535,10613.806,2391.808,2076.187
+2025,fertilizer,B,Nyagatare,Maize,inorganic_fert,463,26304.24,1874.663,81.812,4.754,49311.581,2344.409,1963.789
+2025,fertilizer,A,Nyagatare,Sorghum,inorganic_fert,139,14775.113,1727.324,45.945,8.033,25521.407,2050.127,1866.079
+2025,lime,B,Nyabihu,Irish potato,lime,193,7457.173,9410.149,1.745,2.893,70173.108,2030.367,9682.42
+2025,fertilizer,A,Bugesera,Maize,inorganic_fert,328,8059.876,1729.297,43.423,14.471,13937.917,2016.974,1979.545
+2025,improved_seed,A,Gatsibo,Maize,improved_seed,434,19997.172,2036.595,73.029,4.735,40726.135,1928.512,2133.034
+2025,improved_seed,A,Ngoma,Maize,improved_seed,401,15427.554,2283.272,77.375,5.44,35225.296,1916.27,2407.482
+2025,lime,A,Nyabihu,Irish potato,lime,155,8082.36,13207.692,0.0,1.787,106749.329,1907.16,13443.658
+2025,fertilizer,A,Gisagara,Maize,inorganic_fert,286,6264.181,1694.365,54.729,17.551,10613.806,1862.805,1991.739
+2025,fertilizer,B,Gatsibo,Maize,inorganic_fert,320,9030.824,1242.833,55.603,15.962,11223.81,1791.592,1441.22
+2025,fertilizer,B,Kayonza,Sorghum,inorganic_fert,142,12364.769,1350.97,25.55,10.319,16704.429,1723.675,1490.372
+2025,fertilizer,A,Nyanza,Maize,inorganic_fert,258,5120.473,1762.375,37.598,18.35,9024.193,1655.917,2085.766
+2025,fertilizer,A,Burera,Irish potato,inorganic_fert,104,4357.382,10696.933,81.65,3.387,46610.621,1578.538,11059.201
+2025,fertilizer,A,Burera,Maize,inorganic_fert,232,9567.491,2116.584,63.241,7.728,20250.401,1564.977,2280.157
+2025,fertilizer,B,Bugesera,Maize,inorganic_fert,243,5683.893,902.232,47.665,30.436,5128.188,1560.818,1176.835
+2025,improved_seed,B,Burera,Irish potato,improved_seed,112,4707.644,8163.511,6.501,3.985,38430.907,1531.599,8488.854
+2025,lime,B,Rubavu,Irish potato,lime,156,6011.263,8312.682,0.0,2.958,49969.714,1477.946,8558.545
+2025,improved_seed,A,Burera,Maize,improved_seed,232,9567.491,2116.584,58.661,6.762,20250.401,1369.425,2259.717
+2025,improved_seed,B,Musanze,Irish potato,improved_seed,96,4486.285,8664.727,19.173,3.347,38872.432,1301.226,8954.773
+2025,lime,A,Rubavu,Irish potato,lime,102,4782.979,14145.848,0.0,1.787,67659.291,1208.786,14398.575
+2025,improved_seed,A,Nyabihu,Irish potato,improved_seed,155,8082.36,13207.692,8.229,1.028,106749.329,1097.659,13343.501
+2025,improved_seed,A,Gakenke,Maize,improved_seed,166,8068.587,1620.692,58.129,8.187,13076.698,1070.644,1753.385
+2025,improved_seed,A,Musanze,Maize,improved_seed,190,5876.42,1755.281,52.459,9.673,10314.766,997.74,1925.068
+2025,improved_seed,A,Rutsiro,Maize,improved_seed,179,6188.584,1312.222,39.442,12.06,8120.798,979.405,1470.482
+2025,improved_seed,A,Burera,Irish potato,improved_seed,104,4357.382,10696.933,4.913,2.088,46610.621,973.02,10920.237
+2025,lime,A,Musanze,Irish potato,lime,107,4461.962,11713.249,0.0,1.787,52264.077,933.739,11922.515
+2025,manure,A,Nyagatare,Maize,organic_fert,413,26645.928,3053.389,62.197,0.924,81360.382,752.081,3081.614
+2025,manure,A,Bugesera,Maize,organic_fert,328,8059.876,1729.297,62.302,3.9,13937.917,543.529,1796.733
+2025,manure,B,Nyagatare,Maize,organic_fert,463,26304.24,1874.663,44.072,1.018,49311.581,502.182,1893.754
+2025,manure,A,Kirehe,Maize,organic_fert,502,22153.612,2564.061,87.859,0.86,56803.213,488.335,2586.104
+2025,manure,A,Ngoma,Maize,organic_fert,401,15427.554,2283.272,86.428,1.257,35225.296,442.765,2311.971
+2025,manure,A,Bugesera,Sweet potato,organic_fert,41,2465.808,7832.641,18.632,1.966,19313.789,379.728,7986.638
+2025,lime,A,Gicumbi,Irish potato,lime,87,3694.095,8999.328,5.164,1.111,33244.37,369.486,9099.348
+2025,anti_erosion,B,Nyagatare,Maize,anti_erosion,463,26304.24,1874.663,57.387,0.7,49311.581,345.107,1887.783
+2025,anti_erosion,A,Rwamagana,Cassava,anti_erosion,24,1024.305,13197.696,72.876,2.398,13518.463,324.2,13514.203
+2025,manure,B,Rubavu,Irish potato,organic_fert,156,6011.263,8312.682,48.237,0.643,49969.714,321.243,8366.122
+2025,lime,B,Burera,Irish potato,lime,112,4707.644,8163.511,0.0,0.83,38430.907,318.798,8231.23
+2025,manure,A,Kayonza,Maize,organic_fert,301,15179.169,1645.29,76.889,1.255,24974.134,313.406,1665.937
+2025,manure,A,Gatsibo,Maize,organic_fert,434,19997.172,2036.595,82.349,0.764,40726.135,311.349,2052.164
+2025,lime,A,Rutsiro,Irish potato,lime,90,2951.229,8625.411,28.245,1.218,25455.565,310.019,8730.459
+2025,manure,A,Rubavu,Irish potato,organic_fert,102,4782.979,14145.848,60.81,0.428,67659.291,289.55,14206.386
+2025,anti_erosion,A,Bugesera,Sweet potato,anti_erosion,41,2465.808,7832.641,42.796,1.412,19313.789,272.644,7943.211
+2025,anti_erosion,A,Karongi,Sweet potato,anti_erosion,43,2091.389,9422.095,67.242,1.314,19705.266,258.928,9545.901
+2025,manure,B,Nyamagabe,Sweet potato,organic_fert,133,6312.149,8149.383,51.601,0.495,51440.127,254.869,8189.761
+2025,lime,A,Nyamagabe,Irish potato,lime,60,3285.811,8367.086,10.894,0.908,27492.665,249.529,8443.027
+2025,anti_erosion,B,Kayonza,Cassava,anti_erosion,55,3154.364,15425.109,40.247,0.498,48656.409,242.313,15501.927
+2025,manure,B,Gisagara,Cassava,organic_fert,215,4972.435,14700.995,45.073,0.315,73099.734,230.286,14747.307
+2025,lime,B,Gicumbi,Irish potato,lime,98,2344.044,6606.956,6.389,1.42,15486.999,219.929,6700.781
+2025,manure,A,Gicumbi,Sweet potato,organic_fert,74,5160.514,9685.337,79.8,0.44,49981.319,219.82,9727.933
+2025,manure,B,Rusizi,Cassava,organic_fert,302,11061.09,11038.618,32.315,0.177,122099.153,215.84,11058.132
+2025,manure,A,Nyamasheke,Cassava,organic_fert,57,2886.807,12402.257,20.945,0.596,35802.918,213.444,12476.195
+2025,anti_erosion,A,Rwamagana,Maize,anti_erosion,340,9712.91,1739.079,76.007,1.26,16891.519,212.875,1760.996
+2025,lime,A,Ngororero,Irish potato,lime,22,1736.082,7436.15,9.445,1.587,12909.765,204.942,7554.198
+2025,anti_erosion,A,Rwamagana,Sweet potato,anti_erosion,27,1476.02,8084.626,82.519,1.686,11933.071,201.179,8220.924
+2025,lime,A,Nyaruguru,Irish potato,lime,49,2514.884,6287.015,0.0,1.206,15811.114,190.62,6362.812
+2025,anti_erosion,B,Karongi,Sweet potato,anti_erosion,95,3818.431,7903.485,76.882,0.629,30178.908,189.86,7953.207
+2025,anti_erosion,A,Ngoma,Cassava,anti_erosion,43,2249.452,12669.384,58.935,0.632,28499.166,180.165,12749.477
+2025,anti_erosion,A,Rutsiro,Sweet potato,anti_erosion,28,1796.972,9385.059,65.757,1.065,16864.691,179.585,9484.996
+2025,lime,A,Gatsibo,Irish potato,lime,70,2414.905,5648.382,0.0,1.289,13640.305,175.774,5721.169
+2025,anti_erosion,A,Nyagatare,Maize,anti_erosion,413,26645.928,3053.389,65.064,0.214,81360.382,173.745,3059.909
+2025,anti_erosion,A,Rubavu,Irish potato,anti_erosion,102,4782.979,14145.848,89.187,0.238,67659.291,161.221,14179.555
+2025,anti_erosion,A,Gatsibo,Maize,anti_erosion,434,19997.172,2036.595,77.575,0.384,40726.135,156.279,2044.41
+2025,anti_erosion,B,Rusizi,Cassava,anti_erosion,302,11061.09,11038.618,72.634,0.121,122099.153,148.241,11052.02
+2025,lime,B,Gatsibo,Irish potato,lime,85,2135.387,5403.159,0.276,1.241,11537.834,143.24,5470.238
+2025,lime,A,Kayonza,Irish potato,lime,79,2404.111,3809.418,0.0,1.474,9158.262,135.011,3865.576
+2025,anti_erosion,B,Bugesera,Cassava,anti_erosion,99,2104.749,14782.464,41.279,0.426,31113.376,132.501,14845.417

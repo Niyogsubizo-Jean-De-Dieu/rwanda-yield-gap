@@ -1,0 +1,55 @@
+column,meaning
+year,Survey year (NISR agricultural-year label)
+season,A (Sep-Feb) or B (Mar-Jun)
+district,District
+province,Province
+segment_id,Survey segment (area-frame unit; location not public)
+plot_no,Plot number within segment
+crop,Crop name
+crop_category,NISR crop group
+yield_kg_ha,"Yield (kg/ha), as computed by NISR"
+log_yield,Natural log of yield (model target)
+share_imputed,1 = crop share imputed (NISR 2024 B screening lists one crop per plot); yield approximate
+improved_seed,1 = improved seed sown
+organic_fert,1 = manure/compost on this plot
+inorganic_fert,1 = inorganic fertilizer on this plot
+inorganic_kg_ha,"Inorganic fertilizer, kg per ha of plot (kg-unit records)"
+lime,1 = lime applied
+micronutrient,1 = micronutrients on this plot
+pesticide,1 = pesticide/fungicide on this plot
+erosion_degree,Erosion on plot: 0 very low .. 3 severe (2023+)
+anti_erosion,1 = anti-erosion works (2023+)
+consolidated_site,1 = land-consolidation site (2023+)
+mechanized,1 = mechanical equipment (2024+)
+irrigated,1 = plot irrigated (2023+)
+plot_area_ha,Plot area (ha)
+crop_area_ha,Area of this crop on the plot (ha)
+crop_share,Share of the plot under this crop (crop_area_ha / plot_area_ha)
+farmer_sex,Sex of farmer
+farmer_age,Age of farmer (years)
+stratum,Sampling stratum
+weight,Survey weight (plot expansion factor)
+w_area_ha,Weighted harvested area = harvested_area_ha x weight
+soil_ph,"Soil pH, 0-20 cm, mean over district cropland (iSDAsoil)"
+soil_org_carbon_gkg,"Soil organic carbon g/kg, 0-20 cm (iSDAsoil)"
+soil_nitrogen_gkg,"Soil total nitrogen g/kg, 0-20 cm (iSDAsoil)"
+elevation_m,Mean elevation of district cropland (SRTM)
+slope_deg,Mean slope of district cropland
+share_slope_gt16deg,Share of district cropland on slopes > 16 degrees
+cropland_ha,District cropland area from the consensus satellite cropland mask
+ndvi_anom_mean,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+ndvi_anom_min,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+evi_anom_mean,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+rain_anom_sum,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+rain_anom_min,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+lst_anom_mean,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+lst_anom_max,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+sm_anom_mean,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+t2m_anom_mean,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+s1_vh_anom_mean,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+ndvi_anom_early,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+rain_anom_early,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+ndvi_anom_late,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+rain_anom_late,Seasonal satellite/climate anomaly vs district average (same 16-day periods)
+rain_total_mm,
+ndvi_max,

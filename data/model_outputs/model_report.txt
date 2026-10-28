@@ -1,0 +1,112 @@
+RWANDA YIELD-GAP MODEL - REPORT
+============================================================
+Engine: LightGBM | monotone effects: True | 152,471 plots, 42 features
+Crops: Bush bean, Cassava, Climbing bean, Irish potato, Maize, Sorghum, Soybean, Sweet potato, Wheat | years 2022-2025
+  random (segments held out): done in 58s
+  district (districts held out): done in 74s
+  temporal (train 2022-24, test 2025): done in 13s
+Drivers computed with mean |SHAP| (log-yield units) on 30,000 plots
+Levers not scored (fewer than 200 plots with or without them): improved_seed/Bush bean, improved_seed/Cassava, improved_seed/Climbing bean, improved_seed/Sorghum, improved_seed/Soybean, improved_seed/Sweet potato, improved_seed/Wheat, lime/Bush bean, lime/Cassava, lime/Climbing bean, lime/Maize, lime/Sorghum, lime/Soybean, lime/Sweet potato, lime/Wheat, anti_erosion/Wheat
+Scenarios on 2025 plots (38,198); typical fertilizer dose used (kg/ha, median of users): Bush bean 58, Cassava 52, Climbing bean 74, Irish potato 168, Maize 75, Sorghum 42, Soybean 51, Sweet potato 54, Wheat 108
+
+VALIDATION (model vs baseline = average yield of the crop in that season)
+validation                        random (segments held out)  district (districts held out)  temporal (train 2022-24, test 2025)
+plot_R2_log_model                                      0.760                          0.735                                0.766
+plot_R2_log_baseline                                   0.678                          0.673                                0.749
+plot_R2_within_crop                                    0.191                          0.125                                0.009
+district_R2_model                                      0.983                          0.938                                0.935
+district_R2_baseline                                   0.879                          0.861                                0.905
+district_R2_within_crop                                0.857                          0.338                                0.471
+district_corr_within_crop_median                       0.927                          0.535                                0.534
+district_MAPE_model                                    0.084                          0.174                                0.170
+district_MAPE_baseline                                 0.244                          0.257                                0.214
+district_cells                                      1426.000                       1426.000                              356.000
+
+District correlation (observed vs predicted) per crop:
+validation          random (segments held out)  district (districts held out)  temporal (train 2022-24, test 2025)
+corr_Bush bean                            0.92                           0.48                                 0.54
+corr_Cassava                              0.93                           0.57                                 0.49
+corr_Climbing bean                        0.92                           0.51                                 0.77
+corr_Irish potato                         0.97                           0.84                                 0.88
+corr_Maize                                0.93                           0.77                                 0.51
+corr_Sorghum                              0.93                           0.49                                 0.56
+corr_Soybean                              0.89                           0.56                                 0.16
+corr_Sweet potato                         0.91                           0.37                                 0.53
+
+WHAT DRIVES YIELD DIFFERENCES WITHIN A CROP (share of importance, %; crop identity excluded)
+                          group  share_pct
+Management (inputs & practices)       28.9
+     Season weather (satellite)       27.0
+                  Plot & farmer       26.3
+                 Soil & terrain       17.7
+
+Top 15 features
+            feature                           group  share_pct
+    inorganic_kg_ha Management (inputs & practices)       13.2
+      log_plot_area                   Plot & farmer       10.4
+         crop_share                   Plot & farmer        7.7
+      improved_seed Management (inputs & practices)        7.4
+           ndvi_max      Season weather (satellite)        7.3
+  soil_nitrogen_gkg                  Soil & terrain        4.1
+            soil_ph                  Soil & terrain        3.9
+          pesticide Management (inputs & practices)        3.2
+         farmer_sex                   Plot & farmer        2.9
+            stratum                   Plot & farmer        2.9
+soil_org_carbon_gkg                  Soil & terrain        2.7
+         farmer_age                   Plot & farmer        2.5
+       organic_fert Management (inputs & practices)        2.4
+        elevation_m                  Soil & terrain        2.4
+      rain_total_mm      Season weather (satellite)        2.3
+
+NATIONAL YIELD GAIN (%) IF NON-ADOPTERS ADOPT, 2025
+scenario              anti_erosion  fertilizer  improved_seed  lime  manure  package_fert_seed_manure
+crop          season                                                                                 
+Bush bean     A                0.5         5.4            NaN   NaN     1.4                       6.9
+              B                0.3         6.6            NaN   NaN     1.3                       8.0
+Cassava       A                0.3         0.6            NaN   NaN     0.4                       1.0
+              B                0.2         0.8            NaN   NaN     0.3                       1.0
+Climbing bean A                0.3         7.0            NaN   NaN     1.0                       8.0
+              B                0.2         6.5            NaN   NaN     0.7                       7.2
+Irish potato  A                0.2         2.6            1.6   1.4     0.2                       4.4
+              B                0.1         2.0            3.2   1.6     0.2                       5.5
+Maize         A                0.3        10.0            5.3   NaN     1.0                      19.0
+              B                0.5        12.8            4.6   NaN     0.9                      19.6
+Sorghum       A                0.4         8.2            NaN   NaN     1.1                       9.2
+              B                0.2         8.2            NaN   NaN     0.4                       8.7
+Soybean       A                0.4         3.3            NaN   NaN     2.0                       5.5
+              B                0.2         5.1            NaN   NaN     1.8                       7.1
+Sweet potato  A                0.5         0.5            NaN   NaN     0.8                       1.3
+              B                0.2         0.5            NaN   NaN     0.5                       1.0
+Wheat         A                NaN        12.4            NaN   NaN     1.3                      13.8
+              B                NaN         8.5            NaN   NaN     0.8                       9.4
+
+EXTRA PRODUCTION (tonnes, seasons A+B 2025)
+scenario       anti_erosion  fertilizer  improved_seed     lime  manure  package_fert_seed_manure
+crop                                                                                             
+Bush bean             932.0     14482.0            NaN      NaN  3161.0                   17825.0
+Cassava              2678.0      8812.0            NaN      NaN  3779.0                   12617.0
+Climbing bean         533.0     13520.0            NaN      NaN  1641.0                   15190.0
+Irish potato         1208.0     18648.0        17816.0  11695.0  1240.0                   38004.0
+Maize                2079.0     59164.0        28810.0      NaN  5343.0                  106966.0
+Sorghum               480.0     14250.0            NaN      NaN  1082.0                   15357.0
+Soybean                78.0      1145.0            NaN      NaN   517.0                    1686.0
+Sweet potato         3524.0      5584.0            NaN      NaN  6314.0                   11937.0
+Wheat                   NaN       889.0            NaN      NaN    86.0                     983.0
+
+TOP 10 TARGETS for the fertilizer + seed + manure package (extra tonnes)
+season  district         crop  adoption_pct  yield_gain_pct  extra_production_t
+     A Nyagatare        Maize          42.9            18.1             14725.6
+     A    Kirehe        Maize          67.7            20.5             11636.8
+     A     Ngoma        Maize          54.7            27.0              9527.4
+     A   Gatsibo        Maize          53.2            20.1              8175.4
+     A   Kayonza        Maize          42.3            21.6              5395.5
+     B Nyagatare        Maize          31.8             8.1              3979.8
+     A  Bugesera        Maize          28.9            26.2              3651.0
+     B   Nyabihu Irish potato           4.2             5.0              3478.0
+     A    Burera        Maize          43.5            16.3              3305.7
+     B    Rubavu Irish potato           3.5             6.3              3153.3
+
+Interpretation: effects are model-based associations from survey data (not field trials). Positive effects are imposed for inputs; gains assume non-adopters respond like comparable adopters in the same conditions. Blank = lever not scored for that crop (too few plots with it).
+plot_R2_within_crop = share of the yield variation WITHIN a crop and season explained by the model.
+district_R2_within_crop = how well district yields are ranked for the SAME crop and season (the honest test for a yield-gap map; the baseline scores 0 here).
+Run time 248s

@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rwanda Yield Gap Explorer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: NISR-blue side navigation + main column; each view opens with KPIs, then a hero row where the district map
+   takes ~60% of the width and supporting charts stack beside it, then detail panels. One deliberate light theme:
+   blues on white, like statistics.gov.rw. */
+:root {
+  --nisr: #0b4ea2;        /* NISR blue: navigation, primary marks */
+  --nisr-dark: #083a7a;
+  --sky: #a9d3f2;         /* NISR light blue */
+  --pale: #eaf3fc;        /* tints, selected rows */
+  --bg: #f4f8fd;          /* page */
+  --panel: #ffffff;
+  --ink: #0d2b4e;         /* text: deep navy */
+  --muted: #5b7290;
+  --line: #dbe5f1;
+  --accent: #1f5fae;      /* selected district / key series */
+  --grey: #a9c4e2;        /* comparison series, current yield */
+  --soil: #0a2f6b;        /* potential gain, targets */
+  --good: #1f5fae; --bad: #a9c4e2;
+  --shadow: 0 1px 3px rgba(11, 78, 162, .08);
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", Roboto, Arial, sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--nisr); }
+.app { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: 100vh; }
+aside.side { background: var(--nisr); color: #fff; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 18px; padding: 22px 14px 18px max(14px, env(safe-area-inset-left, 0px)); }
+.logo { display: flex; gap: 10px; align-items: center; padding: 0 6px; }
+.logo svg { flex: none; }
+.logo b { font: 800 16px/1.15 var(--f-display); display: block; }
+.logo small { display: block; font-size: 11.5px; color: #cfe4f7; line-height: 1.3; margin-top: 2px; }
+nav.tabs { display: flex; flex-direction: column; gap: 2px; }
+nav.tabs a { display: flex; gap: 10px; align-items: center; text-decoration: none; color: #dcebfa; font: 600 14.5px var(--f-body); padding: 9px 12px; border-radius: 8px; }
+nav.tabs a svg { flex: none; opacity: .9; }
+nav.tabs a:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+nav.tabs a[aria-current="page"] { background: #fff; color: var(--nisr); }
+.side .grow { flex: 1; }
+.lang { display: flex; border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px; overflow: hidden; margin: 0 6px; }
+.lang button { flex: 1; border: 0; background: none; color: #dcebfa; font: 600 12.5px var(--f-body); padding: 7px 8px; cursor: pointer; }
+.lang button[aria-pressed="true"] { background: #fff; color: var(--nisr); }
+.side .src { font-size: 11.5px; color: #cfe4f7; padding: 0 6px; line-height: 1.4; }
+.main { min-width: 0; display: flex; flex-direction: column; }
+header.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--panel); border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+.wrap { padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+header.bar .wrap { display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: end; justify-content: space-between; padding-block: 12px; }
+header.bar h1 { font: 800 21px/1.2 var(--f-display); margin: 0; color: var(--ink); text-wrap: balance; }
+header.bar p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+.filters { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.field label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 700; }
+select { font: 600 14px var(--f-body); color: var(--ink); background: var(--pale); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; max-width: 60vw; }
+select:focus-visible, button:focus-visible, a:focus-visible, .tile:focus-visible { outline: 2px solid var(--nisr); outline-offset: 2px; }
+main { padding-block: 20px 40px; display: grid; gap: 16px; }
+section.view { display: grid; gap: 16px; }
+.lead { font-size: 16.5px; max-width: 85ch; margin: 0; }
+.lead b { color: var(--nisr); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; }
+.kpi .ic { grid-row: 1 / span 3; grid-column: 2; width: 36px; height: 36px; border-radius: 10px; background: var(--pale); color: var(--nisr); display: grid; place-items: center; }
+.kpi .k { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
+.kpi .v { font: 700 25px/1.2 var(--f-display); font-variant-numeric: tabular-nums; color: var(--ink); }
+.kpi .s { font-size: 12.5px; color: var(--muted); }
+.up { color: var(--nisr); } .down { color: var(--muted); }
+.top2 { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
+.top2 .kpis { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.top2 .kpi { padding: 10px 14px; }
+.top2 .kpi .v { font-size: 22px; }
+@media (max-width: 1180px) { .top2 { grid-template-columns: minmax(0, 1fr); } .top2 .kpis { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); } }
+.brief { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; box-shadow: var(--shadow); display: grid; gap: 8px; align-content: start; }
+.brief-k { font: 700 12px var(--f-body); text-transform: uppercase; letter-spacing: .08em; color: var(--nisr); display: flex; align-items: center; gap: 8px; }
+.brief-k::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--nisr); }
+.brief p { margin: 0; font-size: 16px; line-height: 1.55; max-width: 80ch; }
+.brief p.headline { font: 700 20px/1.3 var(--f-display); color: var(--nisr); }
+.brief p.muted { font-size: 14.5px; color: var(--muted); }
+.brief b { color: var(--nisr); }
+.hero { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.stack { display: grid; gap: 16px; min-width: 0; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 1180px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 860px) { .grid2, .grid3 { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 16px; box-shadow: var(--shadow); min-width: 0; }
+.panel.map { padding: 16px 18px 14px; }
+.panel h2 { font: 700 16px/1.3 var(--f-display); margin: 0 0 2px; text-wrap: balance; }
+.panel h3 { font: 700 14px/1.3 var(--f-display); margin: 0 0 4px; }
+.panel .sub { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+.note { color: var(--muted); font-size: 12.5px; margin: 8px 0 0; }
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { font-family: var(--f-body); fill: var(--muted); font-size: 12px; }
+.chart .val { font-family: var(--f-data); font-size: 11.5px; fill: var(--ink); }
+.chart .lbl { fill: var(--ink); font-size: 12.5px; }
+.chart .hl { font-weight: 700; fill: var(--ink); }
+.mapbox svg { max-height: 640px; }
+.tile { cursor: pointer; }
+.tile rect, .tile path { stroke: #fff; stroke-width: 1.4; transition: opacity .15s; }
+.tile:hover path, .tile:hover rect { opacity: .85; }
+.tile.sel rect, .tile.sel path { stroke: var(--ink); stroke-width: 2.6; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); margin-top: 6px; align-items: center; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; }
+.legend i.line { height: 3px; vertical-align: 3px; border-radius: 2px; }
+.ramp { display: inline-block; width: 160px; height: 10px; border-radius: 5px; background: linear-gradient(90deg, #eaf3fc, #0a3d8f); vertical-align: middle; margin: 0 6px; }
+.levers { display: flex; flex-wrap: wrap; gap: 6px; }
+.levers button { font: 600 13.5px var(--f-body); border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 999px; padding: 6px 13px; cursor: pointer; }
+.levers button[aria-pressed="true"] { background: var(--nisr); border-color: var(--nisr); color: #fff; }
+.levers button:disabled { opacity: .45; cursor: not-allowed; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+td.n, th.n { text-align: right; font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+tr.sel td { background: var(--pale); }
+tbody tr { cursor: pointer; }
+.tablewrap { overflow-x: auto; max-height: 520px; overflow-y: auto; }
+.pill { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 1px 9px; border-radius: 999px; white-space: nowrap; }
+.p-high { background: #0a3d8f; color: #fff; } .p-medium { background: #4a90d9; color: #fff; } .p-low { background: #cfe4f7; color: var(--nisr-dark); } .p-none { background: #eef3f8; color: var(--muted); }
+.pill.warn { background: var(--pale); color: var(--nisr); }
+.reccard { display: grid; gap: 10px; }
+.reccard .act { font: 700 18px/1.3 var(--f-display); color: var(--nisr); margin: 0; }
+.reccard p { margin: 0; }
+.reccard .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.prose { max-width: 80ch; }
+.prose h2 { font: 700 18px var(--f-display); margin: 18px 0 6px; }
+.prose p, .prose li { margin: 6px 0; }
+#tip { position: fixed; z-index: 40; pointer-events: none; background: var(--ink); color: #fff; font-size: 12.5px; line-height: 1.35; padding: 7px 10px; border-radius: 8px; max-width: 280px; opacity: 0; transition: opacity .1s; box-shadow: 0 4px 14px rgba(13, 43, 78, .25); }
+.empty { color: var(--muted); font-style: italic; padding: 16px 0; }
+footer { color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--line); padding-block: 14px 28px; }
+@media (max-width: 900px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  aside.side { position: static; height: auto; flex-direction: column; gap: 10px; padding: 12px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); }
+  nav.tabs { flex-direction: row; overflow-x: auto; scrollbar-width: none; }
+  nav.tabs a { flex: none; padding: 7px 10px; font-size: 13.5px; }
+  nav.tabs a svg, .side .grow, .side .src { display: none; }
+  .lang { margin: 0; max-width: 220px; }
+  .wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  header.bar { position: static; }
+}
+@media (prefers-reduced-motion: reduce) { #tip, .tile path, .tile rect { transition: none; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="logo">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#fff"/><path d="M6 25c4-7 8-10 11-10s6 2 11-4" fill="none" stroke="#0b4ea2" stroke-width="2.6" stroke-linecap="round"/><path d="M6 28h22" stroke="#a9d3f2" stroke-width="2.6" stroke-linecap="round"/><circle cx="17" cy="15" r="2.6" fill="#0b4ea2"/></svg>
+      <div><b data-t="nav_title">Yield Gap Explorer</b><small data-t="nav_sub">NISR Big Data Hackathon 2026 · Track 1</small></div>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#trends" data-tab="trends"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg><span data-t="tab_trends">Yield trends</span></a>
+      <a href="#actions" data-tab="actions"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span data-t="tab_actions">What to do</span></a>
+      <a href="#drivers" data-tab="drivers"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-t="tab_drv">What drives yield</span></a>
+      <a href="#model" data-tab="model"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg><span data-t="tab_model">How reliable</span></a>
+      <a href="#about" data-tab="about"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span data-t="tab_about">About</span></a>
+    </nav>
+    <div class="grow"></div>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" id="lang-en" aria-pressed="true">English</button>
+      <button type="button" id="lang-rw" aria-pressed="false">Kinyarwanda</button>
+    </div>
+    <div class="src">Data: NISR Seasonal Agricultural Survey · satellite (Earth Engine) · MINAGRI PSTA 5</div>
+  </aside>
+  <div class="main">
+    <header class="bar">
+      <div class="wrap">
+        <div><h1 id="page-title">Rwanda Yield Gap Explorer</h1><p data-t="subtitle">Where fertilizer, improved seed and manure would raise harvests most</p></div>
+        <div class="filters">
+          <div class="field"><label for="f-crop" data-t="crop">Crop</label><select id="f-crop"></select></div>
+          <div class="field"><label for="f-season" data-t="season">Season</label><select id="f-season"></select></div>
+          <div class="field"><label for="f-district" data-t="district">District</label><select id="f-district"></select></div>
+          <div class="field" id="baseline-field"><label for="f-base" data-t="baseline">Baseline year</label><select id="f-base"></select></div>
+        </div>
+      </div>
+    </header>
+    <main class="wrap">
+      <section class="view" id="v-trends"></section>
+      <section class="view" id="v-actions" hidden></section>
+      <section class="view" id="v-drivers" hidden></section>
+      <section class="view" id="v-model" hidden></section>
+      <section class="view" id="v-about" hidden></section>
+    </main>
+    <footer class="wrap" id="foot"></footer>
+  </div>
+</div>
+<div id="tip" role="tooltip"></div>
+<noscript><p>This dashboard needs JavaScript.</p></noscript>
+<script src="districts.js" onerror="this.remove()"></script>
+<script src="data.js"></script>
+<script>
+"use strict";
+const D = window.DASH;
+
+/* ------------------------------------------------------------------ language */
+const TXT = {
+  en: {
+    title: "Rwanda Yield Gap Explorer",
+    subtitle: "Where fertilizer, improved seed and manure would raise harvests most",
+    crop: "Crop", season: "Season", district: "District", baseline: "Baseline year",
+    tab_trends: "Yield trends", tab_scen: "Yield gap & scenarios", tab_drv: "What drives yield", tab_model: "How reliable", tab_about: "About",
+    seasonA: "Season A (Sep–Feb)", seasonB: "Season B (Mar–Jun)",
+    kgha: "kg/ha", t: "t", national_avg: "Average of all districts", range: "Range across districts",
+    yield_trend: "Yield trend", from_to: "from {a} to {b}",
+    trend_sub: "NISR published district yields (Seasonal Agricultural Survey), kg/ha",
+    change_map: "Change since the baseline year", change_sub: "Yield change, {a} to latest survey year, by district. Click a district to select it.",
+    adoption: "Input use on this crop", adoption_sub: "Share of the crop's area, survey-weighted (NISR SAS microdata)",
+    fert: "Inorganic fertilizer", seed: "Improved seed", manure: "Manure / compost", lime: "Lime", antierosion: "Anti-erosion works",
+    k_base: "Baseline yield", k_latest: "Latest yield", k_change: "Change", k_rank: "Rank among districts",
+    of30: "of {n}", noData: "No published yield for this selection.",
+    method_break: "2017 uses an earlier survey method; read with care.",
+    lever: "Input", lv_fertilizer: "Fertilizer", lv_improved_seed: "Improved seed", lv_manure: "Manure", lv_lime: "Lime", lv_anti_erosion: "Anti-erosion", lv_package_fert_seed_manure: "Package (fertilizer + seed + manure)",
+    notScored: "Not scored for this crop: too few surveyed plots use it.",
+    k_extra: "Extra production possible", k_gain: "Yield gain", k_adopt: "Current adoption", k_top: "Biggest opportunity",
+    scen_lead: "If farmers who do not use {lever} on {crop} adopted it, {season} production would rise by about <b>{t} t</b> ({g}%).",
+    map_extra: "Extra production by district", map_extra_sub: "Tonnes per season if non-adopters adopt. Click a district to select it.",
+    rank: "Current vs attainable yield", rank_sub: "Top 15 districts by extra production. Grey = current yield, brown = gain.",
+    profile: "{d}: gain by input", profile_sub: "Expected yield gain on {crop}, {season}, if non-adopters adopt",
+    dose: "Fertilizer dose-response", dose_sub: "Expected yield gain on plots that use no inorganic fertilizer today, by dose (kg/ha)",
+    targets: "Top targets for this input", district_col: "District", area_col: "Crop area (ha)", cur_col: "Current yield", gain_col: "Gain", extra_col: "Extra (t)", adopt_col: "Adoption",
+    drv_lead: "What separates high-yield from low-yield plots of {crop}: share of the model's explanation (SHAP), crop identity excluded.",
+    drv_groups: "Driver groups", drv_groups_sub: "{crop} compared with all crops", drv_top: "Top factors for {crop}", drv_top_sub: "Share of explanation, coloured by group",
+    allcrops: "All crops", g_mgmt: "Inputs & practices", g_plot: "Plot & farmer", g_soil: "Soil & terrain", g_weather: "Season weather (satellite)",
+    drv_read: "The strongest factor farmers control for {crop} is <b>{f}</b> ({p}% of the explanation).",
+    val_lead: "The model is validated three ways and against a season-by-season test. Use it to compare inputs, not to replace survey yields.",
+    val_table: "Validation", v_test: "Test", v_mape: "District error, model", v_base: "District error, baseline", v_r2: "Ranks districts within crop (R²)",
+    v_random: "Unseen survey segments", v_district: "Unseen districts", v_temporal: "Unseen year (2025)",
+    v_corr: "How well unseen districts are ranked, by crop", v_corr_sub: "Correlation of observed and predicted district yields, districts held out of training",
+    wf: "Season-by-season test (walk-forward)", wf_sub: "District yield error when each season 2024A–2025B is predicted from earlier seasons only. Lower is better.",
+    wf_read: "A district's own past yield is the best guide to its next yield; the model adds the most when comparing inputs on similar plots.",
+    m_last_year: "District, same season last year", m_district_history: "District history", m_national_mean: "National crop average", m_ridge: "Ridge regression", m_random_forest: "Random forest", m_sk_gbm: "Gradient boosting (scikit-learn)", m_sk_gbm_district: "Gradient boosting + district", m_lightgbm: "LightGBM", m_lightgbm_district: "LightGBM + district", m_xgboost: "XGBoost", m_catboost: "CatBoost", m_ensemble: "Ensemble of tree models", m_hybrid: "History × model anomaly",
+    foot: "Data: NISR Seasonal Agricultural Survey 2017–2026 (published tables) and microdata 2022–2025; iSDAsoil, SRTM, MODIS, CHIRPS, ERA5-Land, Sentinel-1 via Google Earth Engine. Model: {engine}. Generated {date}. NISR Big Data Hackathon 2026, Track 1.",
+    schematic: "Schematic map: districts placed by their approximate position, not to scale.",
+    plots: "plots",
+    psta: "PSTA 5 target 2028/29", k_target: "PSTA 5 target (2028/29)", target_s: "{d} is at {p}% of the national target",
+    scen_target: "With this input the national yield would reach {a} of the {t} kg/ha PSTA 5 target ({p}%).",
+    priority: "Priority", status_col: "Flag", priority_tip: "Gain above the national average and adoption below it",
+    map_real: "District boundaries: {src}.",
+    tab_rec: "Recommendations",
+    inbrief: "In brief", since: "since", click_d: "Click a district to see its details. Darker blue = larger increase.",
+    t_s1: "{crop} yield in {d} ({season}) went from {b} kg/ha in {by} to {l} kg/ha in {ly}, {chg}. The national average changed by {nchg} over the same years.",
+    t_up: "up {p}%", t_down: "down {p}%",
+    t_s2: "{d} now ranks {rank} of {n} districts", t_s2t: " and is at {p}% of the PSTA 5 target ({t} kg/ha).",
+    t_s3: "Here {f}% of the crop's area gets inorganic fertilizer, {s}% improved seed and {m}% manure (Rwanda: {nf}%, {ns}% and {nm}%; {y} survey).",
+    t_map: "Since {a}, the biggest rises were in {up}; the biggest falls in {down}.",
+    t_chart: "{d} compared with the national average and the PSTA 5 target", k_target_pct: "Share of the PSTA 5 target",
+    tab_actions: "What to do", a_best: "Best input per district",
+    a_head: "{d} · {crop} · {season}: promote {lever}.", a_head_none: "{d} · {crop} · {season}: farm inputs add little here.",
+    a_nat: "Across Rwanda, {n} districts gain most from {mode}. If every district adopted its best input, {crop} production would rise by about {t} t per season. Start with {top}.",
+    a_lev: "If farmers in {d} who do not use {lever} started using it, {crop} yield would rise {g}% ({t} t per season). Nationally: +{ng}% ({nt} t). Largest gains: {top}.",
+    a_map_best_h: "Where to act: best input per district ({crop})", a_map_lev_h: "Where {lever} pays off most",
+    a_map_best: "Label = input to promote. Darker blue = more extra harvest (tonnes per season). Click a district.",
+    a_map_lev: "Extra harvest (tonnes per season) if farmers who do not use it start. Click a district.",
+    a_bars: "{d}: {crop} yield today and with each input", a_bars_sub: "kg/ha if farmers who do not use the input start using it",
+    today: "Today", a_top: "Top 10 districts by extra harvest", a_top_best: "Using each district's best input",
+    k_extra_d: "Extra harvest in {d}", k_pkg: "Yield with fertilizer + seed + manure", k_rwanda: "Extra harvest, all districts", of_target: "of target",
+    a_note: "Estimates from NISR survey data ({y}): similar fields with and without each input are compared; they are not field-trial results. Districts with at least 20 surveyed fields of the crop.",
+    d_s: "For {crop}, what farmers do (inputs and practices) explains {mg}% of the difference between high- and low-yield fields; season weather {w}%, plot and farmer {p}%, soil and terrain {s}%. The biggest factor farmers can change is {f}.",
+    d_note: "Shares come from the yield model (SHAP values). Weather and soil are district averages from satellite data.",
+    d_chart: "What makes {crop} yields high or low: top 10 factors",
+    m_s: "In districts it has never seen, the model estimates district yields within {e}% on average; a simple national average misses by {b}%. It ranks districts best for {best} and least well for {worst}.",
+    m_s2: "For a new season, a district's own past yield is still the best guide ({wf}% error, against {wm}% for the best model). Use this tool to compare inputs, not to replace the survey.",
+    m_chart: "Error when each season is predicted from earlier seasons", m_chart_sub: "District yield error, 2024A–2025B. Lower is better.",
+    m_leg_base: "Simple rules (past yields, averages)", m_leg_ml: "Machine-learning models",
+    m_table_note: "District error = average % difference between estimated and surveyed district yields.", nav_title: "Yield Gap Explorer", nav_sub: "NISR Big Data Hackathon 2026 · Track 1",
+    rec_lead: "Recommended action per district for {crop}, {season}: the input that would add the most production where it is not yet used.",
+    rec_map: "Priority action by district", rec_map_sub: "Colour = priority (extra tonnes from the best input). Label = recommended input. Click a district.",
+    high: "High priority", medium: "Medium priority", low: "Low priority", none: "Small gains",
+    k_high: "High-priority districts", k_mode: "Most recommended input", k_sum: "Extra production if each district adopts its top input", k_below: "Districts below the PSTA 5 target",
+    rec_card: "Recommendation for {d}", rec_all: "All districts: recommended action", act_col: "Recommended action", prio_col: "Priority",
+    top10: "Top 10 actions nationally, {season}", top10_sub: "Best single input for every district and crop, ranked by extra tonnes",
+    prov: "By province", prov_sub: "{crop}: extra production from each district's top input", prov_col: "Province", districts_col: "Districts", main_act: "Most common action",
+    pkg_line: "Combined package (fertilizer + seed + manure): +{gain}% → {att} kg/ha{target}.", tgt_part: ", {p}% of the PSTA 5 target",
+    r_fertilizer: "Expand inorganic fertilizer on {crop}. It is used on {adopt}% of the crop area; if the other farmers used it at the typical dose, yield would rise about {gain}% ({t} t per season).",
+    r_improved_seed: "Scale up improved seed for {crop}. It is used on {adopt}% of the area; wider use would add about {gain}% ({t} t per season).",
+    r_manure: "Promote manure and compost on {crop}. Used on {adopt}% of the area today; wider use would add about {gain}% ({t} t per season).",
+    r_lime: "Apply lime on {crop} fields (acidic soils). Used on {adopt}% of the area; wider use would add about {gain}% ({t} t per season).",
+    r_anti_erosion: "Extend anti-erosion works on {crop} fields. They cover {adopt}% of the area; extending them would add about {gain}% ({t} t per season).",
+    r_none: "Gains from the inputs in the survey are small here (under 1%). Focus on other constraints (plot size, planting time, weather risk) and keep current practices.",
+    then: "Next best", map_metric_change: "Yield change since {a}", map_metric_extra: "Extra production (t)",
+    lv_short_fertilizer: "Fertilizer", lv_short_improved_seed: "Seed", lv_short_manure: "Manure", lv_short_lime: "Lime", lv_short_anti_erosion: "Erosion"
+  },
+  rw: {
+    title: "Isesengura ry'icyuho cy'umusaruro mu Rwanda",
+    subtitle: "Aho ifumbire, imbuto z'indobanure n'ifumbire y'imborera byazamura umusaruro kurusha ahandi",
+    crop: "Igihingwa", season: "Igihembwe", district: "Akarere", baseline: "Umwaka fatizo",
+    tab_trends: "Uko umusaruro uhagaze", tab_scen: "Icyuho n'ingamba", tab_drv: "Ibigena umusaruro", tab_model: "Kwizerwa", tab_about: "Ibyerekeye",
+    seasonA: "Igihembwe A (Nzeri–Gashyantare)", seasonB: "Igihembwe B (Werurwe–Kamena)",
+    kgha: "kg/ha", t: "t", national_avg: "Impuzandengo y'uturere twose", range: "Itandukaniro hagati y'uturere",
+    yield_trend: "Uko umusaruro wagiye uhinduka", from_to: "kuva {a} kugeza {b}",
+    trend_sub: "Umusaruro w'uturere watangajwe na NISR (Ubushakashatsi ku buhinzi bw'ibihembwe), kg/ha",
+    change_map: "Impinduka kuva mu mwaka fatizo", change_sub: "Impinduka y'umusaruro kuva {a} kugeza ku mwaka uheruka, ku karere. Kanda ku karere kugira ngo ugahitemo.",
+    adoption: "Ikoreshwa ry'inyongeramusaruro kuri iki gihingwa", adoption_sub: "Igice cy'ubuso bw'igihingwa (imibare y'ibanze ya NISR SAS)",
+    fert: "Ifumbire mvaruganda", seed: "Imbuto z'indobanure", manure: "Ifumbire y'imborera", lime: "Ishwagara", antierosion: "Kurwanya isuri",
+    k_base: "Umusaruro fatizo", k_latest: "Umusaruro uheruka", k_change: "Impinduka", k_rank: "Umwanya mu turere",
+    of30: "kuri {n}", noData: "Nta musaruro watangajwe kuri aya mahitamo.",
+    method_break: "Mu 2017 hakoreshejwe uburyo bwa kera bw'ubushakashatsi; bisome witonze.",
+    lever: "Inyongeramusaruro", lv_fertilizer: "Ifumbire mvaruganda", lv_improved_seed: "Imbuto z'indobanure", lv_manure: "Ifumbire y'imborera", lv_lime: "Ishwagara", lv_anti_erosion: "Kurwanya isuri", lv_package_fert_seed_manure: "Byose hamwe (ifumbire + imbuto + imborera)",
+    notScored: "Ntibyabazwe kuri iki gihingwa: imirima ibikoresha ni mike cyane.",
+    k_extra: "Umusaruro w'inyongera ushoboka", k_gain: "Inyongera ku musaruro", k_adopt: "Ababikoresha ubu", k_top: "Amahirwe manini kurusha",
+    scen_lead: "Abahinzi ba {crop} batarakoresha {lever} babikoresheje, umusaruro w'{season} wazamukaho nka <b>{t} t</b> ({g}%).",
+    map_extra: "Umusaruro w'inyongera ku karere", map_extra_sub: "Toni ku gihembwe abatarabikoresha nibabikoresha. Kanda ku karere kugira ngo ugahitemo.",
+    rank: "Umusaruro w'ubu n'ushoboka", rank_sub: "Uturere 15 dufite umusaruro w'inyongera munini. Ikijuju = ubu, ikigina = inyongera.",
+    profile: "{d}: inyongera kuri buri nyongeramusaruro", profile_sub: "Inyongera itegerejwe kuri {crop}, {season}",
+    dose: "Ingano y'ifumbire n'umusaruro", dose_sub: "Inyongera itegerejwe ku mirima itarakoresha ifumbire mvaruganda, bitewe n'ingano (kg/ha)",
+    targets: "Aho byakorwa mbere", district_col: "Akarere", area_col: "Ubuso (ha)", cur_col: "Umusaruro w'ubu", gain_col: "Inyongera", extra_col: "Inyongera (t)", adopt_col: "Ababikoresha",
+    drv_lead: "Igitandukanya imirima y'umusaruro mwinshi n'iy'umusaruro muke ya {crop}: uruhare rwa buri kintu (SHAP).",
+    drv_groups: "Amatsinda y'ibigena umusaruro", drv_groups_sub: "{crop} ugereranyije n'ibihingwa byose", drv_top: "Ibintu by'ingenzi kuri {crop}", drv_top_sub: "Uruhare, amabara yerekana itsinda",
+    allcrops: "Ibihingwa byose", g_mgmt: "Inyongeramusaruro n'imihingire", g_plot: "Umurima n'umuhinzi", g_soil: "Ubutaka n'imiterere yabwo", g_weather: "Ikirere cy'igihembwe (icyogajuru)",
+    drv_read: "Ikintu cy'ingenzi umuhinzi ashobora guhindura kuri {crop} ni <b>{f}</b> ({p}%).",
+    val_lead: "Icyitegererezo cyagenzuwe mu buryo butatu no ku gihembwe ku kindi. Gikoreshwe mu kugereranya inyongeramusaruro, aho gusimbura ubushakashatsi.",
+    val_table: "Igenzura", v_test: "Igerageza", v_mape: "Ikosa ku karere, icyitegererezo", v_base: "Ikosa ku karere, fatizo", v_r2: "Gutondeka uturere (R²)",
+    v_random: "Ibice by'ubushakashatsi bitabonetse", v_district: "Uturere tutabonetse", v_temporal: "Umwaka utabonetse (2025)",
+    v_corr: "Uko uturere tutabonetse dutondekwa, ku gihingwa", v_corr_sub: "Isano hagati y'umusaruro wabonetse n'uwahanuwe",
+    wf: "Igerageza ku gihembwe ku kindi", wf_sub: "Ikosa ku musaruro w'akarere iyo buri gihembwe 2024A–2025B gihanurwa hifashishijwe ibihembwe byabanje gusa.",
+    wf_read: "Umusaruro w'akarere wabanje ni wo uyobora neza kurusha; icyitegererezo gifasha cyane mu kugereranya inyongeramusaruro.",
+    m_last_year: "Akarere, igihembwe nk'iki umwaka ushize", m_district_history: "Amateka y'akarere", m_national_mean: "Impuzandengo y'igihugu", m_ridge: "Ridge", m_random_forest: "Random forest", m_sk_gbm: "Gradient boosting", m_sk_gbm_district: "Gradient boosting + akarere", m_lightgbm: "LightGBM", m_lightgbm_district: "LightGBM + akarere", m_xgboost: "XGBoost", m_catboost: "CatBoost", m_ensemble: "Ibyitegererezo byose hamwe", m_hybrid: "Amateka × icyitegererezo",
+    foot: "Amakuru: NISR, Ubushakashatsi ku buhinzi bw'ibihembwe 2017–2026 n'imibare y'ibanze 2022–2025; iSDAsoil, SRTM, MODIS, CHIRPS, ERA5-Land, Sentinel-1. Icyitegererezo: {engine}. Byakozwe {date}. NISR Big Data Hackathon 2026.",
+    schematic: "Ikarita y'incamake: uturere dushyizwe hafi y'aho turi, ntabwo ari ku gipimo.",
+    plots: "imirima",
+    psta: "Intego ya PSTA 5 (2028/29)", k_target: "Intego ya PSTA 5 (2028/29)", target_s: "{d} igeze kuri {p}% by'intego y'igihugu",
+    scen_target: "Hamwe n'iyi nyongeramusaruro, umusaruro w'igihugu wagera kuri {a} kuri {t} kg/ha by'intego ya PSTA 5 ({p}%).",
+    priority: "Iby'ibanze", status_col: "Ikimenyetso", priority_tip: "Inyongera iri hejuru y'impuzandengo y'igihugu, abayikoresha bari munsi yayo",
+    map_real: "Imbibi z'uturere: {src}.",
+    tab_rec: "Ibyifuzo",
+    inbrief: "Muri make", since: "kuva", click_d: "Kanda ku karere ubone ibisobanuro. Ubururu bwijimye = kwiyongera kunini.",
+    t_s1: "Umusaruro wa {crop} muri {d} ({season}) wavuye kuri {b} kg/ha mu {by} ugera kuri {l} kg/ha mu {ly}, {chg}. Impuzandengo y'igihugu yahindutseho {nchg} muri iyo myaka.",
+    t_up: "wiyongereyeho {p}%", t_down: "wagabanutseho {p}%",
+    t_s2: "{d} ubu iri ku mwanya wa {rank} mu turere {n}", t_s2t: ", igeze kuri {p}% by'intego ya PSTA 5 ({t} kg/ha).",
+    t_s3: "Hano ifumbire mvaruganda ikoreshwa kuri {f}% by'ubuso bw'iki gihingwa, imbuto z'indobanure kuri {s}%, ifumbire y'imborera kuri {m}% (mu Rwanda: {nf}%, {ns}% na {nm}%; ubushakashatsi bwa {y}).",
+    t_map: "Kuva {a}, umusaruro wiyongereye cyane muri {up}; wagabanutse cyane muri {down}.",
+    t_chart: "{d} ugereranyije n'impuzandengo y'igihugu n'intego ya PSTA 5", k_target_pct: "Aho igeze ku ntego ya PSTA 5",
+    tab_actions: "Icyo gukora", a_best: "Inyongeramusaruro nziza kuri buri karere",
+    a_head: "{d} · {crop} · {season}: gushyira imbere {lever}.", a_head_none: "{d} · {crop} · {season}: inyongeramusaruro zongera bike hano.",
+    a_nat: "Mu Rwanda hose, uturere {n} twunguka cyane kuri {mode}. Buri karere gakoresheje inyongeramusaruro yako nziza, umusaruro wa {crop} wiyongeraho nka {t} t ku gihembwe. Hatangirwe na {top}.",
+    a_lev: "Abahinzi bo muri {d} batarakoresha {lever} batangiye kuyikoresha, umusaruro wa {crop} wiyongeraho {g}% ({t} t ku gihembwe). Mu gihugu: +{ng}% ({nt} t). Aho byunguka cyane: {top}.",
+    a_map_best_h: "Aho gukorera: inyongeramusaruro nziza kuri buri karere ({crop})", a_map_lev_h: "Aho {lever} yunguka cyane",
+    a_map_best: "Ijambo = inyongeramusaruro yo gushyira imbere. Ubururu bwijimye = umusaruro w'inyongera mwinshi. Kanda ku karere.",
+    a_map_lev: "Umusaruro w'inyongera (toni ku gihembwe) abatarayikoresha nibatangira. Kanda ku karere.",
+    a_bars: "{d}: umusaruro wa {crop} ubu n'iyo hakoreshejwe buri nyongeramusaruro", a_bars_sub: "kg/ha abatarayikoresha nibatangira kuyikoresha",
+    today: "Ubu", a_top: "Uturere 10 dufite umusaruro w'inyongera mwinshi", a_top_best: "Hakoreshejwe inyongeramusaruro nziza ya buri karere",
+    k_extra_d: "Inyongera muri {d}", k_pkg: "Umusaruro hamwe n'ifumbire + imbuto + imborera", k_rwanda: "Inyongera mu turere twose", of_target: "by'intego",
+    a_note: "Ibigereranyo bivuye mu bushakashatsi bwa NISR ({y}): hagereranywa imirima isa ikoresha n'idakoresha buri nyongeramusaruro; si ibisubizo by'igerageza mu mirima.",
+    d_s: "Kuri {crop}, ibyo umuhinzi akora (inyongeramusaruro n'imihingire) bisobanura {mg}% by'itandukaniro hagati y'imirima yera cyane n'iyera bike; ikirere {w}%, umurima n'umuhinzi {p}%, ubutaka {s}%. Ikintu cy'ingenzi umuhinzi ashobora guhindura ni {f}.",
+    d_note: "Ibi bivuye mu cyitegererezo (SHAP). Ikirere n'ubutaka ni impuzandengo z'akarere zivuye ku cyogajuru.",
+    d_chart: "Ibituma umusaruro wa {crop} uba mwinshi cyangwa muke: ibintu 10 by'ingenzi",
+    m_s: "Mu turere kitigeze kibona, icyitegererezo kigereranya umusaruro w'akarere hamwe n'ikosa rya {e}% ugereranyije; impuzandengo isanzwe yibeshyaho {b}%. Gitondeka neza uturere kuri {best}, nabi kuri {worst}.",
+    m_s2: "Ku gihembwe gishya, umusaruro w'akarere wabanje ni wo uyobora neza ({wf}% by'ikosa, ugereranyije na {wm}% ku cyitegererezo cyiza). Iki gikoresho gikoreshwe mu kugereranya inyongeramusaruro, si mu gusimbura ubushakashatsi.",
+    m_chart: "Ikosa iyo buri gihembwe gihanuwe hifashishijwe ibyabanje", m_chart_sub: "Ikosa ku musaruro w'akarere, 2024A–2025B. Bike ni byiza.",
+    m_leg_base: "Amategeko yoroshye (umusaruro wabanje, impuzandengo)", m_leg_ml: "Ibyitegererezo by'ubwenge bw'ubukorano",
+    m_table_note: "Ikosa ry'akarere = itandukaniro riri hagati y'umusaruro wagereranyijwe n'uwabonetse mu bushakashatsi.", nav_title: "Icyuho cy'umusaruro", nav_sub: "NISR Big Data Hackathon 2026 · Track 1",
+    rec_lead: "Igikorwa gisabwa kuri buri karere kuri {crop}, {season}: inyongeramusaruro yatanga umusaruro w'inyongera mwinshi aho itarakoreshwa.",
+    rec_map: "Igikorwa cy'ibanze ku karere", rec_map_sub: "Ibara = urwego rw'ibanze (toni z'inyongera). Ijambo = inyongeramusaruro isabwa. Kanda ku karere.",
+    high: "Iby'ibanze cyane", medium: "Iby'ibanze hagati", low: "Iby'ibanze bike", none: "Inyongera nto",
+    k_high: "Uturere tw'ibanze cyane", k_mode: "Inyongeramusaruro isabwa kenshi", k_sum: "Umusaruro w'inyongera buri karere gakoresheje inyongeramusaruro yako ya mbere", k_below: "Uturere turi munsi y'intego ya PSTA 5",
+    rec_card: "Icyifuzo kuri {d}", rec_all: "Uturere twose: igikorwa gisabwa", act_col: "Igikorwa gisabwa", prio_col: "Urwego",
+    top10: "Ibikorwa 10 by'ingenzi mu gihugu, {season}", top10_sub: "Inyongeramusaruro nziza kuri buri karere n'igihingwa, hakurikijwe toni z'inyongera",
+    prov: "Ku ntara", prov_sub: "{crop}: umusaruro w'inyongera", prov_col: "Intara", districts_col: "Uturere", main_act: "Igikorwa gikunze gusabwa",
+    pkg_line: "Byose hamwe (ifumbire + imbuto + imborera): +{gain}% → {att} kg/ha{target}.", tgt_part: ", {p}% by'intego ya PSTA 5",
+    r_fertilizer: "Kongera ikoreshwa ry'ifumbire mvaruganda kuri {crop}. Ikoreshwa kuri {adopt}% by'ubuso; abatarayikoresha bayikoresheje, umusaruro wazamukaho {gain}% ({t} t ku gihembwe).",
+    r_improved_seed: "Kongera ikoreshwa ry'imbuto z'indobanure kuri {crop}. Zikoreshwa kuri {adopt}% by'ubuso; umusaruro wazamukaho {gain}% ({t} t ku gihembwe).",
+    r_manure: "Gushishikariza ikoreshwa ry'ifumbire y'imborera kuri {crop}. Ikoreshwa kuri {adopt}% by'ubuso; umusaruro wazamukaho {gain}% ({t} t ku gihembwe).",
+    r_lime: "Gukoresha ishwagara mu mirima ya {crop} (ubutaka busharira). Ikoreshwa kuri {adopt}% by'ubuso; umusaruro wazamukaho {gain}% ({t} t ku gihembwe).",
+    r_anti_erosion: "Kwagura ibikorwa byo kurwanya isuri mu mirima ya {crop}. Bikorwa kuri {adopt}% by'ubuso; umusaruro wazamukaho {gain}% ({t} t ku gihembwe).",
+    r_none: "Inyongera ziva ku nyongeramusaruro ni nto hano (munsi ya 1%). Hibandwe ku zindi mbogamizi (ingano y'umurima, igihe cyo gutera, ikirere) kandi hakomezwe imihingire isanzwe.",
+    then: "Igikurikiraho", map_metric_change: "Impinduka kuva {a}", map_metric_extra: "Umusaruro w'inyongera (t)",
+    lv_short_fertilizer: "Ifumbire", lv_short_improved_seed: "Imbuto", lv_short_manure: "Imborera", lv_short_lime: "Ishwagara", lv_short_anti_erosion: "Isuri"
+  }
+};
+/* PSTA 5 (2024/25-2028/29) national yield targets for 2028/29, kg/ha (MINAGRI, PSTA 5 abridged version). Beans target applies to bush and climbing beans. */
+const TARGETS = { "Maize": 2740, "Irish potato": 14700, "Bush bean": 1100, "Climbing bean": 1100, "Soybean": 1200, "Cassava": 17900, "Wheat": 1350 };
+const CROP_RW = { "Maize": "Ibigori", "Bush bean": "Ibishyimbo bigufi", "Climbing bean": "Ibishyimbo by'imishingiriro", "Irish potato": "Ibirayi", "Sweet potato": "Ibijumba", "Cassava": "Imyumbati", "Sorghum": "Amasaka", "Soybean": "Soya", "Wheat": "Ingano" };
+const FEAT = {
+  inorganic_kg_ha: ["Fertilizer dose (kg/ha)", "Ingano y'ifumbire mvaruganda"], inorganic_fert: ["Uses fertilizer", "Akoresha ifumbire mvaruganda"],
+  improved_seed: ["Improved seed", "Imbuto z'indobanure"], organic_fert: ["Manure / compost", "Ifumbire y'imborera"], lime: ["Lime", "Ishwagara"],
+  micronutrient: ["Micronutrients", "Intungamubiri nto"], pesticide: ["Pesticide use", "Imiti yica udukoko"], erosion_degree: ["Erosion on the plot", "Isuri mu murima"],
+  anti_erosion: ["Anti-erosion works", "Kurwanya isuri"], consolidated_site: ["Land-use consolidation", "Guhuza ubutaka"], mechanized: ["Mechanization", "Imashini"], irrigated: ["Irrigation", "Kuhira"],
+  log_plot_area: ["Plot size", "Ingano y'umurima"], crop_share: ["Crop share of the plot", "Igice cy'umurima gihinzeho"], farmer_age: ["Farmer age", "Imyaka y'umuhinzi"], farmer_sex: ["Farmer sex", "Igitsina cy'umuhinzi"], stratum: ["Land type (survey stratum)", "Ubwoko bw'ubutaka"],
+  soil_ph: ["Soil pH", "pH y'ubutaka"], soil_org_carbon_gkg: ["Soil organic carbon", "Karubone y'ubutaka"], soil_nitrogen_gkg: ["Soil nitrogen", "Azote y'ubutaka"], elevation_m: ["Elevation", "Ubutumburuke"], slope_deg: ["Slope", "Ubuhaname"], share_slope_gt16deg: ["Share of steep cropland", "Ubutaka buhanamye cyane"], cropland_ha: ["District cropland area", "Ubuso buhingwa bw'akarere"],
+  ndvi_max: ["Peak crop greenness (NDVI)", "Icyatsi cy'ibihingwa (NDVI)"], ndvi_anom_mean: ["Greenness vs normal", "Icyatsi ugereranyije n'ibisanzwe"], ndvi_anom_min: ["Lowest greenness vs normal", "Icyatsi gito kurusha"], evi_anom_mean: ["EVI vs normal", "EVI ugereranyije n'ibisanzwe"],
+  rain_anom_sum: ["Season rainfall vs normal", "Imvura ugereranyije n'ibisanzwe"], rain_anom_min: ["Driest spell vs normal", "Igihe cy'izuba ryinshi"], rain_total_mm: ["Season rainfall total", "Imvura yose y'igihembwe"], rain_anom_early: ["Early-season rain vs normal", "Imvura y'intangiriro"], rain_anom_late: ["Late-season rain vs normal", "Imvura y'impera"],
+  ndvi_anom_early: ["Early greenness vs normal", "Icyatsi cy'intangiriro"], ndvi_anom_late: ["Late greenness vs normal", "Icyatsi cy'impera"], lst_anom_mean: ["Land temperature vs normal", "Ubushyuhe bw'ubutaka"], lst_anom_max: ["Hottest spell vs normal", "Ubushyuhe bwinshi"],
+  sm_anom_mean: ["Soil moisture vs normal", "Ubuhehere bw'ubutaka"], t2m_anom_mean: ["Air temperature vs normal", "Ubushyuhe bw'umwuka"], s1_vh_anom_mean: ["Radar crop signal vs normal", "Ikimenyetso cya radar"]
+};
+const GROUP_KEY = { "Management (inputs & practices)": "g_mgmt", "Plot & farmer": "g_plot", "Soil & terrain": "g_soil", "Season weather (satellite)": "g_weather" };
+const GROUP_COL = { g_mgmt: "#1f5fae", g_plot: "#a9c4e2", g_soil: "#0a2f6b", g_weather: "#5aa3e0" };
+const LEVERS = ["fertilizer", "improved_seed", "manure", "lime", "anti_erosion", "package_fert_seed_manure"];
+
+/* District tiles: column, row on a schematic grid that follows Rwanda's geography (north up). */
+const TILES = {
+  Rubavu: [0, 0], Nyabihu: [1, 0], Musanze: [2, 0], Burera: [3, 0], Gicumbi: [4, 0], Nyagatare: [5, 0],
+  Rutsiro: [0, 1], Ngororero: [1, 1], Gakenke: [2, 1], Rulindo: [3, 1], Gasabo: [4, 1], Gatsibo: [5, 1],
+  Karongi: [0, 2], Muhanga: [1, 2], Kamonyi: [2, 2], Nyarugenge: [3, 2], Kicukiro: [4, 2], Rwamagana: [5, 2], Kayonza: [6, 2],
+  Nyamasheke: [0, 3], Ruhango: [1, 3], Nyanza: [2, 3], Bugesera: [3, 3], Ngoma: [5, 3], Kirehe: [6, 3],
+  Rusizi: [0, 4], Nyamagabe: [1, 4], Huye: [2, 4], Gisagara: [3, 4],
+  Nyaruguru: [1.5, 5]
+};
+
+let LANG = "en";
+try { LANG = localStorage.getItem("yg-lang") || "en"; } catch (e) { /* storage unavailable */ }
+const S = { crop: "Maize", season: "A", district: "Nyagatare", base: 2018, lever: "best", tab: "trends" };
+
+const tr = (k, vars) => { let s = (TXT[LANG][k] ?? TXT.en[k] ?? k); for (const [a, b] of Object.entries(vars || {})) s = s.replaceAll("{" + a + "}", b); return s; };
+const cropName = c => LANG === "rw" ? (CROP_RW[c] || c) : c;
+const featName = f => (FEAT[f] ? FEAT[f][LANG === "rw" ? 1 : 0] : f);
+const seasonName = s => tr(s === "A" ? "seasonA" : "seasonB");
+const nf = (v, d = 0) => v == null || !isFinite(v) ? "–" : Number(v).toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+const pct = (v, d = 0) => v == null || !isFinite(v) ? "–" : nf(v, d) + "%";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const tbl = t => t ? t.rows.map(r => Object.fromEntries(t.cols.map((c, i) => [c, r[i]]))) : [];
+
+const TREND = tbl(D.trend), ADOPT = tbl(D.adoption), SCEN = tbl(D.scenario), SNAT = tbl(D.scenario_nat), DOSE = tbl(D.dose);
+const DRV = tbl(D.drivers), DRVC = tbl(D.drivers_crop), VAL = tbl(D.validation), WF = tbl(D.walk_forward);
+const CROPS = ["Maize", "Bush bean", "Climbing bean", "Irish potato", "Sweet potato", "Cassava", "Sorghum", "Soybean", "Wheat"].filter(c => TREND.some(r => r.crop === c) || SCEN.some(r => r.crop === c));
+const DISTRICTS = Object.keys(D.provinces).sort();
+const YEARS = [...new Set(TREND.map(r => r.year))].sort((a, b) => a - b);
+
+/* ------------------------------------------------------------------ tooltip */
+const tip = document.getElementById("tip");
+function showTip(e, html) { tip.innerHTML = html; tip.style.opacity = 1; moveTip(e); }
+function moveTip(e) { const x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8), y = Math.min(e.clientY + 14, innerHeight - tip.offsetHeight - 8); tip.style.left = x + "px"; tip.style.top = y + "px"; }
+function hideTip() { tip.style.opacity = 0; }
+function bindTips(root) {
+  root.querySelectorAll("[data-tip]").forEach(el => {
+    el.addEventListener("mouseenter", e => showTip(e, el.dataset.tip));
+    el.addEventListener("mousemove", moveTip);
+    el.addEventListener("mouseleave", hideTip);
+  });
+}
+
+/* ------------------------------------------------------------------ chart helpers (SVG, no libraries) */
+function niceTicks(lo, hi, n = 4) {
+  if (!isFinite(lo) || !isFinite(hi) || lo === hi) { hi = lo + 1; }
+  const span = hi - lo, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => span / s <= n + .5);
+  const out = []; for (let v = Math.floor(lo / step) * step; v < hi + step - 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+/* series: [{name, color, width, pts:[{x,y,tip}], dash, label}] ; band: [{x, lo, hi}] */
+function lineChart({ series, band, xs, yFmt = v => nf(v), height = 300, yZero = true, endLabels = true, width = 620, numericX = false, xTicks, refs = [] }) {
+  const W = width, H = height, L = 52, R = endLabels ? 140 : 16, T = 14, B = 30;
+  const all = series.flatMap(s => s.pts.map(p => p.y)).concat(band ? band.flatMap(b => [b.lo, b.hi]) : []).concat(refs.map(r => r.y)).filter(v => v != null);
+  if (!all.length) return `<p class="empty">${tr("noData")}</p>`;
+  let lo = yZero ? 0 : Math.min(...all), hi = Math.max(...all);
+  const ticks = niceTicks(lo, hi); lo = Math.min(lo, ticks[0]); hi = Math.max(hi, ticks.at(-1));
+  const x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const X = x => L + (numericX ? (x - x0) / (x1 - x0 || 1) : (xs.length === 1 ? 0.5 : xs.indexOf(x) / (xs.length - 1))) * (W - L - R), Y = y => T + (1 - (y - lo) / (hi - lo)) * (H - T - B);
+  let g = "";
+  ticks.forEach(t => { g += `<line x1="${L}" x2="${W - R}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--line)"/><text x="${L - 8}" y="${Y(t) + 4}" text-anchor="end">${yFmt(t)}</text>`; });
+  const every = xs.length > 8 ? 2 : 1;
+  (xTicks || xs).forEach((x, i) => { if (xTicks || i % every === 0 || i === xs.length - 1) g += `<text x="${X(x)}" y="${H - 8}" text-anchor="middle">${x}</text>`; });
+  if (band && band.length) {
+    const top = band.map(b => `${X(b.x)},${Y(b.hi)}`).join(" "), bot = band.slice().reverse().map(b => `${X(b.x)},${Y(b.lo)}`).join(" ");
+    g += `<polygon points="${top} ${bot}" fill="var(--grey)" fill-opacity=".18"/>`;
+  }
+  const ends = [];
+  refs.forEach(r => { g += `<line x1="${L}" x2="${W - R}" y1="${Y(r.y)}" y2="${Y(r.y)}" stroke="var(--soil)" stroke-width="1.5" stroke-dasharray="6 4" data-tip="${esc(r.tip || r.label)}"/>`; ends.push({ y: Y(r.y), x: W - R, text: r.label, color: "var(--soil)", strong: false, ref: true }); });
+  series.forEach(s => {
+    const pts = s.pts.filter(p => p.y != null);
+    if (!pts.length) return;
+    g += `<polyline points="${pts.map(p => `${X(p.x)},${Y(p.y)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="${s.width || 2}" ${s.dash ? 'stroke-dasharray="5 4"' : ""} stroke-linejoin="round"/>`;
+    pts.forEach(p => { g += `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="${s.width > 2 ? 4 : 3}" fill="${p.hollow ? "var(--panel)" : s.color}" stroke="${s.color}" stroke-width="1.5" data-tip="${esc(p.tip || "")}"/>`; });
+    const last = pts.at(-1); if (endLabels && s.label) ends.push({ y: Y(last.y), x: X(last.x), text: s.label, color: s.color, strong: s.width > 2 });
+  });
+  ends.sort((a, b) => a.y - b.y); for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 16) ends[i].y = ends[i - 1].y + 16;
+  ends.forEach(e => { g += `<text x="${e.x + 10}" y="${e.y + 4}" class="${e.strong ? "hl" : ""}" style="fill:${e.ref ? "var(--soil)" : e.strong ? "var(--ink)" : "var(--muted)"}">${esc(e.text)}</text>`; });
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" style="max-width:${W * 1.15}px" role="img">${g}</svg></div>`;
+}
+/* horizontal bars; items [{label, v, v2 (stacked gain), color, color2, tip, val, strong}] */
+function barChart(items, { fmt = v => nf(v), labelW = 170, rowH = 28, maxV, width = 620, R = 110 } = {}) {
+  if (!items.length) return `<p class="empty">${tr("noData")}</p>`;
+  const W = width, H = items.length * rowH + 6;
+  const mx = maxV || Math.max(...items.map(i => (i.v || 0) + (i.v2 || 0)), 1e-9);
+  const Wd = v => Math.max(0, v) / mx * (W - labelW - R);
+  let g = "";
+  items.forEach((it, i) => {
+    const y = i * rowH + 3, w1 = Wd(it.v || 0), w2 = Wd(it.v2 || 0);
+    g += `<g data-tip="${esc(it.tip || "")}"><text x="${labelW - 10}" y="${y + rowH / 2 + 2}" text-anchor="end" class="lbl ${it.strong ? "hl" : ""}">${esc(it.label)}</text>`;
+    g += `<rect x="${labelW}" y="${y + 4}" width="${w1}" height="${rowH - 10}" rx="3" fill="${it.color || "var(--grey)"}"/>`;
+    if (it.v2) g += `<rect x="${labelW + w1}" y="${y + 4}" width="${w2}" height="${rowH - 10}" rx="3" fill="${it.color2 || "var(--soil)"}"/>`;
+    g += `<text x="${labelW + w1 + w2 + 8}" y="${y + rowH / 2 + 2}" class="val">${esc(it.val ?? fmt(it.v))}</text></g>`;
+  });
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" style="max-width:${W * 1.15}px" role="img">${g}</svg></div>`;
+}
+/* tile map; values {district: number}; color(v) -> [fill, opacity] */
+/* ------------------------------------------------------------------ data access */
+const trendRows = (crop, season) => TREND.filter(r => r.crop === crop && r.season === season);
+function seriesFor(crop, season, district) {
+  return trendRows(crop, season).filter(r => r.district === district).sort((a, b) => a.year - b.year);
+}
+function natSeries(crop, season) {
+  const by = {}; trendRows(crop, season).forEach(r => { (by[r.year] = by[r.year] || []).push(r.yield_kg_ha); });
+  return Object.entries(by).map(([y, v]) => ({ year: +y, mean: v.reduce((a, b) => a + b, 0) / v.length, lo: Math.min(...v), hi: Math.max(...v), n: v.length })).sort((a, b) => a.year - b.year);
+}
+const baseVal = (rows, base) => { const r = rows.find(r => r.year >= base); return r || null; };
+const scenRows = () => SCEN.filter(r => r.crop === S.crop && r.season === S.season && r.scenario === S.lever);
+const leverAvailable = (lever, crop) => SNAT.some(r => r.crop === crop && r.scenario === lever);
+
+
+/* ------------------------------------------------------------------ blue scales + district map */
+const BLUE0 = [234, 243, 252], BLUE1 = [10, 61, 143];
+function ramp(t) { t = Math.max(0, Math.min(1, t)); const c = BLUE0.map((a, i) => Math.round(a + (BLUE1[i] - a) * t)); return `rgb(${c.join(",")})`; }
+const darkFill = col => { const m = col.match(/\d+/g); if (!m) return false; const [r, g, b] = m.map(Number); return (0.299 * r + 0.587 * g + 0.114 * b) < 140; };
+const TIER_COL = { high: "rgb(10,61,143)", medium: "rgb(74,144,217)", low: "rgb(207,228,247)", none: "rgb(238,243,248)" };
+const NODATA = "rgb(238,243,248)";
+
+/* values: {district: v}; color(v) -> css rgb; sub(d, v) -> short second label; tipFor(d, v) -> html */
+function districtMap(values, { color, sub, tipFor }) {
+  if (window.DIST_GEO && window.DIST_GEO.districts) return geoMap(values, { color, sub, tipFor });
+  const cw = 96, ch = 58, gap = 5, W = 7 * (cw + gap), H = 6 * (ch + gap);
+  let g = "";
+  for (const [d, [c, r]] of Object.entries(TILES)) {
+    const v = values[d], x = c * (cw + gap), y = r * (ch + gap), fill = v == null ? NODATA : color(v), ink = darkFill(fill) ? "#fff" : "var(--ink)";
+    g += `<g class="tile ${d === S.district ? "sel" : ""}" data-d="${d}" data-tip="${esc(tipFor(d, v))}" tabindex="0" role="button" aria-label="${d}">`
+      + `<rect x="${x}" y="${y}" width="${cw}" height="${ch}" rx="8" fill="${fill}"/>`
+      + `<text x="${x + 8}" y="${y + 21}" style="fill:${ink};font-weight:700;font-size:13.5px">${d}</text>`
+      + `<text x="${x + 8}" y="${y + 42}" style="fill:${ink};font-size:12.5px;font-family:var(--f-data)">${v == null ? "–" : esc(sub(d, v))}</text></g>`;
+  }
+  return `<div class="chart mapbox"><svg viewBox="-2 -2 ${W + 4} ${H + 4}" role="img" aria-label="District map">${g}</svg></div><p class="note">${tr("schematic")}</p>`;
+}
+function geoMap(values, { color, sub, tipFor }) {
+  const G = window.DIST_GEO.districts, pts = Object.values(G).flat(2);
+  const lons = pts.map(p => p[0]), lats = pts.map(p => p[1]);
+  const x0 = Math.min(...lons), x1 = Math.max(...lons), ya = Math.min(...lats), yb = Math.max(...lats);
+  const k = Math.cos((ya + yb) / 2 * Math.PI / 180), W = 680, H = Math.round(W * (yb - ya) / ((x1 - x0) * k));
+  const P = p => [((p[0] - x0) / (x1 - x0)) * W, ((yb - p[1]) / (yb - ya)) * H];
+  let g = "", lab = "";
+  for (const [d, rings] of Object.entries(G)) {
+    const v = values[d], fill = v == null ? NODATA : color(v), ink = darkFill(fill) ? "#fff" : "#0d2b4e";
+    const path = rings.map(r => "M" + r.map(p => P(p).map(n => n.toFixed(1)).join(",")).join("L") + "Z").join("");
+    const big = rings.slice().sort((a, b) => b.length - a.length)[0];
+    const c = P([big.reduce((s, p) => s + p[0], 0) / big.length, big.reduce((s, p) => s + p[1], 0) / big.length]);
+    g += `<g class="tile ${d === S.district ? "sel" : ""}" data-d="${d}" data-tip="${esc(tipFor(d, v))}" tabindex="0" role="button" aria-label="${d}"><path d="${path}" fill="${fill}"/></g>`;
+    lab += `<text x="${c[0].toFixed(1)}" y="${(c[1] - 1).toFixed(1)}" text-anchor="middle" style="fill:${ink};font-size:10.5px;font-weight:700;pointer-events:none">${d}</text>`;
+    if (v != null && sub) lab += `<text x="${c[0].toFixed(1)}" y="${(c[1] + 11).toFixed(1)}" text-anchor="middle" style="fill:${ink};font-size:9.5px;font-family:var(--f-data);pointer-events:none">${esc(sub(d, v))}</text>`;
+  }
+  return `<div class="chart mapbox"><svg viewBox="-4 -4 ${W + 8} ${H + 8}" role="img" aria-label="District map">${g}${lab}</svg></div><p class="note">${tr("map_real", { src: esc(window.DIST_GEO.source || "") })}</p>`;
+}
+function bindTiles(root) {
+  root.querySelectorAll(".tile").forEach(el => {
+    const pick = () => { S.district = el.dataset.d; document.getElementById("f-district").value = S.district; render(); };
+    el.addEventListener("click", pick);
+    el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+  });
+  root.querySelectorAll("tr[data-d]").forEach(el => el.addEventListener("click", () => { S.district = el.dataset.d; document.getElementById("f-district").value = S.district; render(); }));
+}
+const kpi = (k, v, s, icon) => `<div class="kpi"><div class="k">${k}</div><div class="ic">${icon || ICON.dot}</div><div class="v">${v}</div><div class="s">${s || ""}</div></div>`;
+const ICON = {
+  dot: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/></svg>`,
+  up: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>`,
+  ton: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16l-2-9H6z"/><path d="M9 11V7a3 3 0 0 1 6 0v4"/></svg>`,
+  flag: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4h11l-2 4 2 4H5"/></svg>`,
+  target: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>`,
+  seed: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V11"/><path d="M12 11c0-4 3-7 8-7 0 5-3 7-8 7zM12 13c0-3-2-5-7-5 0 4 2 5 7 5z"/></svg>`,
+  pct: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>`
+};
+
+/* ------------------------------------------------------------------ recommendations (scenario-based) */
+const SINGLE = ["fertilizer", "improved_seed", "manure", "lime", "anti_erosion"];
+function recFor(d, crop, season) {
+  const rows = SCEN.filter(r => r.district === d && r.crop === crop && r.season === season && r.plots >= 20);
+  const singles = rows.filter(r => SINGLE.includes(r.scenario) && r.yield_gain_pct >= 1 && r.extra_production_t > 0.5).sort((a, b) => b.extra_production_t - a.extra_production_t);
+  return { best: singles[0] || null, next: singles[1] || null, pkg: rows.find(r => r.scenario === "package_fert_seed_manure") || null, any: rows.length > 0 };
+}
+function recsAll(crop, season) {
+  const out = {};
+  DISTRICTS.forEach(d => { out[d] = recFor(d, crop, season); });
+  const ranked = DISTRICTS.filter(d => out[d].best).sort((a, b) => out[b].best.extra_production_t - out[a].best.extra_production_t);
+  ranked.forEach((d, i) => { out[d].tier = i < ranked.length / 3 ? "high" : i < 2 * ranked.length / 3 ? "medium" : "low"; });
+  DISTRICTS.forEach(d => { if (!out[d].tier && out[d].any) out[d].tier = "none"; });
+  return out;
+}
+function recText(r, crop) {
+  if (!r.best) return tr("r_none");
+  const b = r.best;
+  return tr("r_" + b.scenario, { crop: esc(cropName(crop)), adopt: nf(b.adoption_pct), gain: nf(b.yield_gain_pct, 1), t: nf(b.extra_production_t) });
+}
+function pkgText(r, crop) {
+  if (!r.pkg) return "";
+  const t = TARGETS[crop], att = r.pkg.attainable_yield_kg_ha;
+  return tr("pkg_line", { gain: nf(r.pkg.yield_gain_pct, 1), att: nf(att), target: t ? tr("tgt_part", { p: nf(100 * att / t) }) : "" });
+}
+
+
+/* ------------------------------------------------------------------ small helpers for the plain-language views */
+const ord = n => { if (LANG === "rw") return String(n); const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+const signPct = v => (v >= 0 ? "+" : "−") + nf(Math.abs(v)) + "%";
+const listNames = arr => arr.join(", ");
+const brief = (title, html) => `<div class="brief"><div class="brief-k">${title}</div>${html}</div>`;
+const seasonShort = s => (LANG === "rw" ? "Igihembwe " : "Season ") + s;
+const mean = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : null;
+
+/* horizontal bars of yield (kg/ha) with a vertical target line */
+function yieldBars(items, target, { labelW = 210, width = 600 } = {}) {
+  if (!items.length) return `<p class="empty">${tr("noData")}</p>`;
+  const W = width, R = 110, rowH = 30, T = target ? 22 : 4, H = items.length * rowH + T + 4;
+  const mx = Math.max(...items.map(i => i.v), target || 0) * 1.02, X = v => labelW + v / mx * (W - labelW - R);
+  let g = "";
+  if (target) g += `<line x1="${X(target)}" x2="${X(target)}" y1="${T - 6}" y2="${H}" stroke="var(--soil)" stroke-width="1.5" stroke-dasharray="5 4"/><text x="${X(target)}" y="${T - 10}" text-anchor="middle" style="fill:var(--soil);font-size:11.5px;font-weight:700">${tr("psta")}: ${nf(target)}</text>`;
+  items.forEach((it, i) => {
+    const y = T + i * rowH;
+    g += `<g data-tip="${esc(it.tip || "")}"><text x="${labelW - 10}" y="${y + rowH / 2 + 3}" text-anchor="end" class="lbl ${it.strong ? "hl" : ""}">${esc(it.label)}</text>`
+      + `<rect x="${labelW}" y="${y + 5}" width="${Math.max(1, X(it.v) - labelW)}" height="${rowH - 12}" rx="3" fill="${it.color}"/>`
+      + `<text x="${X(it.v) + 8}" y="${y + rowH / 2 + 3}" class="val">${esc(it.val)}</text></g>`;
+  });
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" style="max-width:${W * 1.15}px" role="img">${g}</svg></div>`;
+}
+
+/* ------------------------------------------------------------------ 1. Yield trends */
+function viewTrends() {
+  const el = document.getElementById("v-trends");
+  const rows = seriesFor(S.crop, S.season, S.district), nat = natSeries(S.crop, S.season), tgt = TARGETS[S.crop];
+  const b = baseVal(rows, S.base), last = rows.at(-1);
+  const chg = b && last ? 100 * (last.yield_kg_ha / b.yield_kg_ha - 1) : null;
+  const nb = baseVal(nat.map(n => ({ year: n.year, yield_kg_ha: n.mean })), S.base), nl = nat.at(-1);
+  const natChg = nb && nl ? 100 * (nl.mean / nb.yield_kg_ha - 1) : null;
+  const peers = last ? trendRows(S.crop, S.season).filter(r => r.year === last.year).sort((a, c) => c.yield_kg_ha - a.yield_kg_ha) : [];
+  const rank = peers.findIndex(r => r.district === S.district) + 1;
+  // map values: change since baseline
+  const vals = {};
+  DISTRICTS.forEach(d => { const rr = seriesFor(S.crop, S.season, d), bb = baseVal(rr, S.base), ll = rr.at(-1); if (bb && ll && ll.year > bb.year) vals[d] = 100 * (ll.yield_kg_ha / bb.yield_kg_ha - 1); });
+  const order = Object.entries(vals).sort((a, c) => c[1] - a[1]);
+  const ups = order.slice(0, 3).map(([d, v]) => `${d} (${signPct(v)})`), downs = order.slice(-2).reverse().filter(([, v]) => v < 0).map(([d, v]) => `${d} (${signPct(v)})`);
+  // inputs (latest survey year)
+  const ad = ADOPT.filter(r => r.crop === S.crop && r.season === S.season), ay = Math.max(...ad.map(r => r.year));
+  const da = ad.find(r => r.district === S.district && r.year === ay), na = ad.find(r => r.district === "Rwanda" && r.year === ay);
+  // brief text
+  let txt = "";
+  if (b && last) {
+    txt += `<p>${tr("t_s1", { crop: esc(cropName(S.crop)), d: S.district, season: seasonShort(S.season), b: nf(b.yield_kg_ha), by: b.year, l: nf(last.yield_kg_ha), ly: last.year, chg: tr(chg >= 0 ? "t_up" : "t_down", { p: nf(Math.abs(chg)) }), nchg: natChg == null ? "–" : signPct(natChg) })}`;
+    txt += " " + tr("t_s2", { d: S.district, rank: ord(rank), n: peers.length }) + (tgt ? tr("t_s2t", { p: nf(100 * last.yield_kg_ha / tgt), t: nf(tgt) }) : ".") + "</p>";
+  } else txt += `<p>${tr("noData")}</p>`;
+  if (da && na) txt += `<p>${tr("t_s3", { f: nf(100 * da.fert), s: nf(100 * da.seed), m: nf(100 * da.manure), nf: nf(100 * na.fert), ns: nf(100 * na.seed), nm: nf(100 * na.manure), y: ay })}</p>`;
+  if (order.length) txt += `<p class="muted">${tr("t_map", { a: S.base, up: listNames(ups), down: downs.length ? listNames(downs) : "–" })}</p>`;
+  const vs = Object.values(vals), lo = Math.min(...vs), hi = Math.max(...vs);
+  const map = districtMap(vals, {
+    color: v => ramp((v - lo) / ((hi - lo) || 1)), sub: (d, v) => signPct(v),
+    tipFor: (d, v) => { const rr = seriesFor(S.crop, S.season, d), ll = rr.at(-1); return `<b>${d}</b><br>${v == null ? tr("noData") : signPct(v) + (ll ? ` · ${nf(ll.yield_kg_ha)} ${tr("kgha")} (${ll.year})` : "")}`; }
+  });
+  const xs = YEARS.filter(y => nat.some(n => n.year === y));
+  const lc = lineChart({
+    xs, band: nat.map(n => ({ x: n.year, lo: n.lo, hi: n.hi })), width: 560, height: 300,
+    refs: tgt ? [{ y: tgt, label: tr("psta"), tip: `<b>${tr("psta")}</b><br>${nf(tgt)} ${tr("kgha")}` }] : [],
+    series: [
+      { color: "var(--grey)", width: 2, dash: true, label: tr("national_avg"), pts: nat.map(n => ({ x: n.year, y: n.mean, tip: `<b>${tr("national_avg")}</b><br>${n.year}: ${nf(n.mean)} ${tr("kgha")}` })) },
+      { color: "var(--nisr)", width: 3, label: S.district, pts: rows.map(r => ({ x: r.year, y: r.yield_kg_ha, hollow: !!r.flag, tip: `<b>${S.district}</b><br>${r.year}: ${nf(r.yield_kg_ha)} ${tr("kgha")}` })) }
+    ]
+  });
+  el.innerHTML = `
+    <div class="top2">
+      ${brief(tr("inbrief"), txt)}
+      <div class="kpis k3">
+        ${kpi(tr("k_latest") + (last ? " · " + last.year : ""), last ? nf(last.yield_kg_ha) : "–", tr("kgha"), ICON.up)}
+        ${kpi(tr("k_change") + (b ? " · " + tr("since") + " " + b.year : ""), chg == null ? "–" : `<span class="${chg >= 0 ? "up" : "down"}">${signPct(chg)}</span>`, `${tr("national_avg")}: ${natChg == null ? "–" : signPct(natChg)}`, ICON.pct)}
+        ${tgt ? kpi(tr("k_target_pct"), last ? nf(100 * last.yield_kg_ha / tgt) + "%" : "–", `${nf(tgt)} ${tr("kgha")}`, ICON.target) : kpi(tr("k_rank"), rank || "–", tr("of30", { n: peers.length }), ICON.flag)}
+      </div>
+    </div>
+    <div class="hero">
+      <div class="panel map"><h2>${tr("change_map")}: ${esc(cropName(S.crop))}, ${esc(seasonName(S.season))}</h2><p class="sub">${tr("click_d")}</p>${map}
+        <div class="legend"><span>${vs.length ? signPct(lo) : ""}</span><span class="ramp"></span><span>${vs.length ? signPct(hi) : ""}</span></div></div>
+      <div class="panel"><h2>${tr("t_chart", { d: S.district })}</h2><p class="sub">${esc(cropName(S.crop))}, ${esc(seasonName(S.season))} · ${tr("kgha")} · NISR SAS</p>${lc}
+        <div class="legend"><span><i class="line" style="background:var(--nisr)"></i>${S.district}</span><span><i class="line" style="background:var(--grey)"></i>${tr("national_avg")}</span>${tgt ? `<span><i class="line" style="background:var(--soil)"></i>${tr("psta")}</span>` : ""}</div></div>
+    </div>`;
+  bindTips(el); bindTiles(el);
+}
+
+/* ------------------------------------------------------------------ 2. What to do (recommendations + input scenarios) */
+function viewActions() {
+  const el = document.getElementById("v-actions");
+  const mode = S.lever === "best" || leverAvailable(S.lever, S.crop) ? S.lever : "best";
+  const pills = ["best"].concat(LEVERS).map(l => `<button type="button" data-lever="${l}" aria-pressed="${l === mode}" ${l === "best" || leverAvailable(l, S.crop) ? "" : `disabled title="${esc(tr("notScored"))}"`}>${l === "best" ? tr("a_best") : tr("lv_" + l)}</button>`).join("");
+  const R = recsAll(S.crop, S.season), r = R[S.district] || { any: false }, tgt = TARGETS[S.crop];
+  const crop = esc(cropName(S.crop)), season = seasonShort(S.season);
+  // values per district for the map and the ranking
+  let vals = {}, label = {};
+  if (mode === "best") DISTRICTS.forEach(d => { if (R[d].best) { vals[d] = R[d].best.extra_production_t; label[d] = tr("lv_short_" + R[d].best.scenario); } else if (R[d].any) { vals[d] = 0; label[d] = "–"; } });
+  else SCEN.filter(x => x.crop === S.crop && x.season === S.season && x.scenario === mode && x.plots >= 20).forEach(x => { vals[x.district] = Math.max(0, x.extra_production_t); label[x.district] = nf(x.extra_production_t) + " t"; });
+  const top = Object.entries(vals).filter(([, v]) => v > 0.5).sort((a, c) => c[1] - a[1]);
+  const top3 = top.slice(0, 3).map(([d]) => d);
+  // brief
+  let txt = "";
+  if (mode === "best") {
+    const withRec = DISTRICTS.filter(d => R[d].best), cnt = {};
+    withRec.forEach(d => { cnt[R[d].best.scenario] = (cnt[R[d].best.scenario] || 0) + 1; });
+    const m = Object.entries(cnt).sort((a, c) => c[1] - a[1])[0];
+    txt += `<p class="headline">${r.best ? tr("a_head", { d: S.district, crop, season, lever: tr("lv_" + r.best.scenario).toLowerCase() }) : tr("a_head_none", { d: S.district, crop, season })}</p>`;
+    txt += `<p>${r.any ? recText(r, S.crop) : tr("noData")}${r.pkg ? " " + pkgText(r, S.crop) : ""}</p>`;
+    if (m) txt += `<p class="muted">${tr("a_nat", { n: m[1], mode: tr("lv_" + m[0]).toLowerCase(), crop, t: nf(withRec.reduce((s, d) => s + R[d].best.extra_production_t, 0)), top: listNames(top3) })}</p>`;
+  } else {
+    const x = SCEN.find(y => y.crop === S.crop && y.season === S.season && y.scenario === mode && y.district === S.district), n = SNAT.find(y => y.crop === S.crop && y.season === S.season && y.scenario === mode);
+    txt += `<p class="headline">${tr("lv_" + mode)}: ${crop}, ${season}</p>`;
+    txt += `<p>${x ? tr("a_lev", { d: S.district, lever: tr("lv_" + mode).toLowerCase(), crop, g: nf(x.yield_gain_pct, 1), t: nf(x.extra_production_t), ng: n ? nf(n.yield_gain_pct, 1) : "–", nt: n ? nf(n.extra_production_t) : "–", top: listNames(top3) }) : tr("noData")}</p>`;
+  }
+  const mx = Math.max(1, ...Object.values(vals));
+  const map = districtMap(vals, {
+    color: v => v > 0.5 ? ramp(0.15 + 0.85 * Math.sqrt(v / mx)) : NODATA, sub: d => label[d] || "–",
+    tipFor: (d, v) => { const q = R[d]; if (v == null) return `<b>${d}</b><br>${tr("noData")}`; if (mode === "best") return q && q.best ? `<b>${d}</b> · ${tr(q.tier)}<br>${tr("lv_" + q.best.scenario)}: +${nf(q.best.yield_gain_pct, 1)}% · ${nf(q.best.extra_production_t)} t` : `<b>${d}</b><br>${tr("none")}`; return `<b>${d}</b><br>${tr("lv_" + mode)}: ${nf(v)} t`; }
+  });
+  // chart 2: the selected district's yield today and with each input
+  const dr = SCEN.filter(x => x.crop === S.crop && x.season === S.season && x.district === S.district);
+  const today = dr.length ? dr[0].current_yield_kg_ha : null;
+  const bars = today == null ? [] : [{ label: tr("today"), v: today, color: "var(--grey)", val: nf(today), strong: true, tip: `<b>${tr("today")}</b>: ${nf(today)} ${tr("kgha")}` }]
+    .concat(LEVERS.map(l => dr.find(x => x.scenario === l)).filter(Boolean).map(x => ({
+      label: tr("lv_" + x.scenario), v: x.attainable_yield_kg_ha, color: x.scenario.startsWith("package") ? "var(--soil)" : (r.best && x.scenario === r.best.scenario) || x.scenario === mode ? "var(--nisr)" : "#7fb0e3",
+      strong: (r.best && x.scenario === r.best.scenario) || x.scenario === mode, val: `${nf(x.attainable_yield_kg_ha)} (+${nf(x.yield_gain_pct, 1)}%)`,
+      tip: `<b>${tr("lv_" + x.scenario)}</b><br>+${nf(x.yield_gain_pct, 1)}% · ${nf(x.extra_production_t)} t<br>${tr("adopt_col")}: ${pct(x.adoption_pct)}`
+    })));
+  // chart 3: top 10 districts
+  const topBars = barChart(top.slice(0, 10).map(([d, v]) => ({ label: d, v, color: d === S.district ? "var(--soil)" : "var(--nisr)", strong: d === S.district, val: `${nf(v)} t${mode === "best" ? " · " + label[d] : ""}`, tip: `<b>${d}</b><br>${nf(v)} t` })), { labelW: 120, width: 600, R: 150 });
+  const pkg = dr.find(x => x.scenario === "package_fert_seed_manure");
+  el.innerHTML = `
+    <div class="levers" role="group" aria-label="${tr("lever")}">${pills}</div>
+    <div class="top2">
+      ${brief(tr("inbrief"), txt)}
+      <div class="kpis k3">
+        ${kpi(tr("k_extra_d", { d: S.district }), mode === "best" ? (r.best ? nf(r.best.extra_production_t) + " t" : "–") : (vals[S.district] != null ? nf(vals[S.district]) + " t" : "–"), `${season} · ${mode === "best" ? (r.best ? tr("lv_" + r.best.scenario) : "") : tr("lv_" + mode)}`, ICON.ton)}
+        ${kpi(tr("k_pkg"), pkg ? nf(pkg.attainable_yield_kg_ha) : "–", pkg ? `${tr("today")}: ${nf(pkg.current_yield_kg_ha)} ${tr("kgha")}${tgt ? " · " + nf(100 * pkg.attainable_yield_kg_ha / tgt) + "% " + tr("of_target") : ""}` : "", ICON.target)}
+        ${kpi(tr("k_rwanda"), nf(Object.values(vals).reduce((s, v) => s + v, 0)) + " t", `${crop}, ${season}`, ICON.up)}
+      </div>
+    </div>
+    <div class="hero">
+      <div class="panel map"><h2>${mode === "best" ? tr("a_map_best_h", { crop }) : tr("a_map_lev_h", { lever: tr("lv_" + mode) })}</h2><p class="sub">${mode === "best" ? tr("a_map_best") : tr("a_map_lev")}</p>${map}
+        <div class="legend"><span>0 t</span><span class="ramp"></span><span>${nf(mx)} t</span></div></div>
+      <div class="stack">
+        <div class="panel"><h2>${tr("a_bars", { d: S.district, crop })}</h2><p class="sub">${tr("a_bars_sub")}</p>${yieldBars(bars, tgt)}</div>
+        <div class="panel"><h2>${tr("a_top")}</h2><p class="sub">${mode === "best" ? tr("a_top_best") : tr("lv_" + mode)}</p>${top.length ? topBars : `<p class="empty">${tr("noData")}</p>`}</div>
+      </div>
+    </div>
+    <p class="note">${tr("a_note", { y: D.meta.scenario_year })}</p>`;
+  el.querySelectorAll("[data-lever]").forEach(b => b.addEventListener("click", () => { S.lever = b.dataset.lever; render(); }));
+  bindTips(el); bindTiles(el);
+}
+
+/* ------------------------------------------------------------------ 3. What drives yield */
+function viewDrivers() {
+  const el = document.getElementById("v-drivers");
+  const crop = DRVC.some(r => r.crop === S.crop) ? S.crop : null;
+  const cr = crop ? DRVC.filter(r => r.crop === crop) : DRV;
+  const g = {}; cr.forEach(r => { const k = GROUP_KEY[r.group] || "g_weather"; g[k] = (g[k] || 0) + r.share_pct; });
+  const topF = cr.slice().sort((a, c) => c.share_pct - a.share_pct).slice(0, 10);
+  const mg = cr.filter(r => GROUP_KEY[r.group] === "g_mgmt").sort((a, c) => c.share_pct - a.share_pct)[0];
+  const txt = `<p>${tr("d_s", { crop: esc(cropName(S.crop)), mg: nf(g.g_mgmt), w: nf(g.g_weather), p: nf(g.g_plot), s: nf(g.g_soil), f: mg ? "<b>" + esc(featName(mg.feature)).toLowerCase() + "</b>" : "–" })}</p><p class="muted">${tr("d_note")}</p>`;
+  const feat = barChart(topF.map(r => { const k = GROUP_KEY[r.group] || "g_weather"; return { label: featName(r.feature), v: r.share_pct, color: GROUP_COL[k], strong: k === "g_mgmt", val: pct(r.share_pct, 1), tip: `<b>${featName(r.feature)}</b><br>${tr(k)}: ${pct(r.share_pct, 1)}` }; }), { labelW: 260, width: 640 });
+  el.innerHTML = `
+    <div class="top2">
+      ${brief(tr("inbrief"), txt)}
+      <div class="kpis k3">
+        ${kpi(tr("g_mgmt"), pct(g.g_mgmt), esc(cropName(S.crop)), ICON.seed)}
+        ${kpi(tr("g_weather"), pct(g.g_weather), esc(cropName(S.crop)), ICON.dot)}
+        ${kpi(tr("g_soil") + " / " + tr("g_plot").toLowerCase(), pct((g.g_soil || 0) + (g.g_plot || 0)), esc(cropName(S.crop)), ICON.flag)}
+      </div>
+    </div>
+    <div class="panel"><h2>${tr("d_chart", { crop: esc(cropName(S.crop)) })}</h2><p class="sub">${tr("drv_top_sub")}</p>${feat}
+      <div class="legend">${["g_mgmt", "g_weather", "g_plot", "g_soil"].map(k => `<span><i style="background:${GROUP_COL[k]}"></i>${tr(k)}</span>`).join("")}</div></div>`;
+  bindTips(el);
+}
+
+/* ------------------------------------------------------------------ 4. How reliable */
+function viewModel() {
+  const el = document.getElementById("v-model");
+  const dv = VAL.find(v => v.validation.startsWith("district"));
+  const corr = dv ? Object.keys(dv).filter(k => k.startsWith("corr_")).map(k => ({ crop: k.slice(5), v: dv[k] })).filter(x => x.v != null).sort((a, c) => c.v - a.v) : [];
+  const w = WF.slice().sort((a, c) => a["MAPE_%"] - c["MAPE_%"]);
+  const bestBase = w.find(x => ["last_year", "district_history"].includes(x.model)), bestML = w.find(x => !["last_year", "district_history", "national_mean"].includes(x.model));
+  let txt = dv ? `<p>${tr("m_s", { e: nf(100 * dv.district_MAPE_model), b: nf(100 * dv.district_MAPE_baseline), best: corr.slice(0, 2).map(c => esc(cropName(c.crop))).join(", "), worst: corr.slice(-1).map(c => esc(cropName(c.crop))).join(", ") })}</p>` : "";
+  if (bestBase && bestML) txt += `<p class="muted">${tr("m_s2", { wf: nf(bestBase["MAPE_%"]), wm: nf(bestML["MAPE_%"]) })}</p>`;
+  const isBase = m => ["last_year", "district_history", "national_mean"].includes(m);
+  const chart = w.length ? barChart(w.map(x => ({ label: tr("m_" + x.model), v: x["MAPE_%"], color: isBase(x.model) ? "var(--grey)" : "var(--nisr)", val: pct(x["MAPE_%"], 1), tip: `<b>${tr("m_" + x.model)}</b>` })), { labelW: 270, width: 640 }) : "";
+  const key = v => v.startsWith("random") ? "v_random" : v.startsWith("district") ? "v_district" : "v_temporal";
+  const rowsV = VAL.map(v => `<tr><td>${tr(key(v.validation))}</td><td class="n">${pct(100 * v.district_MAPE_model)}</td><td class="n">${pct(100 * v.district_MAPE_baseline)}</td></tr>`).join("");
+  el.innerHTML = `
+    ${brief(tr("inbrief"), txt)}
+    <div class="hero">
+      <div class="panel"><h2>${tr("m_chart")}</h2><p class="sub">${tr("m_chart_sub")}</p>${chart || `<p class="empty">${tr("noData")}</p>`}
+        <div class="legend"><span><i style="background:var(--grey)"></i>${tr("m_leg_base")}</span><span><i style="background:var(--nisr)"></i>${tr("m_leg_ml")}</span></div></div>
+      <div class="panel"><h2>${tr("val_table")}</h2><p class="sub">${esc(D.meta.engine || "")} · ${nf(D.meta.plots)} ${tr("plots")}</p>
+        <table><thead><tr><th>${tr("v_test")}</th><th class="n">${tr("v_mape")}</th><th class="n">${tr("v_base")}</th></tr></thead><tbody>${rowsV}</tbody></table>
+        <p class="note">${tr("m_table_note")}</p></div>
+    </div>`;
+  bindTips(el);
+}
+
+function viewAbout() {
+  document.getElementById("v-about").innerHTML = `<div class="panel prose">
+    <h2>What this dashboard is for</h2><p>It helps MINAGRI, RAB and district agronomists decide where to promote fertilizer, improved seed, manure, lime and anti-erosion works, for which crop and season, to raise harvests towards the PSTA 5 targets.</p>
+    <h2>How to read it</h2><ul>
+      <li><b>Yield trends:</b> how the district's yield moved since a baseline year, compared with the national average and the PSTA 5 target (NISR published yields 2017–2025).</li>
+      <li><b>What to do:</b> for each district, the input that would add the most harvest where farmers do not use it yet, and how much. Pick an input to see where it pays off most.</li>
+      <li><b>What drives yield:</b> what separates high-yield from low-yield fields.</li>
+      <li><b>How reliable:</b> how the model was tested.</li></ul>
+    <h2>Data and method</h2><ul>
+      <li>NISR Seasonal Agricultural Survey: published district tables 2017–2026 and plot microdata 2022–2025 (152,835 plot records).</li>
+      <li>Soil (iSDAsoil), terrain (SRTM), MODIS greenness and temperature, CHIRPS rainfall, ERA5-Land, Sentinel-1, aggregated per district with Google Earth Engine.</li>
+      <li>A LightGBM yield model compares similar fields with and without each input; gains are added up with survey weights per district. Targets: MINAGRI PSTA 5 (2024/25–2028/29).</li></ul>
+    <h2>Limits</h2><ul>
+      <li>Gains are estimates from survey data, not field trials; they show where inputs are likely to pay off.</li>
+      <li>Survey plots have no public GPS, so soil and satellite data are district averages.</li>
+      <li>An input is shown for a crop only if at least 200 surveyed fields use it and 200 do not. Paddy rice is excluded.</li></ul>
+    <h2>Use of AI</h2><p>AI assistance (Claude, Anthropic) was used to write code and draft text; all results come from the code in the project repository run on NISR data.</p>
+    <p class="note">Kinyarwanda text was machine-assisted; please report wording to correct.</p></div>`;
+}
+
+/* ------------------------------------------------------------------ controls + routing */
+const TABS = ["trends", "actions", "drivers", "model", "about"];
+const TAB_KEY = { trends: "tab_trends", actions: "tab_actions", drivers: "tab_drv", model: "tab_model", about: "tab_about" };
+function fillControls() {
+  const fc = document.getElementById("f-crop"), fs = document.getElementById("f-season"), fd = document.getElementById("f-district"), fb = document.getElementById("f-base");
+  fc.innerHTML = CROPS.map(c => `<option value="${c}">${esc(cropName(c))}</option>`).join("");
+  fs.innerHTML = ["A", "B"].map(s => `<option value="${s}">${esc(seasonName(s))}</option>`).join("");
+  fd.innerHTML = DISTRICTS.map(d => `<option value="${d}">${d} (${esc(D.provinces[d])})</option>`).join("");
+  fb.innerHTML = YEARS.slice(0, -1).map(y => `<option value="${y}">${y}</option>`).join("");
+  fc.value = S.crop; fs.value = S.season; fd.value = S.district; fb.value = S.base;
+}
+function applyLang() {
+  document.documentElement.lang = LANG === "rw" ? "rw" : "en";
+  document.querySelectorAll("[data-t]").forEach(el => { el.textContent = tr(el.dataset.t); });
+  document.title = tr("title");
+  document.getElementById("lang-en").setAttribute("aria-pressed", LANG === "en");
+  document.getElementById("lang-rw").setAttribute("aria-pressed", LANG === "rw");
+  document.getElementById("foot").textContent = tr("foot", { engine: D.meta.engine || "", date: D.meta.generated });
+  fillControls();
+}
+function render() {
+  TABS.forEach(t => { document.getElementById("v-" + t).hidden = t !== S.tab; });
+  document.querySelectorAll("nav.tabs a").forEach(a => a.setAttribute("aria-current", a.dataset.tab === S.tab ? "page" : "false"));
+  document.getElementById("baseline-field").hidden = S.tab !== "trends";
+  document.getElementById("page-title").textContent = tr(TAB_KEY[S.tab]);
+  hideTip();
+  ({ trends: viewTrends, actions: viewActions, drivers: viewDrivers, model: viewModel, about: viewAbout })[S.tab]();
+}
+function route() { const h = location.hash.replace("#", ""); S.tab = TABS.includes(h) ? h : "trends"; render(); }
+
+document.getElementById("f-crop").addEventListener("change", e => { S.crop = e.target.value; render(); });
+document.getElementById("f-season").addEventListener("change", e => { S.season = e.target.value; render(); });
+document.getElementById("f-district").addEventListener("change", e => { S.district = e.target.value; render(); });
+document.getElementById("f-base").addEventListener("change", e => { S.base = +e.target.value; render(); });
+document.getElementById("lang-en").addEventListener("click", () => { LANG = "en"; try { localStorage.setItem("yg-lang", LANG); } catch (e) {} applyLang(); render(); });
+document.getElementById("lang-rw").addEventListener("click", () => { LANG = "rw"; try { localStorage.setItem("yg-lang", LANG); } catch (e) {} applyLang(); render(); });
+addEventListener("hashchange", route);
+if (!YEARS.includes(S.base)) S.base = YEARS[0];
+applyLang();
+route();
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+year,scenario,season,crop,levers,plots,area_ha,current_yield_kg_ha,adoption_pct,yield_gain_pct,current_production_t,extra_production_t
+2025,anti_erosion,A,Bush bean,anti_erosion,4936,193830.187,613.95,71.768,0.478,119001.952,569.347
+2025,anti_erosion,A,Cassava,anti_erosion,1034,33026.165,13541.18,72.367,0.304,447213.241,1358.649
+2025,anti_erosion,A,Climbing bean,anti_erosion,2849,122414.419,793.5,86.676,0.307,97135.884,298.429
+2025,anti_erosion,A,Irish potato,anti_erosion,1426,52516.183,8986.699,87.465,0.172,471947.121,810.726
+2025,anti_erosion,A,Maize,anti_erosion,6520,224353.954,1981.52,75.983,0.347,444561.786,1541.046
+2025,anti_erosion,A,Sorghum,anti_erosion,573,38679.755,1398.891,58.682,0.369,54108.757,199.839
+2025,anti_erosion,A,Soybean,anti_erosion,801,27672.265,469.581,75.903,0.371,12994.383,48.21
+2025,anti_erosion,A,Sweet potato,anti_erosion,1091,56483.302,8020.69,80.325,0.457,453035.059,2069.689
+2025,anti_erosion,B,Bush bean,anti_erosion,4858,205375.519,587.117,67.263,0.301,120579.547,362.64
+2025,anti_erosion,B,Cassava,anti_erosion,2381,56539.555,13919.502,73.553,0.168,787002.43,1318.924
+2025,anti_erosion,B,Climbing bean,anti_erosion,2969,122006.746,850.811,85.851,0.226,103804.708,234.964
+2025,anti_erosion,B,Irish potato,anti_erosion,1359,45151.511,6985.703,88.209,0.126,315415.05,397.125
+2025,anti_erosion,B,Maize,anti_erosion,2838,88982.497,1301.414,71.931,0.464,115803.027,537.755
+2025,anti_erosion,B,Sorghum,anti_erosion,1745,104682.318,1140.075,73.789,0.235,119345.651,279.917
+2025,anti_erosion,B,Soybean,anti_erosion,1038,37070.777,372.549,78.156,0.217,13810.668,29.948
+2025,anti_erosion,B,Sweet potato,anti_erosion,1649,77857.441,7696.972,83.108,0.243,599266.567,1454.264
+2025,fertilizer,A,Bush bean,inorganic_fert,4936,193830.187,613.95,33.43,5.433,119001.952,6465.619
+2025,fertilizer,A,Cassava,inorganic_fert,1034,33026.165,13541.18,19.209,0.648,447213.241,2899.86
+2025,fertilizer,A,Climbing bean,inorganic_fert,2849,122414.419,793.5,42.721,6.972,97135.884,6772.408
+2025,fertilizer,A,Irish potato,inorganic_fert,1426,52516.183,8986.699,81.605,2.594,471947.121,12241.053
+2025,fertilizer,A,Maize,inorganic_fert,6520,224353.954,1981.52,67.141,9.98,444561.786,44365.802
+2025,fertilizer,A,Sorghum,inorganic_fert,573,38679.755,1398.891,37.621,8.188,54108.757,4430.684
+2025,fertilizer,A,Soybean,inorganic_fert,801,27672.265,469.581,27.58,3.34,12994.383,434.014
+2025,fertilizer,A,Sweet potato,inorganic_fert,1091,56483.302,8020.69,9.112,0.529,453035.059,2395.099
+2025,fertilizer,A,Wheat,inorganic_fert,39,2214.369,1247.669,51.59,12.394,2762.798,342.411
+2025,fertilizer,B,Bush bean,inorganic_fert,4858,205375.519,587.117,25.063,6.649,120579.547,8016.823
+2025,fertilizer,B,Cassava,inorganic_fert,2381,56539.555,13919.502,19.972,0.751,787002.43,5912.028
+2025,fertilizer,B,Climbing bean,inorganic_fert,2969,122006.746,850.811,45.318,6.5,103804.708,6747.57
+2025,fertilizer,B,Irish potato,inorganic_fert,1359,45151.511,6985.703,89.427,2.031,315415.05,6407.136
+2025,fertilizer,B,Maize,inorganic_fert,2838,88982.497,1301.414,60.713,12.779,115803.027,14798.379
+2025,fertilizer,B,Sorghum,inorganic_fert,1745,104682.318,1140.075,28.521,8.228,119345.651,9819.168
+2025,fertilizer,B,Soybean,inorganic_fert,1038,37070.777,372.549,26.025,5.146,13810.668,710.637
+2025,fertilizer,B,Sweet potato,inorganic_fert,1649,77857.441,7696.972,12.611,0.532,599266.567,3189.198
+2025,fertilizer,B,Wheat,inorganic_fert,92,5858.08,1093.157,57.001,8.538,6403.803,546.777
+2025,improved_seed,A,Irish potato,improved_seed,1426,52516.183,8986.699,9.313,1.608,471947.121,7587.292
+2025,improved_seed,A,Maize,improved_seed,6520,224353.954,1981.52,73.236,5.272,444561.786,23436.002
+2025,improved_seed,B,Irish potato,improved_seed,1359,45151.511,6985.703,6.645,3.243,315415.05,10229.009
+2025,improved_seed,B,Maize,improved_seed,2838,88982.497,1301.414,70.452,4.64,115803.027,5373.773
+2025,lime,A,Irish potato,lime,1426,52516.183,8986.699,2.944,1.399,471947.121,6604.322
+2025,lime,B,Irish potato,lime,1359,45151.511,6985.703,11.995,1.614,315415.05,5090.594
+2025,manure,A,Bush bean,organic_fert,4936,193830.187,613.95,68.789,1.364,119001.952,1622.706
+2025,manure,A,Cassava,organic_fert,1034,33026.165,13541.18,39.934,0.355,447213.241,1586.057
+2025,manure,A,Climbing bean,organic_fert,2849,122414.419,793.5,83.103,0.983,97135.884,955.084
+2025,manure,A,Irish potato,organic_fert,1426,52516.183,8986.699,88.038,0.162,471947.121,762.446
+2025,manure,A,Maize,organic_fert,6520,224353.954,1981.52,82.315,0.966,444561.786,4293.147
+2025,manure,A,Sorghum,organic_fert,573,38679.755,1398.891,30.532,1.093,54108.757,591.4
+2025,manure,A,Soybean,organic_fert,801,27672.265,469.581,67.047,2.047,12994.383,265.97
+2025,manure,A,Sweet potato,organic_fert,1091,56483.302,8020.69,51.733,0.783,453035.059,3549.491
+2025,manure,A,Wheat,organic_fert,39,2214.369,1247.669,55.269,1.327,2762.798,36.671
+2025,manure,B,Bush bean,organic_fert,4858,205375.519,587.117,49.075,1.276,120579.547,1538.196
+2025,manure,B,Cassava,organic_fert,2381,56539.555,13919.502,37.235,0.279,787002.43,2192.981
+2025,manure,B,Climbing bean,organic_fert,2969,122006.746,850.811,80.646,0.661,103804.708,686.261
+2025,manure,B,Irish potato,organic_fert,1359,45151.511,6985.703,87.048,0.151,315415.05,477.6
+2025,manure,B,Maize,organic_fert,2838,88982.497,1301.414,63.194,0.906,115803.027,1049.686
+2025,manure,B,Sorghum,organic_fert,1745,104682.318,1140.075,42.385,0.411,119345.651,490.752
+2025,manure,B,Soybean,organic_fert,1038,37070.777,372.549,54.804,1.816,13810.668,250.814
+2025,manure,B,Sweet potato,organic_fert,1649,77857.441,7696.972,58.98,0.461,599266.567,2764.042
+2025,manure,B,Wheat,organic_fert,92,5858.08,1093.157,67.82,0.771,6403.803,49.358
+2025,package_fert_seed_manure,A,Bush bean,inorganic_fert+organic_fert,4936,193830.187,613.95,26.762,6.872,119001.952,8177.438
+2025,package_fert_seed_manure,A,Cassava,inorganic_fert+organic_fert,1034,33026.165,13541.18,16.874,1.005,447213.241,4496.175
+2025,package_fert_seed_manure,A,Climbing bean,inorganic_fert+organic_fert,2849,122414.419,793.5,39.486,7.977,97135.884,7748.411
+2025,package_fert_seed_manure,A,Irish potato,inorganic_fert+improved_seed+organic_fert,1426,52516.183,8986.699,8.096,4.402,471947.121,20774.601
+2025,package_fert_seed_manure,A,Maize,inorganic_fert+improved_seed+organic_fert,6520,224353.954,1981.52,48.294,18.958,444561.786,84278.745
+2025,package_fert_seed_manure,A,Sorghum,inorganic_fert+organic_fert,573,38679.755,1398.891,14.237,9.248,54108.757,5003.856
+2025,package_fert_seed_manure,A,Soybean,inorganic_fert+organic_fert,801,27672.265,469.581,22.239,5.472,12994.383,711.07
+2025,package_fert_seed_manure,A,Sweet potato,inorganic_fert+organic_fert,1091,56483.302,8020.69,7.569,1.317,453035.059,5967.474
+2025,package_fert_seed_manure,A,Wheat,inorganic_fert+organic_fert,39,2214.369,1247.669,29.186,13.769,2762.798,380.418
+2025,package_fert_seed_manure,B,Bush bean,inorganic_fert+organic_fert,4858,205375.519,587.117,15.012,8.001,120579.547,9647.831
+2025,package_fert_seed_manure,B,Cassava,inorganic_fert+organic_fert,2381,56539.555,13919.502,12.524,1.032,787002.43,8121.104
+2025,package_fert_seed_manure,B,Climbing bean,inorganic_fert+organic_fert,2969,122006.746,850.811,41.678,7.168,103804.708,7441.159
+2025,package_fert_seed_manure,B,Irish potato,inorganic_fert+improved_seed+organic_fert,1359,45151.511,6985.703,6.029,5.462,315415.05,17229.344
+2025,package_fert_seed_manure,B,Maize,inorganic_fert+improved_seed+organic_fert,2838,88982.497,1301.414,32.33,19.591,115803.027,22686.811
+2025,package_fert_seed_manure,B,Sorghum,inorganic_fert+organic_fert,1745,104682.318,1140.075,13.531,8.675,119345.651,10353.02
+2025,package_fert_seed_manure,B,Soybean,inorganic_fert+organic_fert,1038,37070.777,372.549,15.387,7.059,13810.668,974.85
+2025,package_fert_seed_manure,B,Sweet potato,inorganic_fert+organic_fert,1649,77857.441,7696.972,10.661,0.996,599266.567,5969.095
+2025,package_fert_seed_manure,B,Wheat,inorganic_fert+organic_fert,92,5858.08,1093.157,47.259,9.407,6403.803,602.408

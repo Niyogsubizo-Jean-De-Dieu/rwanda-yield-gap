@@ -1,0 +1,118 @@
+group,model,cells,MAPE_%,R2_within_crop,median_corr_within_crop,bias_%
+Bush bean,national_mean,102,15.8869,0.0,0.0,1.4588
+Bush bean,district_history,102,13.562,0.2681,0.6867,-2.3601
+Bush bean,last_year,102,11.8016,0.597,0.782,-0.8351
+Bush bean,ridge,102,23.2216,-0.1159,0.3908,18.585
+Bush bean,random_forest,102,18.8986,0.0965,0.4834,11.2849
+Bush bean,sk_gbm,102,12.7704,0.1244,0.5389,-3.3864
+Bush bean,sk_gbm_district,102,12.6875,0.3059,0.6815,-2.7044
+Bush bean,lightgbm,102,11.7048,0.3393,0.6348,-2.467
+Bush bean,lightgbm_district,102,13.3067,0.2962,0.6421,-1.9758
+Bush bean,xgboost,102,11.8905,0.2906,0.5633,0.6496
+Bush bean,catboost,102,17.9499,0.3448,0.6365,9.5103
+Bush bean,ensemble,102,11.651,0.3408,0.6339,2.8306
+Bush bean,hybrid,102,12.3128,0.2361,0.5141,-2.8779
+Cassava,national_mean,44,11.3778,-0.0,0.0,-2.5371
+Cassava,district_history,44,10.5635,0.2384,0.6912,0.3543
+Cassava,last_year,44,10.5635,0.2384,0.6912,0.3543
+Cassava,ridge,44,38.4894,-0.2617,0.1541,35.8115
+Cassava,random_forest,44,38.8119,-3.4252,0.3853,-35.2666
+Cassava,sk_gbm,44,13.7685,-0.3323,0.5611,-3.2013
+Cassava,sk_gbm_district,44,16.3251,-0.9375,0.636,2.0414
+Cassava,lightgbm,44,13.8364,-0.2646,0.5978,-6.3982
+Cassava,lightgbm_district,44,14.2121,-0.4699,0.6677,0.5264
+Cassava,xgboost,44,18.8053,-1.8738,0.5376,-2.3541
+Cassava,catboost,44,11.9412,-0.0081,0.504,-1.8484
+Cassava,ensemble,44,16.7951,-0.6496,0.5375,-11.1731
+Cassava,hybrid,44,17.4986,-0.0989,0.4726,-13.007
+Climbing bean,national_mean,96,18.9355,0.0,-0.0,-2.1164
+Climbing bean,district_history,96,9.7085,0.6893,0.8697,-4.1397
+Climbing bean,last_year,96,10.8955,0.593,0.8874,-4.1815
+Climbing bean,ridge,96,22.0664,0.2536,0.5676,13.4924
+Climbing bean,random_forest,96,25.9711,0.3465,0.6814,19.2117
+Climbing bean,sk_gbm,96,15.3259,0.3735,0.735,-8.4266
+Climbing bean,sk_gbm_district,96,14.0774,0.4309,0.8399,-8.3132
+Climbing bean,lightgbm,96,14.4895,0.4122,0.725,-8.3115
+Climbing bean,lightgbm_district,96,13.4949,0.5315,0.8483,-7.4163
+Climbing bean,xgboost,96,13.8288,0.3575,0.6708,-4.874
+Climbing bean,catboost,96,16.1647,0.4491,0.6962,6.2173
+Climbing bean,ensemble,96,12.7477,0.4609,0.7398,-0.3371
+Climbing bean,hybrid,96,13.6326,0.4213,0.669,-5.6139
+Irish potato,national_mean,65,48.711,-0.0,-0.0,36.8242
+Irish potato,district_history,65,12.8582,0.8255,0.903,0.1192
+Irish potato,last_year,65,11.9148,0.8386,0.9127,-0.1252
+Irish potato,ridge,65,35.5504,0.6424,0.8513,28.6387
+Irish potato,random_forest,65,30.045,0.655,0.8969,-30.6218
+Irish potato,sk_gbm,65,16.1723,0.8127,0.9141,-2.3794
+Irish potato,sk_gbm_district,65,17.3411,0.8274,0.9191,-3.2822
+Irish potato,lightgbm,65,15.1774,0.8485,0.9321,-2.1739
+Irish potato,lightgbm_district,65,15.0874,0.8427,0.9385,-1.7003
+Irish potato,xgboost,65,15.6219,0.8334,0.9084,-1.2036
+Irish potato,catboost,65,17.0828,0.8276,0.9078,2.041
+Irish potato,ensemble,65,15.4264,0.8338,0.9212,-7.7689
+Irish potato,hybrid,65,22.6448,0.6931,0.8477,9.0933
+Maize,national_mean,109,22.1821,0.0,-0.0,2.5385
+Maize,district_history,109,16.4405,0.499,0.6837,-7.1757
+Maize,last_year,109,16.5934,0.5155,0.7319,-0.8616
+Maize,ridge,109,36.9138,0.2767,0.613,12.0532
+Maize,random_forest,109,28.7587,0.2985,0.5778,4.8486
+Maize,sk_gbm,109,25.8402,0.3512,0.6448,-1.8503
+Maize,sk_gbm_district,109,28.1312,0.411,0.7033,-7.2739
+Maize,lightgbm,109,26.7727,0.4047,0.6689,5.9373
+Maize,lightgbm_district,109,28.6245,0.4091,0.7158,-6.4668
+Maize,xgboost,109,27.4002,0.3304,0.6125,0.5681
+Maize,catboost,109,22.0133,0.3217,0.6739,5.2055
+Maize,ensemble,109,25.5056,0.4075,0.6787,-1.6623
+Maize,hybrid,109,30.3969,0.2584,0.5552,13.1081
+Sorghum,national_mean,58,18.3562,-0.0,0.0,-1.6673
+Sorghum,district_history,58,11.2042,0.6747,0.8558,-8.728
+Sorghum,last_year,58,11.7705,0.5873,0.8324,-4.8933
+Sorghum,ridge,58,20.3803,0.3186,0.5868,15.2389
+Sorghum,random_forest,58,18.3435,0.2399,0.4658,5.5767
+Sorghum,sk_gbm,58,16.1543,0.301,0.6076,5.9014
+Sorghum,sk_gbm_district,58,15.6286,0.2902,0.7306,-2.9407
+Sorghum,lightgbm,58,17.8023,0.2867,0.5362,7.032
+Sorghum,lightgbm_district,58,15.2409,0.3208,0.6996,0.5516
+Sorghum,xgboost,58,16.2335,0.3565,0.5866,3.0194
+Sorghum,catboost,58,20.393,0.2611,0.5583,6.5246
+Sorghum,ensemble,58,17.1592,0.3461,0.595,5.808
+Sorghum,hybrid,58,20.8172,0.0175,0.3852,7.7801
+Soybean,national_mean,63,20.2116,-0.0,-0.0,-5.0874
+Soybean,district_history,63,19.44,-0.0669,0.4254,-5.5699
+Soybean,last_year,63,20.153,-0.3555,0.3614,-1.7462
+Soybean,ridge,63,29.3188,-0.0508,0.4059,20.2206
+Soybean,random_forest,63,50.9663,-0.6699,0.2497,42.5439
+Soybean,sk_gbm,63,27.9421,-0.4533,0.2187,-9.4283
+Soybean,sk_gbm_district,63,28.832,-1.2178,0.2318,-14.774
+Soybean,lightgbm,63,26.3604,-0.279,0.2319,-5.4497
+Soybean,lightgbm_district,63,29.2266,-0.7745,0.1742,-10.7713
+Soybean,xgboost,63,26.3405,-0.3245,0.4014,0.8221
+Soybean,catboost,63,28.3758,-0.4509,0.2924,7.9521
+Soybean,ensemble,63,27.4726,-0.3345,0.274,3.9832
+Soybean,hybrid,63,23.2751,-0.21,0.3329,-4.2466
+Sweet potato,national_mean,106,14.4739,0.0,0.0,-7.8574
+Sweet potato,district_history,106,11.2806,0.6193,0.8206,-9.3287
+Sweet potato,last_year,106,10.2756,0.6295,0.8395,-7.9635
+Sweet potato,ridge,106,19.9987,-0.5432,0.0488,7.6138
+Sweet potato,random_forest,106,17.6086,-0.0155,0.5963,-14.5975
+Sweet potato,sk_gbm,106,14.8512,0.0689,0.5308,-5.9615
+Sweet potato,sk_gbm_district,106,12.3439,0.4195,0.7254,-3.6955
+Sweet potato,lightgbm,106,13.9875,0.079,0.5241,-4.0202
+Sweet potato,lightgbm_district,106,13.2272,0.3097,0.6532,-5.3639
+Sweet potato,xgboost,106,13.7313,0.1455,0.5425,-2.8045
+Sweet potato,catboost,106,14.9869,0.1122,0.5218,2.367
+Sweet potato,ensemble,106,13.2234,0.1688,0.5794,-5.5531
+Sweet potato,hybrid,106,13.4146,0.0964,0.5168,-6.5952
+Wheat,national_mean,3,10.8751,0.0,,-9.3079
+Wheat,district_history,3,6.2292,-0.956,,2.6441
+Wheat,last_year,3,4.2349,0.8872,,1.332
+Wheat,ridge,3,18.5731,-0.2382,,18.3262
+Wheat,random_forest,3,62.831,0.9142,,52.6886
+Wheat,sk_gbm,3,14.7287,-3.8542,,12.8224
+Wheat,sk_gbm_district,3,8.8571,-0.401,,9.9389
+Wheat,lightgbm,3,15.9778,-4.274,,21.8406
+Wheat,lightgbm_district,3,16.5416,-1.801,,19.5905
+Wheat,xgboost,3,8.451,-1.3272,,6.7607
+Wheat,catboost,3,8.4282,0.9994,,2.4287
+Wheat,ensemble,3,16.4715,-0.514,,17.1854
+Wheat,hybrid,3,16.4184,-5.4289,,20.6219

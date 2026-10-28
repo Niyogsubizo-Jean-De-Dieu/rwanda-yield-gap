@@ -1,0 +1,4 @@
+validation,plots,plot_R2_log_model,plot_R2_log_baseline,plot_R2_within_crop,district_R2_model,district_R2_baseline,district_corr_model,district_MAPE_model,district_MAPE_baseline,district_cells,district_R2_within_crop,district_corr_within_crop_median,corr_Bush bean,corr_Cassava,corr_Climbing bean,corr_Irish potato,corr_Maize,corr_Sorghum,corr_Soybean,corr_Sweet potato
+random (segments held out),152471,0.7603,0.6782,0.1908,0.983,0.8794,0.9943,0.0835,0.2437,1426,0.8566,0.9266,0.9166,0.9344,0.922,0.9676,0.9315,0.9312,0.8895,0.9099
+district (districts held out),152471,0.7351,0.6726,0.1253,0.9376,0.8615,0.9706,0.1738,0.2568,1426,0.3381,0.5351,0.4794,0.569,0.5084,0.8445,0.7671,0.4935,0.5618,0.3682
+"temporal (train 2022-24, test 2025)",38198,0.7662,0.7493,0.0085,0.9348,0.9051,0.9687,0.17,0.2138,356,0.4706,0.5342,0.5355,0.4867,0.7742,0.8772,0.5052,0.5569,0.1553,0.533

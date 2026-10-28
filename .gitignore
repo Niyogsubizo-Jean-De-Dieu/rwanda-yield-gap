@@ -1,0 +1,13 @@
+# NISR microdata and plot-level files stay off GitHub
+data/microdata/
+data/sas_published_tables/
+data/model_data/model_dataset.csv
+data/model_data/plot_crop_dataset.csv
+data/model_outputs/oof_predictions.csv
+data/model_outputs/yield_model.pkl
+data/model_outputs/walk_forward/district_predictions.csv
+demo/_video/
+*.zip
+__pycache__/
+.ipynb_checkpoints/
+catboost_info/

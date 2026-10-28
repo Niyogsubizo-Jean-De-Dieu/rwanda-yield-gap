@@ -1,0 +1,12 @@
+# Dashboard: no packages needed (python3 app.py). Pipeline:
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3
+lightgbm>=4.0
+matplotlib>=3.7
+jupyterlab
+# optional
+# xgboost            # walk-forward comparison
+# catboost           # walk-forward comparison
+# playwright         # demo/record_demo.py (then: python3 -m playwright install chromium)
+# geopandas          # src/make_district_map.py with a shapefile instead of GeoJSON

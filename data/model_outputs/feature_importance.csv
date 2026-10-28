@@ -1,0 +1,43 @@
+feature,importance,group,method,share_pct
+crop,0.8109191564698516,Crop & season,mean |SHAP| (log-yield units),
+inorganic_kg_ha,0.08383982264216075,Management (inputs & practices),mean |SHAP| (log-yield units),13.171978208967825
+log_plot_area,0.06619615963405509,Plot & farmer,mean |SHAP| (log-yield units),10.40000258515167
+crop_share,0.04900925695134053,Plot & farmer,mean |SHAP| (log-yield units),7.699788051270681
+improved_seed,0.04698629752125548,Management (inputs & practices),mean |SHAP| (log-yield units),7.381963219454941
+ndvi_max,0.046352890711931424,Season weather (satellite),mean |SHAP| (log-yield units),7.282449403384048
+soil_nitrogen_gkg,0.026266152139550362,Soil & terrain,mean |SHAP| (log-yield units),4.12664498459481
+soil_ph,0.025007699398699606,Soil & terrain,mean |SHAP| (log-yield units),3.928930920357677
+pesticide,0.020613841118721693,Management (inputs & practices),mean |SHAP| (log-yield units),3.238616894239285
+farmer_sex,0.0185157630655613,Plot & farmer,mean |SHAP| (log-yield units),2.9089902618584453
+stratum,0.0182017944614108,Plot & farmer,mean |SHAP| (log-yield units),2.8596630151892617
+soil_org_carbon_gkg,0.017075938336303793,Soil & terrain,mean |SHAP| (log-yield units),2.682781052906997
+farmer_age,0.01579499684183553,Plot & farmer,mean |SHAP| (log-yield units),2.4815338064270898
+organic_fert,0.015555931887451383,Management (inputs & practices),mean |SHAP| (log-yield units),2.4439745861134203
+elevation_m,0.01512819305185892,Soil & terrain,mean |SHAP| (log-yield units),2.3767730290967677
+rain_total_mm,0.014410897732741085,Season weather (satellite),mean |SHAP| (log-yield units),2.2640795856344544
+slope_deg,0.014318306613385678,Soil & terrain,mean |SHAP| (log-yield units),2.2495327012535222
+season,0.013665441019810685,Crop & season,mean |SHAP| (log-yield units),
+lst_anom_max,0.011892045855766477,Season weather (satellite),mean |SHAP| (log-yield units),1.8683456612351104
+s1_vh_anom_mean,0.011874801138942565,Season weather (satellite),mean |SHAP| (log-yield units),1.8656363635879303
+rain_anom_sum,0.010401290243637265,Season weather (satellite),mean |SHAP| (log-yield units),1.6341347597918625
+cropland_ha,0.009845117493509489,Soil & terrain,mean |SHAP| (log-yield units),1.5467550980245346
+ndvi_anom_mean,0.00882686283402683,Season weather (satellite),mean |SHAP| (log-yield units),1.3867782783796323
+t2m_anom_mean,0.008729054021659946,Season weather (satellite),mean |SHAP| (log-yield units),1.3714116482444472
+rain_anom_early,0.008301132998208867,Season weather (satellite),mean |SHAP| (log-yield units),1.304181467902649
+erosion_degree,0.008018628812503932,Management (inputs & practices),mean |SHAP| (log-yield units),1.2597975598649387
+ndvi_anom_min,0.007723523670079767,Season weather (satellite),mean |SHAP| (log-yield units),1.2134339299947257
+rain_anom_min,0.007273080942240931,Season weather (satellite),mean |SHAP| (log-yield units),1.1426653905524975
+lst_anom_mean,0.006516814314840316,Season weather (satellite),mean |SHAP| (log-yield units),1.0238492096212999
+ndvi_anom_late,0.006471641355979092,Season weather (satellite),mean |SHAP| (log-yield units),1.0167521379553177
+rain_anom_late,0.006337115519150844,Season weather (satellite),mean |SHAP| (log-yield units),0.9956169382924098
+evi_anom_mean,0.006273776860150104,Season weather (satellite),mean |SHAP| (log-yield units),0.9856658743486816
+ndvi_anom_early,0.005489672375855961,Season weather (satellite),mean |SHAP| (log-yield units),0.8624761197047751
+sm_anom_mean,0.005175903400486472,Season weather (satellite),mean |SHAP| (log-yield units),0.8131802364840166
+share_slope_gt16deg,0.0049383807652824165,Soil & terrain,mean |SHAP| (log-yield units),0.77586332816471
+anti_erosion,0.004711857962569149,Management (inputs & practices),mean |SHAP| (log-yield units),0.7402745908899603
+consolidated_site,0.0020452347721903697,Management (inputs & practices),mean |SHAP| (log-yield units),0.3213244852210308
+irrigated,0.0014319920319392579,Management (inputs & practices),mean |SHAP| (log-yield units),0.22497862287502263
+mechanized,0.0005183604768152883,Management (inputs & practices),mean |SHAP| (log-yield units),0.08143901895097305
+inorganic_fert,0.0003314699132827244,Management (inputs & practices),mean |SHAP| (log-yield units),0.05207685723911469
+lime,5.4133421514313333e-05,Management (inputs & practices),mean |SHAP| (log-yield units),0.008504839658437385
+micronutrient,4.5543437345721e-05,Management (inputs & practices),mean |SHAP| (log-yield units),0.007155277115026442
