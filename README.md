@@ -7,7 +7,7 @@ Where would fertilizer, improved seed and manure raise harvests most? This proje
 | | |
 | --- | --- |
 | **Live dashboard** | <https://niyogsubizo-jean-de-dieu.github.io/rwanda-yield-gap/> |
-| **Demo video** | [`demo/demo.webm`](demo/demo.webm) (1 min 24 s) |
+| **Demo video** | [`demo/demo.webm`](demo/demo.webm) (1 min 56 s) |
 | **Run locally** | `python3 app.py` |
 | **Team** | Rebecca Dukundimana and Jean de Dieu Niyogisubizo, University of Rwanda |
 
