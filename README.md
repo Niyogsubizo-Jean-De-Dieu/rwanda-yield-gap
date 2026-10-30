@@ -6,9 +6,27 @@ Where would fertilizer, improved seed and manure raise harvests most? This proje
 
 | | |
 | --- | --- |
-| **Live dashboard** | `https://<github-user>.github.io/<repo-name>/` |
+| **Live dashboard** | <https://niyogsubizo-jean-de-dieu.github.io/rwanda-yield-gap/> |
 | **Demo video** | [`demo/demo.webm`](demo/demo.webm) (1 min 24 s) |
 | **Run locally** | `python3 app.py` |
+| **Team** | Rebecca Dukundimana and Jean de Dieu Niyogisubizo, University of Rwanda |
+
+## Satellite and geospatial data
+
+Satellite data are a key part of this project. For every district and season from 2017 to 2026 we extracted seasonal anomalies (difference from the district's own normal) with Google Earth Engine (scripts in [`gee/`](gee/)) and joined them to the 152,835 surveyed fields.
+
+| Source | What it measures | How it is used |
+| --- | --- | --- |
+| MODIS NDVI / EVI (250 m, 16-day) | Crop greenness and vigour | Seasonal anomalies per district per season, 2017–2026 (early, late, mean, minimum, peak) |
+| MODIS land surface temperature | Daytime land heat | Seasonal anomaly (mean, hottest spell) per district per season |
+| CHIRPS rainfall | Daily rainfall | Season total and anomalies (early, late, driest spell) per district per season |
+| ERA5-Land | Soil moisture and air temperature | Seasonal anomalies per district per season |
+| Sentinel-1 radar (10 m) | Crop structure and moisture (VH backscatter), works through clouds | Seasonal anomaly per district per season |
+| iSDAsoil | Soil pH, organic carbon, nitrogen | District cropland averages |
+| SRTM | Elevation and slope | District cropland averages and share of steep cropland |
+| Consensus cropland mask | Where crops are grown | All variables are averaged over cropland only |
+
+In the yield model, **season weather from satellites explains about 27%** of within-crop yield differences, and **soil and terrain about 18%** (SHAP shares, [`data/model_outputs/driver_groups.csv`](data/model_outputs/driver_groups.csv)). All satellite values are at district level: see *The district-level data challenge* below.
 
 ## 1. The problem and why it matters
 
@@ -25,14 +43,14 @@ The dashboard answers this from data NISR already collects every season.
 | SAS published district tables 2017–2026 | NISR | District yield trends (baseline to latest season) |
 | SAS plot microdata 2022–2025, Seasons A and B | [NISR Microdata Portal](https://microdata.statistics.gov.rw/index.php/catalog) (catalog 103, 111, 113, 124) | 152,835 plot-crop records: yield, fertilizer, seed, manure, lime, erosion control, plot and farmer traits, survey weights |
 | Soil and terrain | iSDAsoil, SRTM (Google Earth Engine) | Soil pH, carbon and nitrogen; elevation and slope of district cropland |
-| Season weather and crop condition | MODIS NDVI/EVI and land temperature, CHIRPS rainfall, ERA5-Land, Sentinel-1 radar (Google Earth Engine) | 16-day anomalies per district and season, 2017–2026 |
+| Season weather and crop condition | MODIS NDVI/EVI and land temperature, CHIRPS rainfall, ERA5-Land soil moisture and air temperature, Sentinel-1 radar (Google Earth Engine) | Seasonal anomalies per district and season, 2017–2026 (see *Satellite and geospatial data* above) |
 | Policy targets | [PSTA 5](https://www.minagri.gov.rw/fileadmin/user_upload/Minagri/Publications/Policies_and_strategies/PSTA_5_Abridged_version_Final.pdf) | 2028/29 national yield targets shown on the charts |
 
 The data used by the dashboard are in [`data/`](data/). They are all district-level aggregates; see [`data/README.md`](data/README.md). The raw microdata are too large and are governed by NISR's access terms, so they are not in this repository. Download them from the link above.
 
 ## 3. What the dashboard communicates and how to use it
 
-Pick a **crop**, **season** and **district** at the top. Each page opens with a short **In brief** text that rewrites itself for your selection and states the main point, followed by at most three charts. Hover for exact values; click a district on the map to select it; switch **English / Kinyarwanda** in the side menu.
+Pick a **crop**, **season** and **district** at the top of the left column. On a computer the page has three columns: the menu, a fixed column with the filters, a short **In brief** text that rewrites itself for your selection, and the map; and a statistics column on the right (key figures, then all charts) that scrolls on its own. On a phone everything is one scrolling column. Hover for exact values; click a district on the map to select it; switch **English / Kinyarwanda** in the side menu.
 
 | Page | What it shows | Question it answers |
 | --- | --- | --- |
@@ -40,12 +58,12 @@ Pick a **crop**, **season** and **district** at the top. Each page opens with a 
 | **What to do** | Map of the input each district should promote (fertilizer, improved seed, manure, lime or anti-erosion works); the district's yield today and with each input; top 10 districts by extra harvest. Choose one input to see where it pays off most | What should be done, where, first, and how much would it add? |
 | **What drives yield** | The 10 factors that most separate high- from low-yield fields, for the chosen crop | What matters most, and how much is under farmers' control? |
 | **How reliable** | Error of the model and of simple rules when each season is predicted from earlier seasons; validation table | How far can the results be trusted? |
-| **About** | Purpose, data, method, limits, AI use | |
+| **About** | Purpose, data, satellite data, the district-level data challenge, limits, team, AI use | |
 
 ## 4. Method
 
 1. **Survey data** (`src/prepare_microdata.py`): plot × crop records harmonized across four yearly layouts. Survey-weighted district yields match NISR's published tables (median ratio 0.89–1.04 for the main crops).
-2. **Context features** (`src/build_model_dataset.py`): district soil, terrain and seasonal satellite anomalies joined to each plot.
+2. **Context features** (`gee/`, `src/build_model_dataset.py`): district soil, terrain and seasonal satellite anomalies joined to each plot. Because the public microdata have no plot GPS or sector codes, these are district values (one per district and season); see the district-level data challenge in section 7.
 3. **Yield model** (`src/train_model.py`): LightGBM on log yield with 42 features. Inputs are constrained to have non-negative effects.
 4. **Validation:** unseen segments, unseen districts and an unseen year; a walk-forward test season by season (`src/compare_models.py`).
 5. **Drivers:** mean absolute SHAP values per feature and group.
@@ -105,7 +123,7 @@ python3 src/build_dashboard_data.py     # -> docs/data.js
 ## 7. Limitations
 
 - Effects are associations in survey data, not field-trial results. They show where inputs are likely to pay off; field trials should confirm them.
-- Survey plots have no public GPS, so soil and satellite features are district averages.
+- **The district-level data challenge.** NISR's public survey microdata contain no plot GPS coordinates and no sector codes, so satellite, soil and terrain variables can only be attached at district level (one value per district and season). This limits how much plot-to-plot variation the model can explain (within-crop plot R² about 0.13–0.19) and is why results are reported per district. With GPS-linked plots (available to NISR internally), the same pipeline could use field-level satellite data (10 m Sentinel-2/Sentinel-1, terrain wetness, curvature, NDWI) and give field-level recommendations. **That is our main recommendation to NISR.**
 - Single-plot predictions are noisy, so results are reported per district.
 - In a season-by-season test, a district's own past yield predicts its next yield better than the model. The model is for comparing inputs, not for replacing survey estimates.
 - 2024 Season B uses only plots with an exact crop share: the NISR screening file lists one crop per plot.
@@ -116,7 +134,7 @@ python3 src/build_dashboard_data.py     # -> docs/data.js
 
 This submission is the team's own work. All data sources are cited above.
 
-AI assistance (Claude, Anthropic) was used to write and debug code, check data processing and draft documentation. The team reviewed the methods and results, and all figures come from running the code in this repository.
+**Use of AI:** AI assistance (Claude, Anthropic) was used only to generate code. All code was reviewed, tested and approved by the team. The problem definition, data choices, analysis decisions and interpretation of results are the team's own.
 
 **Data:**
 - National Institute of Statistics of Rwanda (SAS microdata and tables)
@@ -125,4 +143,4 @@ AI assistance (Claude, Anthropic) was used to write and debug code, check data p
 
 Intellectual property in this submission is assigned to NISR under the hackathon rules.
 
-**Team:** <name 1, university, student ID> · <name 2, university, student ID>
+**Team:** Rebecca Dukundimana and Jean de Dieu Niyogisubizo, University of Rwanda.
