@@ -7,7 +7,7 @@ Where would fertilizer, improved seed and manure raise harvests most? This proje
 | | |
 | --- | --- |
 | **Live dashboard** | <https://niyogsubizo-jean-de-dieu.github.io/rwanda-yield-gap/> |
-| **Demo video** | [`demo/demo.webm`](demo/demo.webm) (2 min 06 s) |
+| **Demo video** | [`demo/demo.webm`](demo/demo.webm) |
 | **Run locally** | `python3 app.py` |
 | **Team** | Rebecca Dukundimana and Jean de Dieu Niyogisubizo, University of Rwanda |
 
@@ -59,9 +59,9 @@ Pick a **crop**, **season** and **district** at the top of the left column. On a
 | **What drives yield** | The 10 factors that most separate high- from low-yield fields, for the chosen crop | What matters most, and how much is under farmers' control? |
 | **How reliable** | Error of the model and of simple rules when each season is predicted from earlier seasons; validation table | How far can the results be trusted? |
 | **About** | Purpose, data, satellite data, the district-level data challenge, limits, team, AI use | |
-| **Data assistant** ("Ask the data" in the side menu) | Answers typed questions in English or Kinyarwanda (yields, trends, recommendations, input effects, input use, drivers, accuracy, data, method, limits, targets) with numbers from the dashboard, and an "Open on map" link | Quick answers without clicking through the pages |
+| **Ask AI** (side menu) | Answers typed questions in English or Kinyarwanda, typos included (yields, trends, why yields changed, what to do, input effects, input use, top districts, comparisons, drivers, accuracy, data, method, limits, targets) with numbers from the dashboard, and an "Open on map" link | Quick answers without clicking through the pages |
 
-The data assistant runs entirely in the browser on the published results (`docs/data.js`) and a built-in knowledge base: no server, no API key, no external calls. It never invents numbers; if it does not understand a question it says so and suggests questions it can answer.
+**Ask AI** runs entirely in the browser on the published results (`docs/data.js`) and a built-in knowledge base: no server, no API key, no external AI service. Keyword rules handle clear questions; a small naive-Bayes intent classifier, trained when the page loads on 387 labelled example questions in both languages (`TRAIN` in `docs/assistant.js`), handles the rest. It never invents numbers; if it does not understand a question it says so and suggests questions it can answer.
 
 ## 4. Method
 
@@ -102,7 +102,7 @@ rwanda-yield-gap/
 ├── notebooks/                   # 05 yield-gap model, 06 walk-forward validation (same code, with charts)
 ├── gee/                         # Google Earth Engine scripts used to extract the satellite features
 ├── docs/                        # the dashboard (published with GitHub Pages)
-└── demo/                        # demo.webm and the script that records it
+└── demo/                        # demo video (demo.webm)
 ```
 
 ## 6. Run it

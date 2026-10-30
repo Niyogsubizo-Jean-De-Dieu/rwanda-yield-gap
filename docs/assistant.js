@@ -1,12 +1,14 @@
-/* ==================================================================== "Ask the data" assistant
-   A deterministic question-answering helper that runs entirely in the browser. It reads only window.DASH (through
+/* ==================================================================== "Ask AI" assistant
+   A question-answering helper that runs entirely in the browser: keyword rules for clear questions, and a small
+   naive-Bayes intent classifier, trained when the page loads on the labelled example questions in TRAIN below,
+   for questions the rules do not catch. It reads only window.DASH (through
    the tables and helpers defined in index.html: S, TXT, tr, recFor, recsAll, SCEN, SNAT, ADOPT, DRVC, VAL, WF ...)
    and the knowledge-base texts below. No server, no API key, no external calls; it never invents numbers.
    Loaded after the main script in index.html. */
 "use strict";
 
 Object.assign(TXT.en, {
-  as_title: "Ask the data", as_btn: "Ask the data", as_ph: "Ask about yields, inputs, districts…", as_send: "Send", as_close: "Close", as_you: "You",
+  as_title: "Ask AI", as_btn: "Ask AI", as_ph: "Ask about yields, inputs, districts…", as_send: "Send", as_close: "Close", as_you: "You",
   as_hello: "Hello! I answer only from this dashboard's results (NISR survey, satellite data, model). Ask about a district, crop or input, or pick a question below.",
   as_open: "Open on map", as_open_page: "Open page",
   as_yield: "{crop} yield in {d} ({season} {y}) was {v} kg/ha, {rank} of {n} districts{tgt}.",
@@ -41,6 +43,8 @@ Object.assign(TXT.en, {
   kb_team: "Made by Rebecca Dukundimana and Jean de Dieu Niyogisubizo (University of Rwanda) for the NISR Big Data Hackathon 2026, Track 1. AI assistance (Claude, Anthropic) was used only to generate code; all code was reviewed, tested and approved by the team. The problem definition, data choices, analysis decisions and interpretation of results are the team's own.",
   kb_howto: "Choose a crop, season and district at the top left. Yield trends shows the change since a baseline year; What to do shows the best input per district (or pick one input); What drives yield and How reliable explain the model. Click a district on the map to select it, hover for values, and switch language in the side menu.",
   as_unknown: "I can answer questions about yields, trends, recommendations, inputs, drivers, model accuracy, data and methods. Try:",
+  as_why_inputs: "In the survey years {y0}–{y1} in {d}, fertilizer use on {crop} went from {f0}% to {f1}% of the area, improved seed {s0}% → {s1}%, manure {m0}% → {m1}%.",
+  as_why_drv: "For {crop}, inputs and practices explain about {mg}% of yield differences between fields and season weather (rainfall and crop greenness from satellites) {w}%, so a poor rainy season can lower yields even when input use holds. These are associations in the data, not proven causes.",
   as_country: "This dashboard covers Rwanda's 30 districts, not other countries. ",
   as_top_yield_low: "Lowest {crop} yields{where} in {season} {y}: {list}.",
   as_cmp: "{crop} yield ({season} {y}): {list}. Average of all districts: {avg} kg/ha.",
@@ -53,7 +57,7 @@ Object.assign(TXT.en, {
   as_q4: "Top districts for fertilizer on {crop}", as_q5: "What drives {crop} yield?", as_q6: "How reliable is the model?"
 });
 Object.assign(TXT.rw, {
-  as_title: "Baza amakuru", as_btn: "Baza amakuru", as_ph: "Baza ku musaruro, inyongeramusaruro, uturere…", as_send: "Ohereza", as_close: "Funga", as_you: "Wowe",
+  as_title: "Baza AI", as_btn: "Baza AI", as_ph: "Baza ku musaruro, inyongeramusaruro, uturere…", as_send: "Ohereza", as_close: "Funga", as_you: "Wowe",
   as_hello: "Muraho! Nsubiza nkoresheje gusa ibisubizo by'iki gikoresho (ubushakashatsi bwa NISR, amakuru y'icyogajuru, icyitegererezo). Baza ku karere, igihingwa cyangwa inyongeramusaruro, cyangwa uhitemo ikibazo hasi.",
   as_open: "Fungura ku ikarita", as_open_page: "Fungura urupapuro",
   as_yield: "Umusaruro wa {crop} muri {d} ({season} {y}) wari {v} kg/ha, ku mwanya wa {rank} mu turere {n}{tgt}.",
@@ -88,6 +92,8 @@ Object.assign(TXT.rw, {
   kb_team: "Cyakozwe na Rebecca Dukundimana na Jean de Dieu Niyogisubizo (Kaminuza y'u Rwanda) mu irushanwa NISR Big Data Hackathon 2026, Track 1. Ubufasha bwa AI (Claude, Anthropic) bwakoreshejwe gusa mu kwandika code; code yose yasuzumwe, igeragezwa kandi yemezwa n'itsinda. Gusobanura ikibazo, guhitamo amakuru, ibyemezo by'isesengura no gusobanura ibisubizo ni iby'itsinda.",
   kb_howto: "Hitamo igihingwa, igihembwe n'akarere hejuru ibumoso. 'Uko umusaruro uhagaze' herekana impinduka kuva mu mwaka fatizo; 'Icyo gukora' herekana inyongeramusaruro nziza kuri buri karere (cyangwa uhitemo imwe); 'Ibigena umusaruro' na 'Kwizerwa' hasobanura icyitegererezo. Kanda ku karere ku ikarita kugira ngo ugahitemo, shyira imbeba hejuru urebe imibare, uhindure ururimi mu ruhande.",
   as_unknown: "Nshobora gusubiza ibibazo ku musaruro, impinduka zawo, inama, inyongeramusaruro, ibigena umusaruro, kwizerwa kw'icyitegererezo, amakuru n'uburyo. Gerageza:",
+  as_why_inputs: "Mu myaka y'ubushakashatsi {y0}–{y1} muri {d}, ikoreshwa ry'ifumbire mvaruganda kuri {crop} ryavuye kuri {f0}% rigera kuri {f1}% by'ubuso, imbuto z'indobanure {s0}% → {s1}%, ifumbire y'imborera {m0}% → {m1}%.",
+  as_why_drv: "Kuri {crop}, inyongeramusaruro n'imihingire bisobanura hafi {mg}% by'itandukaniro ry'umusaruro hagati y'imirima, ikirere cy'igihembwe (imvura n'icyatsi cy'ibihingwa bigaragazwa n'icyogajuru) {w}%; bityo igihembwe cy'imvura nke gishobora kugabanya umusaruro n'iyo inyongeramusaruro zikoreshejwe. Aya ni amasano agaragara mu makuru, si impamvu zemejwe.",
   as_country: "Iki gikoresho kireba uturere 30 tw'u Rwanda, si ibindi bihugu. ",
   as_top_yield_low: "Uturere dufite umusaruro wa {crop} muke{where} mu {season} {y}: {list}.",
   as_cmp: "Umusaruro wa {crop} ({season} {y}): {list}. Impuzandengo y'uturere twose: {avg} kg/ha.",
@@ -121,8 +127,8 @@ const Ask = (() => {
   /* typo tolerance: a word of 5+ letters one edit away (two for 8+ letters) from a known word is read as that word
      ("maise" -> maize, "nyagatre" -> nyagatare). NOFIX lists real English words that are that close but mean
      something else ("fields" is not "yields"). */
-  const VOCAB = "accuracy accurate akarere amasaka average bugesera burera cassava change climbing compare compost district districts driver drivers eastern erosion fertiliser fertilizer fertilizers gakenke gasabo gatsibo gicumbi gisagara harvest highest ibigori ibijumba ibirayi ibishyimbo icyitegererezo icyogajuru ifumbire imbogamizi imborera improve improved imyumbati intego ishwagara kamonyi karongi kayonza kicukiro kigali kirehe limitation limitations lowest maize manure muhanga musanze national ngoma ngororero northern nyabihu nyagatare nyamagabe nyamasheke nyanza nyarugenge nyaruguru output potato potatoes production productivity province recommend recommendation recommendations reliability reliable rubavu ruhango rulindo rusizi rutsiro rwamagana rwanda satellite season seasons since sorghum southern soybean soybeans target targets trend umusaruro uturere western wheat yield yields".split(" ");
-  const NOFIX = new Set("accurately amperage approved astern averaged averages baize beverage cassavas chance chang changed changes charge chariest cheat claiming clamming clamping clicking climaxing clinging clinking clipping clomping clubbing clumping commendation commendations compared compares comport comports compos compose composed composer composes composite composted composts coverage cribbing crimping crumbing delivers deniability derision destruct destructs dietrich disprove disproved distinct distract distracts distrait distrust distrusts diver divers drainers drier driers drifters drinkers drive drivel drivels driven drives drover drovers easter easterly easterner easters elimination eliminations exchange factional fertilize fertilized fertilizes field fields hairiest hardest hardiest harshest harvested harvester harvests highness hoariest hoarsest imitation imitations imploded implored imported improper improves improvise improvised inaccuracy inaccurate lamination leverage levitation liability lightest litigation lowliest maine maizes manicure manured manures mature mince nationally nationals nighest northerly northerner notional optional outputs overage overages pastern pasterns pliability plumbing potables prediction productions productive productively projection protection provence providence provinces ramayana rational rationale rationals readability readable realizable reason reasons recommence recommenced recommended recommends redistrict redistricts reduction reliably reliance reproduction reproved restrict restricts reusable rightest river rivers rwandan rwandans rwandas satellited satellites seasonal seasoned sessions sharpest singe slimming slowest southerly southerner southerns starlets stepsons tangents targeted tightest tomatoes tread treed trends trendy trent unproved unreliability unreliable vince visitation visitations wanda websters westerly westerner westerns wheal wield wields wince".split(" "));
+  const VOCAB = "accuracy accurate akarere amasaka average bugesera burera cassava cause caused change climbing compare compost decline decrease district districts driver drivers eastern erosion explain farmers fertiliser fertilizer fertilizers gakenke gasabo gatsibo gicumbi gisagara happened harvest highest ibigori ibijumba ibirayi ibishyimbo icyitegererezo icyogajuru ifumbire imbogamizi imborera improve improved imyumbati increase inputs intego ishwagara kamonyi karongi kayonza kicukiro kigali kirehe limitation limitations lowest maize manure muhanga musanze national ngoma ngororero northern nyabihu nyagatare nyamagabe nyamasheke nyanza nyarugenge nyaruguru output potato potatoes production productivity province reason recommend recommendation recommendations reduce reliability reliable rubavu ruhango rulindo rusizi rutsiro rwamagana rwanda satellite season seasons should since sorghum southern soybean soybeans target targets trend umusaruro uturere western wheat where which yield yields".split(" ");
+  const NOFIX = new Set("accurately amperage appended approved astern averaged averages baize beverage callused caroused cased cassavas caucused causes chance chang changed changes charge chariest charmers cheat claiming clamming clamping clause clicking climaxing clinging clinking clipping clomping clubbing clumping commendation commendations compared compares comport comports compos compose composed composer composes composite composted composts coverage cribbing crimping crumbing dampened deadline decease deceased deceases declined declines decreased decreases deduce delivers deniability derision destruct destructs dietrich disprove disproved distinct distract distracts distrait distrust distrusts diver divers drainers drier driers drifters drinkers drive drivel drivels driven drives drover drovers easter easterly easterner easters elimination eliminations exchange explained explains factional farmer fertilize fertilized fertilizes field fields framers hairiest hampered hardened hardest hardiest harkened harshest harvested harvester harvests hastened highness hoariest hoarsest hyphened imitation imitations imploded implored imported improper improves improvise improvised inaccuracy inaccurate increased increases input lamination leverage levitation liability lightest litigation lowliest maine maizes manicure manured manures mature mince nationally nationals neckline nighest northerly northerner notional optional outputs overage overages pastern pasterns pause paused pliability plumbing potables prediction productions productive productively projection protection provence providence provinces ramayana rational rationale rationals readability readable realizable reasoned reasoner reasons recline reclined recliner reclines recommence recommenced recommended recommends recreate redistrict redistricts reduced reduces reduction reliably reliance reproduction reproved restrict restricts reusable rightest river rivers rwandan rwandans rwandas satellited satellites seasonal seasoned seduce sessions sharpened sharpest shoulder singe slimming slowest southerly southerner southerns starlets stepsons tangents targeted there tightest tomatoes tread treason treed trends trendy trent unproved unreliability unreliable vince visitation visitations wanda warmers websters westerly westerner westerns wheal wheres whore wield wields wince".split(" "));
   function edits(a, b) { // Damerau-Levenshtein distance
     const d = Array.from({ length: a.length + 1 }, (_, i) => [i].concat(Array(b.length).fill(0)));
     for (let j = 1; j <= b.length; j++) d[0][j] = j;
@@ -142,12 +148,14 @@ const Ask = (() => {
   const RE = {
     team: /\bteam\b|\bwho (made|built|created|developed)|\bauthors?\b|\bitsinda|\bnde\b|\bwakoze|\bai\b|\bclaude\b|\bartificial intel|\bubwenge bw/,
     howto: /how (do|can|should) (i|we) (use|read|navigate)|how to (use|read|navigate)|how does (the|this) dashboard|\buse (the|this) dashboard|\bnkoresha\b|\bnkoresha nte|\bgukoresha iki gikoresho|\bnte\b.*gikoresho|\bgisomwa/,
-    limits: /\blimit|\bcaveat|\bweakness|\bgps\b|\bchallenge|\bshortcoming|\bi?mbogamizi|\baho bigarukira|\bintege nke/,
-    accuracy: /\baccura|\breliab|\berror\b|\berrors\b|\btrust|\bvalidat|\bmape\b|\br2\b|\br²|\bkwizerwa|\bcyizewe|\bbyizewe|\bikosa|\bkwizera/,
+    limits: /\blimit|\bweak|\bcaveat|\bweakness|\bgps\b|\bchallenge|\bshortcoming|\bi?mbogamizi|\baho bigarukira|\bintege nke/,
+    accuracy: /\baccura|\bhow sure|\bconfiden|\bcertain|\breliab|\berror\b|\berrors\b|\btrust|\bvalidat|\bmape\b|\br2\b|\br²|\bkwizerwa|\bcyizewe|\bbyizewe|\bikosa|\bkwizera/,
     method: /\bmethod|\bcalculat|\bcompute|\bhow did you|\bhow do you (get|know|estimate|work out)|\bhow (does|do|did) (the )?(model|scenario|estimate|recommendation)|\bhow (are|were|is) .*(calculated|computed|estimated)|\bshap\b|\blightgbm\b|\buburyo\b|\bmwabaze|\bbyabazwe|\bbibarwa/,
     data: /\bdata\b|\bdataset|\bsource|\bsatellite|\bsentinel|\bmodis\b|\bchirps\b|\bera5|\bearth engine|\bndvi\b|\bisdasoil|\bsrtm\b|\bamakuru\b|\bicyogajuru|\bibyogajuru/,
     targets: /\bpsta|\bnst ?2|\btarget|\bgoal|\bintego/,
-    drivers: /\bdrive|\bdriver|\bfactor|\bexplain|\baffect|\bwhat matters|\binfluenc|\bdetermin|\bwhy (are|is|do)|\bkigena|\bbigena|\bigena\b|\bigitera|\bimpamvu/,
+    why: /\bcaus|\bwhat (made|led)|\bmade .*\b(rise|drop|fall|go|grow)|\bkubera iki|\bbitewe n'iki|\breason|\bwhy\b|\bwhat happened|\bexplain the|\bimpamvu|\byatewe|\bbyatewe|\bwatewe|\bbyateye|\bigitera|\bgitera/,
+    move: /\bdrop|\bfall|\bfell|\bdeclin|\bdecreas|\bdown\b|\bloss|\blow|\brise|\brose|\bincreas|\bgrow|\bchang|\bimprov|gabanuk|gabanut|iyonger|manuka|manutse|\bmuke\b|hindut/,
+    drivers: /\bdrive|\bgituma|\bbituma|\bituma\b|\bdriver|\bfactor|\bexplain|\baffect|\bwhat matters|\binfluenc|\bdetermin|\bwhy (are|is|do)|\bkigena|\bbigena|\bigena\b|\bigitera|\bimpamvu/,
     top: /\btop\b|\bwhich (district|country|province|region|area|part)|\bwhat district|\bhighest|\blowest|\bbest district|\bworst|\branking|\brank\b|\bwhere\b|\bmost\b|\bleading|\bbiggest|\blargest|\bpoorest|\bbottom\b|\bu?tuhe\b|\bakahe\b|\btwa mbere|\bku isonga|\bdufite umusaruro mwinshi/,
     topSoft: /\bhigher\b|\bhigh\b|\blower\b|\blow\b|\bmore\b|\bless\b|\bbetter\b|\bwhich\b|\bmwinshi\b|\bmuke\b|\bcyane\b|\bhejuru\b|\bhasi\b/,
     low: /\blowest|\blower\b|\blow\b|\bworst|\bleast|\bpoorest|\bsmallest|\bweakest|\bbottom\b|\bless\b|\bmuke\b|\bhasi\b|\bnabi\b/,
@@ -156,24 +164,28 @@ const Ask = (() => {
     greet: /^(hi|hello|hey|good (morning|afternoon|evening)|muraho|mwaramutse|mwiriwe|bite|salut|bonjour)\b/,
     thanks: /\bthank|\bthanks\b|\bmurakoze|\bmurakoze cyane/,
     topGain: /\bgain|\bextra|\bopportunit|\bpriorit|\bpay|\binyongera|\btwunguka|\bkunguka/,
-    effect: /what if|\bwould\b|\bcould\b|\bimpact|\beffect|\bgain|\bincrease|\braise|\bboost|\badd\b|\badds\b|\bshould .* use|\byakongera|\bbyakongera|\byazamura|\bbyazamura|\binyongera|\bingaruka|\bbakoresheje|\bbatangiye|\byongera/,
+    effect: /what if|\bhow much (extra|more)|\bextra\b|\bwould\b|\bcould\b|\bimpact|\beffect|\bgain|\bincrease|\braise|\bboost|\badd\b|\badds\b|\bshould .* use|\byakongera|\bbyakongera|\byazamura|\bbyazamura|\binyongera|\bingaruka|\bbakoresheje|\bbatangiye|\byongera/,
     adopt: /how many|\bshare\b|\bpercent|\badopt|\buse\b|\buses\b|\busing\b|\bused\b|\bbakoresha|\bikoreshwa|\bbangahe|\bbingahe|\bhakoreshwa/,
-    rec: /\brecommend|\bshould\b|\bbest input|\bwhich input|\bwhat input|\bwhat to do|\badvice|\badvise|\bpriority|\bicyo gukora|\binama\b|\bbakwiye|\byakwiye|\bikwiye|\byakora|\bbakora|\bgukora iki|\bakora iki/,
-    trend: /\btrend|\bchang|\bsince\b|\bgrow|\bincreas|\bdecreas|\bimprov|\bdeclin|\bover time|\bevolv|\bimpinduka|\bkuva\b|\bwiyongereye|\bwagabanutse|\bwahindutse|\byahindutse/,
+    rec: /\b(how|ways?) (can|could|to|do|should|we|i)\b.*\b(increase|improve|raise|boost|grow|get more|double)|\b(make|get) .*\b(better|higher|more)\b|\btwakora|\bbakora iki|\bnakora iki|\bngo .*(byere|yere|wiyongere|byiyongere)|\bcan be done|\bwhat (can|could|should) (we|i|farmers|they|be|he|she) (do|done)|\bto (increase|improve|raise|boost)\b|\bkongera umusaruro|\bwakongera|\btwakongera|\bbakongera|\bgute\b|\brecommend|\bshould\b|\bbest input|\bwhich input|\bwhat input|\bwhat to do|\badvice|\badvise|\bpriority|\bicyo gukora|\binama\b|\bbakwiye|\byakwiye|\bikwiye|\byakora|\bbakora|\bgukora iki|\bakora iki/,
+    trend: /\btrend|\bchang|\bsince\b|\bgrow|\bincreas|\bdecreas|\bimprov(?!ed seed)|\bdeclin|\bover time|\bevolv|\bimpinduka|\bkuva\b|\bwiyongereye|\bwagabanutse|\bwahindutse|\byahindutse/,
     yieldw: /\byield|\bharvest|\bproduc|\boutput|\btonnes?\b|\bperform|\bdoing\b|\byeza|\bweze|\bwera|\bkg\b|\bkg\/ha|\bumusaruro|\bwera\b|\bangahe/,
     national: /\brwanda\b|\bnational|\bcountry|\ball districts|\bigihugu|\bmu gihugu|\buturere twose/,
     input: /\binput|\binyongeramusaruro/
   };
   const PROV = { Eastern: /\beast|\biburasirazuba/, Western: /\bwest|\biburengerazuba/, Northern: /\bnorth|\bamajyaruguru/, Southern: /\bsouth|\bamajyepfo/, "Kigali City": /\bkigali|\bumujyi/ };
+  const SHORT = { waht: "what", wat: "what", wht: "what", whta: "what", hw: "how", hwo: "how", wich: "which", whic: "which", wher: "where", whre: "where", wy: "why", whay: "why", teh: "the", yeld: "yield", yied: "yield", yild: "yield", fert: "fertilizer", u: "you", r: "are", pls: "please" };
+  const fixShort = t => t.replace(/[a-z]+/g, w => SHORT[w] || w);
   function parse(q) {
-    const t = fixTypos(norm(q));
+    const t = fixTypos(fixShort(norm(q)));
     const districts = DISTRICTS.filter(d => new RegExp("\\b" + d.toLowerCase() + "\\b").test(t)), district = districts[0] || null;
     const province = (Object.entries(PROV).find(([, re]) => re.test(t)) || [null])[0];
-    const crop = (CROP_WORDS.find(([, re]) => re.test(t)) || [null])[0];
+    const crops = []; let rest = t; // all crops named, most specific first ("climbing bean" is not also "bean")
+    CROP_WORDS.forEach(([c, re]) => { if (re.test(rest)) { crops.push(c); rest = rest.replace(new RegExp(re.source, "g"), " "); } });
+    const crop = crops[0] || null;
     const lever = (LEVER_WORDS.find(([, re]) => re.test(t)) || [null])[0];
     const sm = t.match(/\b(?:season|igihembwe)\s*(?:cya\s*)?([ab])\b/) || t.match(/\b20\d\d\s?([ab])\b/);
     const years = [...t.matchAll(/\b(20[12]\d)(?=[ab]?\b)/g)].map(m => +m[1]);
-    return { t, district, districts, province, crop, lever, season: sm ? sm[1].toUpperCase() : null, years, national: has(t, RE.national), country: has(t, RE.country) };
+    return { t, district, districts, province, crop, crops, lever, season: sm ? sm[1].toUpperCase() : null, years, national: has(t, RE.national), country: has(t, RE.country) };
   }
   function intentOf(p) {
     const t = p.t, words = t.split(" ").length;
@@ -187,16 +199,19 @@ const Ask = (() => {
     if (has(t, RE.method)) return "method";
     if (has(t, RE.data) && !p.district) return "data";
     if (has(t, RE.targets) && !p.district) return "targets";
+    if (has(t, RE.why) && has(t, RE.move)) return "why";
     if (has(t, RE.drivers)) return "drivers";
     if (p.districts.length > 1) return "compare";
+    if (!p.lever && has(t, RE.rec) && has(t, /\bincrease|\bimprove|\braise|\bboost|\bbetter|\bmore\b|\btwakora|\bnakora|\bbakora|\bngo\b/)) return "rec";
     if (!p.district && (has(t, RE.top) || p.province || (has(t, RE.topSoft) && (has(t, RE.yieldw) || p.crop || p.lever)))) return "top";
-    if (p.lever && has(t, RE.adopt) && !has(t, /what if|\bwould\b|\bif farmers|\bbakoresheje|\bbatangiye/)) return "adoption";
+    if (p.lever && has(t, RE.adopt) && !has(t, /what if|\bwould\b|\bif farmers|\bworth|\bpay|\bbenefit|\bhelp|\bbakoresheje|\bbatangiye|\bakamaro/)) return "adoption";
     if (!p.lever && has(t, RE.input) && has(t, RE.adopt)) return "adoption";
     if (p.lever && (has(t, RE.effect) || has(t, RE.rec))) return "effect";
     if (has(t, RE.rec)) return "rec";
     if (has(t, RE.trend)) return "trend";
     if (p.lever) return "effect";
-    if (has(t, RE.yieldw) || p.district || p.crop) return "yield";
+    if (has(t, RE.yieldw)) return "yield";
+    if (p.district || p.crop) return "weak"; // only a name: let the classifier decide, else give the yield
     return null;
   }
 
@@ -204,12 +219,82 @@ const Ask = (() => {
   const lv = l => tr("lv_" + l).toLowerCase();
   const C = c => esc(cropName(c));
   const latestYear = (crop, season) => Math.max(...trendRows(crop, season).map(r => r.year));
+  /* ---------------------------------------------------------------- trained intent classifier (multinomial naive Bayes)
+     Names are replaced by placeholders before training and use, so "maize yield in Huye" teaches "CROP yield in DIST". */
+  const TRAIN = {
+    yield: "what is the maize yield in huye|how much maize does musanze produce|yield of beans in nyagatare|how much do farmers harvest in kirehe|how productive is gicumbi for potatoes|tell me about maize in bugesera|kg per hectare of cassava in ruhango|how is rubavu doing|output of wheat in burera|how good is the harvest in ngoma|what did nyanza harvest in 2024|production level of sorghum in kayonza|show me huye|umusaruro w'ibigori i musanze|ibirayi byeze angahe i nyabihu|musanze yejeje angahe|umusaruro wa huye|imyumbati yeze ite i ruhango|what are maize yields like in gatsibo|current bean yield in rusizi|how much sorghum per hectare in kayonza|latest wheat figures for musanze|how big is the potato harvest in rubavu|maize numbers for huye|average yield of soybean in bugesera|how well do beans grow in nyamagabe|status of cassava in kamonyi|harvest per hectare in karongi|yield this season|how many tonnes per hectare|ibigori byeze bingahe i gatsibo|umusaruro w'ibirayi i rubavu ni uwuhe|ibishyimbo byera bite i rusizi|uko umusaruro uhagaze i nyamagabe",
+    trend: "how has maize yield changed since 2018|trend of beans in huye|is yield going up or down in musanze|did potato yield improve over time|evolution of cassava since 2019|has nyagatare improved|is gicumbi getting better or worse|change in yield over the years|history of maize yields in kirehe|umusaruro wahindutse ute kuva 2018|impinduka z'umusaruro w'ibigori|umusaruro wiyongereye cyangwa wagabanutse|uko umusaruro wagiye uhinduka|did beans go up or down|has cassava yield fallen since 2017|is wheat production rising|how did yields move over the years|compare 2019 and 2025 yields|is the trend positive in ngoma|did potatoes get worse in nyaruguru|growth of maize yield since 2020|has soybean gone up|umusaruro wiyongereye kuva 2019|ese ibirayi byiyongereye|ibigori byagabanutse|uko umusaruro wahindutse mu myaka",
+    why: "what caused maize yield to drop|why did yield fall in huye|why is bean yield low in musanze|reason for the decline in potato yield|why did nyagatare improve so much|what explains the drop|what happened to maize in 2024|why are yields lower this season|cause of low production in gicumbi|ni iki cyateye umusaruro kugabanuka|impamvu umusaruro wagabanutse|kubera iki umusaruro wiyongereye|umusaruro w'ibishyimbo wagabanutse kubera iki|why did it go down|why did production decrease|what led to lower yields|why the fall in 2024|umusaruro wagabanutse kubera iki|ni iki cyatumye umusaruro ugabanuka|what is the reason maize went up|why did beans improve|why did yield rise in kirehe|what explains the increase|why is gicumbi falling behind|why did the harvest change|why is yield so low here|kubera iki ibigori byiyongereye|ni iki cyatumye umusaruro wiyongera|impamvu ibishyimbo byagabanutse",
+    rec: "what can be done to increase beans|how can we increase maize yield|how to improve yield in huye|what should farmers in kirehe do|what is the best input for musanze|how do we get more harvest|what do you recommend for gicumbi|which input should we promote|advice for bean farmers|how to boost production|what action should the district take|ways to raise potato yield|what would help farmers most|twakora iki ngo umusaruro wiyongere|ni iki cyakongera umusaruro w'ibishyimbo|inama ku bahinzi ba huye|abahinzi bakwiye gukora iki|nakongera umusaruro nte|icyo gukora i kirehe|what would make maize better|how do we make beans grow better|what can raise production in ngoma|what helps yield the most here|best way to improve harvest|what to promote in musanze|ni iki cyafasha abahinzi|twakora iki ngo umusaruro wiyongere|byakorwa iki|which practice should we promote|what should the district agronomist do|what is the priority action|how should we spend the input budget|what intervention works best|what can we do about low yields|how to help farmers produce more|recommendations for rwamagana|ni iki twashyira imbere|iki gikwiye gukorwa|inama wagira abahinzi",
+    effect: "what if farmers used fertilizer|how much would fertilizer add|effect of manure on maize|impact of improved seed in huye|is lime worth it|does fertilizer pay off in kirehe|gain from the package|what happens if we use seed|benefit of anti erosion works|ifumbire yakongera angahe|imbuto z'indobanure zakongera iki|ingaruka z'ifumbire y'imborera|ishwagara yafasha iki|is manure worth it|would fertilizer help|is seed worth buying|does lime help maize|value of using compost|ifumbire ifite akamaro kangana iki|imborera ifite akamaro|does improved seed pay off|how much more with fertilizer|what if they used compost|is fertilizer profitable|how much extra from manure|impact of the full package|would anti erosion works help|gain if farmers adopt seed|imbuto z'indobanure zatanga iki|ifumbire yakongeraho angahe|byose hamwe byakongera angahe",
+    top: "which district has the highest maize yield|top districts for beans|where is cassava best|best performing districts|which districts produce the most|ranking of districts for potatoes|lowest yields for sorghum|worst districts for maize|which province is best|leading districts|where should we start|which district gains most from fertilizer|ni akahe karere keza cyane|uturere twa mbere|ni utuhe turere dufite umusaruro mwinshi|akarere ka nyuma|uturere dufite umusaruro muke|best 5 districts|which areas lead in maize|bottom districts|where are yields lowest|which district is number one|district ranking for cassava|top producers of potatoes|where should fertilizer go first|akarere ka mbere|uturere dufite umusaruro muke|ni ahahe hera cyane",
+    adoption: "how many farmers use fertilizer|share of area with improved seed|fertilizer adoption in huye|percentage using manure|who uses lime|how common is fertilizer use|input use in musanze|do farmers use compost|abahinzi bangahe bakoresha ifumbire|ikoreshwa ry'imbuto z'indobanure|ni bangahe bakoresha imborera|what share uses fertilizer|how widespread is improved seed|percentage of farmers using lime|is manure common|fertilizer coverage|how many use anti erosion|ikoreshwa ry'ifumbire ringana iki|abakoresha imbuto z'indobanure ni bangahe",
+    drivers: "what drives maize yield|which factors matter most|what affects yield|what determines bean production|most important factors|does weather matter more than fertilizer|role of soil|what influences harvest|ni iki kigena umusaruro|ibintu by'ingenzi bigena umusaruro|ikirere gifite uruhare rungana iki|what makes yield high|what makes some fields better|why do some farms produce more|what is behind high yields|ni iki gituma umusaruro uba mwinshi|ni iki gituma imirima imwe yera cyane|how important is rainfall|does soil matter|what is the role of weather|which factor is strongest|what explains high yields|is fertilizer the main factor|importance of plot size|ikirere gifite akamaro kangana iki|ubutaka bufite uruhare ki|ibintu bigena umusaruro",
+    accuracy: "how accurate is the model|can i trust the results|how reliable are these numbers|what is the error|is the prediction good|how was it validated|how good is the model|icyitegererezo cyizewe gute|ikosa ry'icyitegererezo|ese twakwizera iyi mibare|how confident is the model|how precise are the estimates|how much can we rely on this|is the model any good|how wrong can it be|how certain are these figures|what is the margin of error|does the model work well|biraboneka ko ari ukuri|imibare yizewe|is this model trustworthy|how big are the errors|how good are the predictions|validation results|can the model predict next season|how was accuracy tested|icyitegererezo gifite ikosa ringana iki",
+    data: "where does the data come from|which satellite data did you use|what sources|tell me about the satellite images|what survey is this based on|which datasets|is this nisr data|amakuru ava he|ni ayahe makuru mwakoresheje|icyogajuru mwakoresheje|what information did you use|which survey data|what images did you use|ni ayahe makuru yakoreshejwe|what satellites|which earth observation data|where are the numbers from|what is the source of yields|which soil data|did you use rainfall data|ni ayahe makuru y'ubutaka",
+    method: "how did you calculate this|how does the model work|how are the scenarios computed|what method was used|explain the approach|what is lightgbm|how do you estimate the gain|uburyo bwakoreshejwe|mwabaze mute|icyitegererezo gikora gite|what is inside the model|what inputs does the model use|which variables were used|how was the model built|what features are in the model|how were the numbers produced|how was the extra harvest estimated|what technique did you use|ni ibihe bintu icyitegererezo gikoresha|byakozwe bite|how did you work out the extra tonnes|how was the model trained|what algorithm|what is shap|how are gains added up|how did you estimate|ni gute mwabaze inyongera",
+    limits: "what are the limitations|what are the weaknesses|what can't this tell me|caveats|why no plot gps|what are the problems with the data|is it field level|imbogamizi ni izihe|aho bigarukira|intege nke z'ubu bushakashatsi|what are the risks of this analysis|what should i be careful about|what is missing from the data|how could this be wrong|what are the shortcomings|what does the data not show|is anything missing|ni iki kibura mu makuru|ni ibihe bibazo biri mu makuru|what are the caveats|any limitations|what can go wrong|how reliable is the district level data|is this causal|ni izihe ntege nke",
+    targets: "what is the psta 5 target|nst2 goals|government target for maize|how far are we from the target|what is the goal for 2029|intego ya psta 5|intego za leta|intego y'umusaruro|what does the government plan for 2029|what are the official targets|what is the national objective|where should yields be by 2029|policy target for beans|what does minagri aim for|leta irateganya iki mu 2029|intego ya minagri|maize target 2029|how far from the psta goal|national yield targets|what is the 2028 target|intego y'ibigori",
+    team: "who made this|who built the dashboard|did you use ai|who are the authors|which university|ni nde wakoze iki gikoresho|mwakoresheje ai|itsinda ryakoze|who is behind this|who developed it|who are you guys|which students made it|who worked on this project|abakoze uyu mushinga ni bande|ni bande bakoze iki|whos the team|names of the authors|which school|who wrote this|ni bande bakoze uru rubuga",
+    howto: "how do i use this dashboard|how do i read the map|what do the colours mean|how to navigate|what does this page show|nkoresha nte iki gikoresho|ikarita isomwa ite|how do i switch language|how do i pick a district|what does the map show|how do i change the crop|ni gute nahindura ururimi|nahitamo akarere nte"
+  };
+  const PLACE = [[new RegExp("\\b(" + DISTRICTS.map(d => d.toLowerCase()).join("|") + ")\\b", "g"), " dist "], [/\b20[12]\d[ab]?\b/g, " year "]];
+  const STOP = new Set("the a an of in on for to is are was be do does did i we you it this that what how which my our me and or with by at from can could would should will there their about give tell show please ni ese iki ku mu muri na ya cya rya bya z y w".split(" "));
+  const tokens = t => {
+    let x = t; PLACE.forEach(([re, w]) => { x = x.replace(re, w); });
+    CROP_WORDS.forEach(([, re]) => { x = x.replace(new RegExp(re.source + "\\w*", "g"), " crop "); });
+    LEVER_WORDS.forEach(([, re]) => { x = x.replace(new RegExp(re.source + "\\w*", "g"), " lever "); });
+    return x.replace(/[^a-z ]/g, " ").split(/\s+/).filter(w => w && !STOP.has(w))
+      .map(w => w.replace(/^(u|i|a|ku|mu|ba|bi|ka|tu|ma|wa|ya)(?=[a-z]{4})/, "").slice(0, 5)); // crude stems: "umusaruro" ~ "musaruro"
+  };
+  const NB = (() => {
+    const m = { n: {}, tot: {}, docs: {}, vocab: new Set(), N: 0 };
+    for (const [intent, ex] of Object.entries(TRAIN)) ex.split("|").forEach(q => {
+      const c = (m.n[intent] = m.n[intent] || {});
+      tokens(fixTypos(norm(q))).forEach(k => { c[k] = (c[k] || 0) + 1; m.tot[intent] = (m.tot[intent] || 0) + 1; m.vocab.add(k); });
+      m.docs[intent] = (m.docs[intent] || 0) + 1; m.N++;
+    });
+    return m;
+  })();
+  function classify(t) {
+    const tk = tokens(t).filter(k => NB.vocab.has(k));
+    if (!tk.length) return null;
+    const V = NB.vocab.size, A = 0.3; // light smoothing and equal priors: best leave-one-out accuracy on TRAIN
+    const sc = Object.keys(NB.n).map(i => [i, tk.reduce((s, k) => s + Math.log(((NB.n[i][k] || 0) + A) / (NB.tot[i] + A * V)), 0)]);
+    const mx = Math.max(...sc.map(x => x[1])), z = sc.reduce((s, x) => s + Math.exp(x[1] - mx), 0);
+    const best = sc.sort((a, b) => b[1] - a[1])[0];
+    return { intent: best[0], p: 1 / z };
+  }
+  const MULTI = ["yield", "trend", "rec", "why", "drivers", "effect", "adoption", "targets", "top"];
   function answer(q) {
-    const p = parse(q), intent = intentOf(p);
+    const p = parse(q);
+    let intent = intentOf(p), via = "rules";
+    if (intent == null || intent === "weak") {
+      const g = classify(p.t);
+      if (g && g.p >= 0.25) { intent = g.intent; via = "classifier"; } else if (intent === "weak") intent = "yield";
+    }
+    if (p.crops.length > 1 && MULTI.includes(intent)) {
+      const parts = p.crops.map(c => core({ ...p, crop: c }, intent));
+      return { ...parts[0], text: parts.map(a => a.text).join("<br><br>"), intent, via };
+    }
+    return { ...core(p, intent), intent, via };
+  }
+  function core(p, intent) {
     const crop = p.crop || S.crop, season = p.season || S.season, d = p.district || S.district;
     const go = (tab, extra) => ({ tab, crop, season, district: d, ...extra });
     const sn = seasonShort(season);
     switch (intent) {
+      case "why": {
+        const rows = seriesFor(crop, season, d), b = baseVal(rows, p.years[0] || S.base), l = rows.at(-1);
+        const nat = natSeries(crop, season), nb = baseVal(nat.map(n => ({ year: n.year, yield_kg_ha: n.mean })), b ? b.year : S.base), nl = nat.at(-1);
+        const ch = (a, c) => signPct(100 * (c / a - 1));
+        let text = b && l && l.year > b.year ? tr("as_trend", { crop: C(crop), d, season: sn, b: nf(b.yield_kg_ha), by: b.year, l: nf(l.yield_kg_ha), ly: l.year, c: ch(b.yield_kg_ha, l.yield_kg_ha), nc: nb && nl ? ch(nb.yield_kg_ha, nl.mean) : "–" }) : "";
+        const ad = ADOPT.filter(r => r.crop === crop && r.season === season && r.district === d).sort((a, c) => a.year - c.year);
+        if (ad.length > 1) { const a0 = ad[0], a1 = ad.at(-1); text += " " + tr("as_why_inputs", { d, crop: C(crop), y0: a0.year, y1: a1.year, f0: nf(100 * a0.fert), f1: nf(100 * a1.fert), s0: nf(100 * a0.seed), s1: nf(100 * a1.seed), m0: nf(100 * a0.manure), m1: nf(100 * a1.manure) }); }
+        const g = groupShares(DRVC.filter(r => r.crop === crop));
+        if (g.g_mgmt != null) text += " " + tr("as_why_drv", { crop: C(crop), mg: nf(g.g_mgmt), w: nf(g.g_weather) });
+        return { text: text.trim() || tr("noData"), go: go("trends") };
+      }
       case "greet": return { text: tr("as_hi"), suggest: suggestions().slice(0, 3) };
       case "thanks": return { text: tr("as_thanks") };
       case "compare": {
@@ -388,5 +473,5 @@ const Ask = (() => {
   panel.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
   $("ask-form").addEventListener("submit", e => { e.preventDefault(); ask(input.value); input.value = ""; });
   refresh();
-  return { refresh, answer, ask, parse, intentOf, open, close };
+  return { refresh, answer, ask, parse, intentOf, classify, tokens, TRAIN, open, close };
 })();

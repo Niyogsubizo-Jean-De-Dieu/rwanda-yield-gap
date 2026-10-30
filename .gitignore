@@ -11,3 +11,6 @@ demo/_video/
 __pycache__/
 .ipynb_checkpoints/
 catboost_info/
+
+# demo recording script (the team records the demo video by hand)
+demo/record_demo.py
