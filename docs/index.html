@@ -171,6 +171,33 @@ footer { color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--lin
   .lang { margin: 0; max-width: 220px; }
   .col { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 }
+/* "Ask the data" assistant (docs/assistant.js) */
+#ask-btn { position: fixed; z-index: 50; right: max(18px, env(safe-area-inset-right, 0px)); bottom: max(18px, env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 7px; height: 52px; min-width: 52px; padding: 0 18px 0 15px; border: 0; border-radius: 999px; background: var(--nisr); color: #fff; font: 700 15px var(--f-body); cursor: pointer; box-shadow: 0 6px 18px rgba(11, 78, 162, .35); }
+#ask-btn:hover { background: var(--nisr-dark); }
+#ask-btn[aria-expanded="true"] { display: none; }
+#ask-panel { position: fixed; z-index: 50; right: max(18px, env(safe-area-inset-right, 0px)); bottom: max(18px, env(safe-area-inset-bottom, 0px)); width: 380px; max-width: calc(100vw - 36px); height: min(600px, calc(100vh - 36px)); height: min(600px, calc(100dvh - 36px)); display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 12px 40px rgba(13, 43, 78, .25); overflow: hidden; }
+#ask-panel[hidden] { display: none; }
+.ask-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 10px 16px; background: var(--nisr); color: #fff; font: 700 15.5px var(--f-display); }
+#ask-close { border: 0; background: none; color: #fff; font-size: 24px; line-height: 1; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; }
+#ask-close:hover { background: rgba(255, 255, 255, .15); }
+#ask-log { flex: 1; min-height: 0; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--bg); }
+.ask-msg { max-width: 92%; padding: 8px 11px; border-radius: 12px; font-size: 14px; line-height: 1.45; }
+.ask-msg p { margin: 0; }
+.ask-msg.bot { align-self: flex-start; background: var(--panel); border: 1px solid var(--line); }
+.ask-msg.me { align-self: flex-end; background: var(--nisr); color: #fff; }
+.ask-go { margin-top: 6px; border: 0; background: none; padding: 0; color: var(--nisr); font: 700 13px var(--f-body); cursor: pointer; text-decoration: underline; }
+.ask-sugg, #ask-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.ask-sugg { margin-top: 6px; }
+#ask-chips { padding: 8px 10px 4px; border-top: 1px solid var(--line); max-height: 92px; overflow-y: auto; }
+.ask-chip { border: 1px solid var(--line); background: var(--pale); color: var(--nisr-dark); border-radius: 999px; padding: 3px 10px; font: 600 12.5px var(--f-body); cursor: pointer; text-align: left; }
+.ask-chip:hover { border-color: var(--nisr); }
+#ask-form { display: flex; gap: 6px; padding: 8px 10px 10px; }
+#ask-in { flex: 1; min-width: 0; font: 15px var(--f-body); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: #fff; }
+#ask-in:focus-visible { outline: 2px solid var(--nisr); outline-offset: 0; }
+#ask-send { border: 0; border-radius: 10px; background: var(--nisr); color: #fff; font: 700 14px var(--f-body); padding: 0 14px; cursor: pointer; }
+@media (max-width: 640px) {
+  #ask-panel { left: 0; right: 0; bottom: 0; width: 100%; max-width: none; height: 85vh; height: 85dvh; border-radius: 16px 16px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+}
 @media (prefers-reduced-motion: reduce) { #tip, .tile path, .tile rect { transition: none; } }
 </style>
 </head>
@@ -837,7 +864,8 @@ const ABOUT = {
       <li><b>Yield trends:</b> how the district's yield moved since a baseline year, compared with the national average and the PSTA 5 target (NISR published yields 2017–2025).</li>
       <li><b>What to do:</b> for each district, the input that would add the most harvest where farmers do not use it yet, and how much. Pick an input to see where it pays off most.</li>
       <li><b>What drives yield:</b> what separates high-yield from low-yield fields.</li>
-      <li><b>How reliable:</b> how the model was tested.</li></ul>
+      <li><b>How reliable:</b> how the model was tested.</li>
+      <li><b>Ask the data</b> (blue button, bottom right): ask questions in English or Kinyarwanda; answers come only from the results shown here, computed in your browser.</li></ul>
     <h2>Data and method</h2><ul>
       <li>NISR Seasonal Agricultural Survey: published district tables 2017–2026 and plot microdata 2022–2025 (152,835 plot records).</li>
       <li>A LightGBM yield model compares similar fields with and without each input; gains are added up with survey weights per district. Targets: MINAGRI PSTA 5 (2024/25–2028/29).</li></ul>
@@ -854,7 +882,8 @@ const ABOUT = {
       <li><b>Uko umusaruro uhagaze:</b> uko umusaruro w'akarere wahindutse kuva mu mwaka fatizo, ugereranyije n'impuzandengo y'igihugu n'intego ya PSTA 5 (umusaruro watangajwe na NISR 2017–2025).</li>
       <li><b>Icyo gukora:</b> kuri buri karere, inyongeramusaruro yatanga umusaruro w'inyongera mwinshi aho abahinzi batarayikoresha, n'ingano yawo. Hitamo inyongeramusaruro urebe aho yunguka cyane.</li>
       <li><b>Ibigena umusaruro:</b> igitandukanya imirima yera cyane n'iyera bike.</li>
-      <li><b>Kwizerwa:</b> uko icyitegererezo cyagenzuwe.</li></ul>
+      <li><b>Kwizerwa:</b> uko icyitegererezo cyagenzuwe.</li>
+      <li><b>Baza amakuru</b> (buto y'ubururu, hasi iburyo): baza mu Kinyarwanda cyangwa mu Cyongereza; ibisubizo biva gusa mu bisubizo bigaragara hano, bibarirwa muri mudasobwa yawe.</li></ul>
     <h2>Amakuru n'uburyo</h2><ul>
       <li>Ubushakashatsi bwa NISR ku buhinzi bw'ibihembwe: imbonerahamwe z'uturere 2017–2026 n'imibare y'ibanze y'imirima 2022–2025 (imirima 152,835).</li>
       <li>Icyitegererezo cya LightGBM kigereranya imirima isa ikoresha n'idakoresha buri nyongeramusaruro; inyongera zibarwa ku karere hakoreshejwe uburemere bw'ubushakashatsi. Intego: MINAGRI PSTA 5 (2024/25–2028/29).</li></ul>
@@ -905,6 +934,7 @@ function render() {
   if (newTab) { mapCol.scrollTop = 0; scrollTo(0, 0); }
   mv.querySelectorAll("[data-lever]").forEach(b => b.addEventListener("click", () => { S.lever = b.dataset.lever; render(); }));
   [mv, sv].forEach(el => { bindTips(el); bindTiles(el); });
+  if (typeof Ask !== "undefined") Ask.refresh(); // assistant chips follow the selection and language
 }
 function route() { const h = location.hash.replace("#", ""); S.tab = TABS.includes(h) ? h : "trends"; render(); }
 
@@ -919,5 +949,6 @@ if (!YEARS.includes(S.base)) S.base = YEARS[0];
 applyLang();
 route();
 </script>
+<script src="assistant.js"></script>
 </body>
 </html>

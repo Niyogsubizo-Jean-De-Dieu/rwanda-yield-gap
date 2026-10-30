@@ -59,6 +59,9 @@ Pick a **crop**, **season** and **district** at the top of the left column. On a
 | **What drives yield** | The 10 factors that most separate high- from low-yield fields, for the chosen crop | What matters most, and how much is under farmers' control? |
 | **How reliable** | Error of the model and of simple rules when each season is predicted from earlier seasons; validation table | How far can the results be trusted? |
 | **About** | Purpose, data, satellite data, the district-level data challenge, limits, team, AI use | |
+| **Data assistant** ("Ask" button, bottom right) | Answers typed questions in English or Kinyarwanda (yields, trends, recommendations, input effects, input use, drivers, accuracy, data, method, limits, targets) with numbers from the dashboard, and an "Open on map" link | Quick answers without clicking through the pages |
+
+The data assistant runs entirely in the browser on the published results (`docs/data.js`) and a built-in knowledge base: no server, no API key, no external calls. It never invents numbers; if it does not understand a question it says so and suggests questions it can answer.
 
 ## 4. Method
 
