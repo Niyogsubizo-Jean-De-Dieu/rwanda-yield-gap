@@ -52,7 +52,7 @@ async def main():
         # 1. Yield trends
         await caption(pg, "Rwanda Yield Gap Explorer: NISR survey + satellite data, 30 districts, 2017 to 2026")
         await wait(4500)
-        await caption(pg, "Left: filters, a plain-language summary and the map. Right: key figures and charts")
+        await caption(pg, "Left: filters and a large map. Right: a plain-language summary, key figures and charts")
         await wait(4500)
         await caption(pg, "Click any district on the map to select it: both columns update")
         await pg.click(MAP.format("Musanze")); await wait(3000)
@@ -91,9 +91,9 @@ async def main():
 
         # 4. Data assistant
         await pg.click("a[data-tab='trends']"); await wait(800)
-        await caption(pg, "Ask the data: an in-browser assistant that answers from the published results")
+        await caption(pg, "Ask the data (side menu): an in-browser assistant that answers from the published results")
         await pg.click("#ask-btn"); await wait(1500)
-        for q in ["What should Bugesera do for maize?", "How has Irish potato yield in Musanze changed since 2019?"]:
+        for q in ["What should Bugesera do for maize?", "which district has the higest maise output?", "How has Irish potato yield in Musanze changed since 2019?"]:
             await pg.type("#ask-in", q, delay=35); await wait(400)
             await pg.press("#ask-in", "Enter"); await wait(5000)
         await caption(pg, "'Open on map' jumps to the answer on the dashboard")

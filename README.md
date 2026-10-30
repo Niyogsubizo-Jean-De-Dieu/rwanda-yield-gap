@@ -7,7 +7,7 @@ Where would fertilizer, improved seed and manure raise harvests most? This proje
 | | |
 | --- | --- |
 | **Live dashboard** | <https://niyogsubizo-jean-de-dieu.github.io/rwanda-yield-gap/> |
-| **Demo video** | [`demo/demo.webm`](demo/demo.webm) (1 min 56 s) |
+| **Demo video** | [`demo/demo.webm`](demo/demo.webm) (2 min 06 s) |
 | **Run locally** | `python3 app.py` |
 | **Team** | Rebecca Dukundimana and Jean de Dieu Niyogisubizo, University of Rwanda |
 
@@ -50,7 +50,7 @@ The data used by the dashboard are in [`data/`](data/). They are all district-le
 
 ## 3. What the dashboard communicates and how to use it
 
-Pick a **crop**, **season** and **district** at the top of the left column. On a computer the page has three columns: the menu, a fixed column with the filters, a short **In brief** text that rewrites itself for your selection, and the map; and a statistics column on the right (key figures, then all charts) that scrolls on its own. On a phone everything is one scrolling column. Hover for exact values; click a district on the map to select it; switch **English / Kinyarwanda** in the side menu.
+Pick a **crop**, **season** and **district** at the top of the left column. On a computer the page has three columns: the menu; a large fixed column with the filters and the map; and a statistics column on the right that scrolls on its own: a short **In brief** text that rewrites itself for your selection, key figures, then all charts. On a phone everything is one scrolling column. Hover for exact values; click a district on the map to select it; switch **English / Kinyarwanda** in the side menu.
 
 | Page | What it shows | Question it answers |
 | --- | --- | --- |
@@ -59,7 +59,7 @@ Pick a **crop**, **season** and **district** at the top of the left column. On a
 | **What drives yield** | The 10 factors that most separate high- from low-yield fields, for the chosen crop | What matters most, and how much is under farmers' control? |
 | **How reliable** | Error of the model and of simple rules when each season is predicted from earlier seasons; validation table | How far can the results be trusted? |
 | **About** | Purpose, data, satellite data, the district-level data challenge, limits, team, AI use | |
-| **Data assistant** ("Ask" button, bottom right) | Answers typed questions in English or Kinyarwanda (yields, trends, recommendations, input effects, input use, drivers, accuracy, data, method, limits, targets) with numbers from the dashboard, and an "Open on map" link | Quick answers without clicking through the pages |
+| **Data assistant** ("Ask the data" in the side menu) | Answers typed questions in English or Kinyarwanda (yields, trends, recommendations, input effects, input use, drivers, accuracy, data, method, limits, targets) with numbers from the dashboard, and an "Open on map" link | Quick answers without clicking through the pages |
 
 The data assistant runs entirely in the browser on the published results (`docs/data.js`) and a built-in knowledge base: no server, no API key, no external calls. It never invents numbers; if it does not understand a question it says so and suggests questions it can answer.
 

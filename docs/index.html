@@ -43,9 +43,13 @@ aside.side { background: var(--nisr); color: #fff; position: sticky; top: 0; hei
 .logo b { font: 800 16px/1.15 var(--f-display); display: block; }
 .logo small { display: block; font-size: 11.5px; color: #cfe4f7; line-height: 1.3; margin-top: 2px; }
 nav.tabs { display: flex; flex-direction: column; gap: 2px; }
-nav.tabs a { display: flex; gap: 10px; align-items: center; text-decoration: none; color: #dcebfa; font: 600 14.5px var(--f-body); padding: 9px 12px; border-radius: 8px; }
+nav.tabs a, nav.tabs .ask-nav { display: flex; gap: 10px; align-items: center; text-decoration: none; color: #dcebfa; font: 600 14.5px var(--f-body); padding: 9px 12px; border-radius: 8px; }
 nav.tabs a svg { flex: none; opacity: .9; }
-nav.tabs a:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+nav.tabs a:hover, nav.tabs .ask-nav:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+/* the data assistant opens from the menu; set apart from the page tabs by a thin rule */
+nav.tabs .ask-nav { width: 100%; border: 0; margin-top: 8px; background: rgba(255, 255, 255, .12); cursor: pointer; text-align: left; position: relative; }
+nav.tabs .ask-nav::before { content: ""; position: absolute; left: 6px; right: 6px; top: -6px; border-top: 1px solid rgba(255, 255, 255, .25); }
+nav.tabs .ask-nav[aria-expanded="true"] { background: #fff; color: var(--nisr); }
 nav.tabs a[aria-current="page"] { background: #fff; color: var(--nisr); }
 .side .grow { flex: 1; }
 .lang { display: flex; border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px; overflow: hidden; margin: 0 6px; }
@@ -133,15 +137,12 @@ footer { color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--lin
   .app { height: 100vh; height: 100dvh; min-height: 0; }
   aside.side { height: 100vh; height: 100dvh; }
   .main { height: 100vh; height: 100dvh; min-height: 0; }
-  .cols { display: grid; grid-template-columns: minmax(0, 48fr) minmax(0, 52fr); height: 100%; min-height: 0; }
+  .cols { display: grid; grid-template-columns: minmax(0, 58fr) minmax(0, 42fr); height: 100%; min-height: 0; }
   #map-col { height: 100%; min-height: 0; overflow: hidden; background: var(--panel); border-right: 1px solid var(--line); padding-right: 18px; }
   #stats-col { height: 100%; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-left: 18px; }
   #map-view { display: flex; flex-direction: column; gap: 10px; flex: 1 1 0; min-height: 0; }
   #map-view > * { flex: none; }
-  #map-view .brief { flex: 0 1 auto; min-height: 3.6em; max-height: 30vh; overflow-y: auto; padding: 12px 16px; box-shadow: none; }
-  #map-view .brief p { font-size: 15px; }
-  #map-view .brief p.headline { font-size: 18px; }
-  #map-view .panel.map { flex: 1 1 0; min-height: 66%; display: flex; flex-direction: column; box-shadow: none; padding: 10px 14px 8px; }
+  #map-view .panel.map { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; box-shadow: none; padding: 10px 12px 8px; }
   #map-view .panel.map h2 { font-size: 15px; }
   #map-view .panel.map .sub { font-size: 12.5px; margin-bottom: 4px; }
   #map-view .panel.map .note { font-size: 11.5px; margin-top: 4px; }
@@ -154,7 +155,7 @@ footer { color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--lin
   #map-view .panel.map > .mapbox { flex: 1 1 0; min-height: 0; }
   #map-view .mapbox svg { width: 100%; height: 100%; max-height: none; max-width: none !important; }
   .levers button { font-size: 12.5px; padding: 4px 11px; }
-  #stats-col .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #stats-col .kpis { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
   #stats-col .kpi .v { font-size: 22px; }
   /* About: one centred, scrolling text column */
   .cols.full { grid-template-columns: minmax(0, 1fr); }
@@ -166,18 +167,17 @@ footer { color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--lin
   .app { grid-template-columns: minmax(0, 1fr); }
   aside.side { position: static; height: auto; flex-direction: column; gap: 10px; padding: 12px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); }
   nav.tabs { flex-direction: row; overflow-x: auto; scrollbar-width: none; }
-  nav.tabs a { flex: none; padding: 7px 10px; font-size: 13.5px; }
+  nav.tabs a, nav.tabs .ask-nav { flex: none; width: auto; padding: 7px 10px; font-size: 13.5px; }
+  nav.tabs .ask-nav { margin-top: 0; }
+  nav.tabs .ask-nav::before { display: none; }
   nav.tabs a svg, .side .grow, .side .src { display: none; }
   .lang { margin: 0; max-width: 220px; }
   .col { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 }
 /* "Ask the data" assistant (docs/assistant.js) */
-#ask-btn { position: fixed; z-index: 50; right: max(18px, env(safe-area-inset-right, 0px)); bottom: max(18px, env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 7px; height: 52px; min-width: 52px; padding: 0 18px 0 15px; border: 0; border-radius: 999px; background: var(--nisr); color: #fff; font: 700 15px var(--f-body); cursor: pointer; box-shadow: 0 6px 18px rgba(11, 78, 162, .35); }
-#ask-btn:hover { background: var(--nisr-dark); }
-#ask-btn[aria-expanded="true"] { display: none; }
-#ask-panel { position: fixed; z-index: 50; right: max(18px, env(safe-area-inset-right, 0px)); bottom: max(18px, env(safe-area-inset-bottom, 0px)); width: 380px; max-width: calc(100vw - 36px); height: min(600px, calc(100vh - 36px)); height: min(600px, calc(100dvh - 36px)); display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 12px 40px rgba(13, 43, 78, .25); overflow: hidden; }
+#ask-panel { position: fixed; z-index: 50; top: 0; right: 0; bottom: 0; width: 400px; max-width: 100vw; padding-right: env(safe-area-inset-right, 0px); display: flex; flex-direction: column; background: var(--panel); border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(13, 43, 78, .18); overflow: hidden; }
 #ask-panel[hidden] { display: none; }
-.ask-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 10px 16px; background: var(--nisr); color: #fff; font: 700 15.5px var(--f-display); }
+.ask-head { display: flex; align-items: center; justify-content: space-between; padding: max(10px, env(safe-area-inset-top, 0px)) 12px 10px 16px; background: var(--nisr); color: #fff; font: 700 15.5px var(--f-display); }
 #ask-close { border: 0; background: none; color: #fff; font-size: 24px; line-height: 1; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; }
 #ask-close:hover { background: rgba(255, 255, 255, .15); }
 #ask-log { flex: 1; min-height: 0; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--bg); }
@@ -196,7 +196,7 @@ footer { color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--lin
 #ask-in:focus-visible { outline: 2px solid var(--nisr); outline-offset: 0; }
 #ask-send { border: 0; border-radius: 10px; background: var(--nisr); color: #fff; font: 700 14px var(--f-body); padding: 0 14px; cursor: pointer; }
 @media (max-width: 640px) {
-  #ask-panel { left: 0; right: 0; bottom: 0; width: 100%; max-width: none; height: 85vh; height: 85dvh; border-radius: 16px 16px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  #ask-panel { top: auto; left: 0; width: 100%; height: 85vh; height: 85dvh; border-left: 0; border-radius: 16px 16px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
 }
 @media (prefers-reduced-motion: reduce) { #tip, .tile path, .tile rect { transition: none; } }
 </style>
@@ -214,6 +214,7 @@ footer { color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--lin
       <a href="#drivers" data-tab="drivers"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-t="tab_drv">What drives yield</span></a>
       <a href="#model" data-tab="model"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg><span data-t="tab_model">How reliable</span></a>
       <a href="#about" data-tab="about"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span data-t="tab_about">About</span></a>
+      <button type="button" id="ask-btn" class="ask-nav" aria-expanded="false" aria-controls="ask-panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 10.5h7M8.5 13.5h4"/></svg><span id="ask-btn-t">Ask the data</span></button>
     </nav>
     <div class="grow"></div>
     <div class="lang" role="group" aria-label="Language">
@@ -604,7 +605,7 @@ function geoMap(values, { color, sub, tipFor }) {
     lab += `<text class="maplbl" x="${c[0].toFixed(1)}" y="${(c[1] - 1).toFixed(1)}" text-anchor="middle" style="font-size:10.5px;font-weight:700">${d}</text>`;
     if (v != null && sub) lab += `<text class="maplbl" x="${c[0].toFixed(1)}" y="${(c[1] + 11).toFixed(1)}" text-anchor="middle" style="font-size:9.5px;font-family:var(--f-data)">${esc(sub(d, v))}</text>`;
   }
-  return `<div class="chart mapbox"><svg viewBox="-4 -4 ${W + 8} ${H + 8}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="District map">${g}${sel}${lab}</svg></div><p class="note">${tr("map_real", { src: esc(window.DIST_GEO.source || "") })}</p>`;
+  return `<div class="chart mapbox"><svg viewBox="-4 -4 ${W + 8} ${H + 8}" preserveAspectRatio="xMinYMin meet" role="img" aria-label="District map">${g}${sel}${lab}</svg></div><p class="note">${tr("map_real", { src: esc(window.DIST_GEO.source || "") })}</p>`;
 }
 function bindTiles(root) {
   root.querySelectorAll(".tile").forEach(el => {
@@ -727,10 +728,9 @@ function viewTrends() {
     { label: tr(k), v: 100 * da[k], color: "var(--nisr)", strong: true, val: pct(100 * da[k]), tip: `<b>${S.district}</b> · ${tr(k)}: ${pct(100 * da[k])}` },
     { label: "Rwanda", v: 100 * na[k], color: "var(--grey)", val: pct(100 * na[k]), tip: `<b>Rwanda</b> · ${tr(k)}: ${pct(100 * na[k])}` }]) : [];
   return {
-    map: brief(tr("inbrief"), txt)
-      + mapPanel(`${tr("change_map")}: ${esc(cropName(S.crop))}, ${esc(seasonName(S.season))}`, tr("click_d"), map,
+    map: mapPanel(`${tr("change_map")}: ${esc(cropName(S.crop))}, ${esc(seasonName(S.season))}`, tr("click_d"), map,
         `<span>${vs.length ? signPct(lo) : ""}</span><span class="ramp"></span><span>${vs.length ? signPct(hi) : ""}</span>`, true),
-    stats: kpis(
+    stats: brief(tr("inbrief"), txt) + kpis(
         kpi(tr("k_latest") + (last ? " · " + last.year : ""), last ? nf(last.yield_kg_ha) : "–", tr("kgha"), ICON.up),
         kpi(tr("k_change") + (b ? " · " + tr("since") + " " + b.year : ""), chg == null ? "–" : `<span class="${chg >= 0 ? "up" : "down"}">${signPct(chg)}</span>`, `${tr("national_avg")}: ${natChg == null ? "–" : signPct(natChg)}`, ICON.pct),
         tgt ? kpi(tr("k_target_pct"), last ? nf(100 * last.yield_kg_ha / tgt) + "%" : "–", `${nf(tgt)} ${tr("kgha")}`, ICON.target) : kpi(tr("k_rank"), rank || "–", tr("of30", { n: peers.length }), ICON.flag))
@@ -787,10 +787,9 @@ function viewActions() {
   const pkg = dr.find(x => x.scenario === "package_fert_seed_manure");
   return {
     map: `<div class="levers" role="group" aria-label="${tr("lever")}">${pills}</div>`
-      + brief(tr("inbrief"), txt)
       + mapPanel(mode === "best" ? tr("a_map_best_h", { crop }) : tr("a_map_lev_h", { lever: tr("lv_" + mode) }), mode === "best" ? tr("a_map_best") : tr("a_map_lev"), map,
         `<span>0 t</span><span class="ramp"></span><span>${nf(mx)} t</span>`, true),
-    stats: kpis(
+    stats: brief(tr("inbrief"), txt) + kpis(
         kpi(tr("k_extra_d", { d: S.district }), mode === "best" ? (r.best ? nf(r.best.extra_production_t) + " t" : "–") : (vals[S.district] != null ? nf(vals[S.district]) + " t" : "–"), `${season} · ${mode === "best" ? (r.best ? tr("lv_" + r.best.scenario) : "") : tr("lv_" + mode)}`, ICON.ton),
         kpi(tr("k_pkg"), pkg ? nf(pkg.attainable_yield_kg_ha) : "–", pkg ? `${tr("today")}: ${nf(pkg.current_yield_kg_ha)} ${tr("kgha")}${tgt ? " · " + nf(100 * pkg.attainable_yield_kg_ha / tgt) + "% " + tr("of_target") : ""}` : "", ICON.target),
         kpi(tr("k_rwanda"), nf(Object.values(vals).reduce((s, v) => s + v, 0)) + " t", `${crop}, ${season}`, ICON.up))
@@ -815,10 +814,9 @@ function viewDrivers() {
   const groups = barChart(GROUPS.flatMap(k => (crop ? [{ label: tr(k), v: g[k] || 0, color: GROUP_COL[k], strong: true, val: pct(g[k], 0), tip: `<b>${tr(k)}</b><br>${esc(cropName(S.crop))}: ${pct(g[k], 1)}` }] : [])
     .concat([{ label: crop ? tr("allcrops") : tr(k), v: gAll[k] || 0, color: crop ? "#cfdced" : GROUP_COL[k], val: pct(gAll[k], 0), tip: `<b>${tr(k)}</b><br>${tr("allcrops")}: ${pct(gAll[k], 1)}` }])), { labelW: 230, width: 560, rowH: 32, R: 60 });
   return {
-    map: brief(tr("inbrief"), txt)
-      + mapPanel(tr("drv_groups"), tr("drv_groups_sub", { crop: esc(cropName(S.crop)) }), fitChart(groups),
+    map: mapPanel(tr("drv_groups"), tr("drv_groups_sub", { crop: esc(cropName(S.crop)) }), fitChart(groups),
         GROUPS.map(k => `<span><i style="background:${GROUP_COL[k]}"></i>${tr(k)}</span>`).join("") + (crop ? `<span><i style="background:#cfdced"></i>${tr("allcrops")}</span>` : "")),
-    stats: kpis(
+    stats: brief(tr("inbrief"), txt) + kpis(
         kpi(tr("g_mgmt"), pct(g.g_mgmt), esc(cropName(S.crop)), ICON.seed),
         kpi(tr("g_weather"), pct(g.g_weather), esc(cropName(S.crop)), ICON.dot),
         kpi(tr("g_soil") + " / " + tr("g_plot").toLowerCase(), pct((g.g_soil || 0) + (g.g_plot || 0)), esc(cropName(S.crop)), ICON.flag))
@@ -841,10 +839,9 @@ function viewModel() {
   const key = v => v.startsWith("random") ? "v_random" : v.startsWith("district") ? "v_district" : "v_temporal";
   const rowsV = VAL.map(v => `<tr><td>${tr(key(v.validation))}</td><td class="n">${pct(100 * v.district_MAPE_model)}</td><td class="n">${pct(100 * v.district_MAPE_baseline)}</td></tr>`).join("");
   return {
-    map: brief(tr("inbrief"), txt)
-      + mapPanel(tr("m_chart"), tr("m_chart_sub"), chart ? fitChart(chart) : `<p class="empty">${tr("noData")}</p>`,
+    map: mapPanel(tr("m_chart"), tr("m_chart_sub"), chart ? fitChart(chart) : `<p class="empty">${tr("noData")}</p>`,
         `<span><i style="background:var(--grey)"></i>${tr("m_leg_base")}</span><span><i style="background:var(--nisr)"></i>${tr("m_leg_ml")}</span>`),
-    stats: kpis(
+    stats: brief(tr("inbrief"), txt) + kpis(
         kpi(tr("v_district"), dv ? pct(100 * dv.district_MAPE_model) : "–", `${tr("v_base")}: ${dv ? pct(100 * dv.district_MAPE_baseline) : "–"}`, ICON.target),
         kpi(tr("k_wf"), bestBase ? pct(bestBase["MAPE_%"]) : "–", bestML ? `${tr("m_" + bestML.model)}: ${pct(bestML["MAPE_%"])}` : "", ICON.up),
         kpi(tr("k_plots"), nf(D.meta.plots), `NISR SAS 2022–2025 · ${esc(D.meta.engine || "")}`, ICON.seed))
@@ -865,7 +862,7 @@ const ABOUT = {
       <li><b>What to do:</b> for each district, the input that would add the most harvest where farmers do not use it yet, and how much. Pick an input to see where it pays off most.</li>
       <li><b>What drives yield:</b> what separates high-yield from low-yield fields.</li>
       <li><b>How reliable:</b> how the model was tested.</li>
-      <li><b>Ask the data</b> (blue button, bottom right): ask questions in English or Kinyarwanda; answers come only from the results shown here, computed in your browser.</li></ul>
+      <li><b>Ask the data</b> (in the side menu): ask questions in English or Kinyarwanda; answers come only from the results shown here, computed in your browser.</li></ul>
     <h2>Data and method</h2><ul>
       <li>NISR Seasonal Agricultural Survey: published district tables 2017–2026 and plot microdata 2022–2025 (152,835 plot records).</li>
       <li>A LightGBM yield model compares similar fields with and without each input; gains are added up with survey weights per district. Targets: MINAGRI PSTA 5 (2024/25–2028/29).</li></ul>
@@ -883,7 +880,7 @@ const ABOUT = {
       <li><b>Icyo gukora:</b> kuri buri karere, inyongeramusaruro yatanga umusaruro w'inyongera mwinshi aho abahinzi batarayikoresha, n'ingano yawo. Hitamo inyongeramusaruro urebe aho yunguka cyane.</li>
       <li><b>Ibigena umusaruro:</b> igitandukanya imirima yera cyane n'iyera bike.</li>
       <li><b>Kwizerwa:</b> uko icyitegererezo cyagenzuwe.</li>
-      <li><b>Baza amakuru</b> (buto y'ubururu, hasi iburyo): baza mu Kinyarwanda cyangwa mu Cyongereza; ibisubizo biva gusa mu bisubizo bigaragara hano, bibarirwa muri mudasobwa yawe.</li></ul>
+      <li><b>Baza amakuru</b> (mu ruhande rw'ibumoso): baza mu Kinyarwanda cyangwa mu Cyongereza; ibisubizo biva gusa mu bisubizo bigaragara hano, bibarirwa muri mudasobwa yawe.</li></ul>
     <h2>Amakuru n'uburyo</h2><ul>
       <li>Ubushakashatsi bwa NISR ku buhinzi bw'ibihembwe: imbonerahamwe z'uturere 2017–2026 n'imibare y'ibanze y'imirima 2022–2025 (imirima 152,835).</li>
       <li>Icyitegererezo cya LightGBM kigereranya imirima isa ikoresha n'idakoresha buri nyongeramusaruro; inyongera zibarwa ku karere hakoreshejwe uburemere bw'ubushakashatsi. Intego: MINAGRI PSTA 5 (2024/25–2028/29).</li></ul>
