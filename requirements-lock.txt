@@ -1,0 +1,12 @@
+# Exact versions used for the published results (Python 3.11, Windows, November 2026).
+# pip install -r requirements-lock.txt
+catboost==1.2.10
+joblib==1.6.0
+lightgbm==4.7.0
+matplotlib==3.11.2
+numpy==2.4.6
+pandas==3.1.1
+scikit-learn==1.9.1
+scipy==1.17.1
+threadpoolctl==3.8.0
+xgboost==3.2.0

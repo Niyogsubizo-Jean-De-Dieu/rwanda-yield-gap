@@ -62,7 +62,7 @@ try:
 except Exception:
     cb = None
 
-SEASONS = [f"{y}{s}" for y in range(2022, 2026) for s in "AB"]
+SEASONS = [f"{y}{s}" for y in range(2017, 2026) for s in "AB"]
 CELL = ["district", "crop", "season"]
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 TREE_MODELS = ["random_forest", "sk_gbm", "lightgbm", "xgboost", "catboost"]

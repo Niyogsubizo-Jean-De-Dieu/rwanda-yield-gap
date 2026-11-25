@@ -1,5 +1,6 @@
 """
-Prepare NISR Seasonal Agricultural Survey (SAS) microdata (2022-2025) into one analysis-ready table.
+Prepare NISR Seasonal Agricultural Survey (SAS) microdata (2017-2025) into one analysis-ready table.
+2017-2021 are read by legacy_sas.py; 2022-2025 by the settings below.
 
 Folder layout: one folder per year, unzipped as downloaded from microdata.statistics.gov.rw.
 All NISR layouts are found automatically (CSV preferred, Stata .dta otherwise):
@@ -28,6 +29,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import legacy_sas  # noqa: E402  (SAS 2017-2021 reader)
 
 # ------------------------------------------------------------------ year settings
 # Production-file columns. None = not in that year's production file (taken from the fertilizer file
@@ -95,6 +99,7 @@ DICTIONARY = {
     "usable_yield": "1 = positive yield, harvested area and weight (and crop share not imputed)",
     "share_imputed": "1 = crop share imputed (NISR 2024 B screening lists one crop per plot); yield approximate",
     "extreme_yield": "1 = above 99th percentile (crop x season x year)",
+    "<input>_share_plots": "district_crop_summary: share of the crop's smallholder plots using the input, weighted by plot weight (NISR's definition)",
 }
 
 
@@ -131,6 +136,11 @@ def season_of(path):
 
 def find_files(root, seasons=("A", "B")):
     for ydir in sorted(p for p in Path(root).iterdir() if p.is_dir() and re.fullmatch(r"\d{4}", p.name)):
+        if int(ydir.name) in legacy_sas.YEARS:          # 2017-2021: own reader, finds its own files
+            for season in seasons:
+                if legacy_sas.has_season(str(ydir), season):
+                    yield int(ydir.name), season, str(ydir), None, None
+            continue
         files = [f for f in ydir.rglob("*") if f.is_file() and f.suffix.lower() in EXT_RANK]
         for season in seasons:
             def pick(regex):
@@ -254,6 +264,8 @@ def plot_flag(d, name, any_name):
 
 # ------------------------------------------------------------------ one year x season
 def prepare_one(year, season, prod_path, fert_path, log, scr_path=None):
+    if year in legacy_sas.YEARS:
+        return finish(legacy_sas.prepare(year, season, prod_path, log), year, season, log)
     if year not in PROD:
         log.append(f"{year}{season}: no column settings for this year -> skipped (add PROD[{year}])")
         return None
@@ -323,7 +335,11 @@ def prepare_one(year, season, prod_path, fert_path, log, scr_path=None):
                          ("irrigated", "irrigated_plot")]:
         if isinstance(cfg.get(key), str) and cfg[key] in p.columns:
             d[out_col] = d[out_col].fillna(0.0)
+    return finish(d, year, season, log)
 
+
+def finish(d, year, season, log):
+    """Weighted area, usable-yield and extreme-yield flags (same rules for every year)."""
     d["w_area_ha"] = d.harvested_area_ha * d.weight
     ok = (d.yield_kg_ha > 0) & (d.harvested_area_ha > 0) & d.weight.notna()
     if not USE_IMPUTED_SHARES:
@@ -359,7 +375,17 @@ def district_summary(d):
         m = x.inorganic_kg_ha.notna()
         r["inorganic_kg_ha_mean"] = (x.loc[m, "inorganic_kg_ha"] * w[m]).sum() / w[m].sum() if m.any() else np.nan
         return pd.Series(r)
-    return s.groupby(["year", "season", "district", "crop"]).apply(agg).reset_index()
+    out = s.groupby(["year", "season", "district", "crop"]).apply(agg).reset_index()
+    # NISR's own definition in its SAS reports: share of PLOTS (survey-weighted), all smallholder plots of the crop
+    a = d[d.is_lsf == 0]
+    def plots(x):
+        r = {"plot_weight_sum": x.weight.sum()}
+        for c in ["improved_seed", "inorganic_fert", "organic_fert"]:
+            m = x[c].notna() & (x.weight > 0)
+            r[f"{c}_share_plots"] = np.average(x.loc[m, c], weights=x.loc[m, "weight"]) if m.any() else np.nan
+        return pd.Series(r)
+    ps = a.groupby(["year", "season", "district", "crop"]).apply(plots).reset_index()
+    return out.merge(ps, on=["year", "season", "district", "crop"], how="left")
 
 
 def validate(summary, panel_path, log):

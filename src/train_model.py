@@ -70,7 +70,9 @@ SCENARIOS = {
     "anti_erosion": {"anti_erosion": 1},
     "package_fert_seed_manure": {"inorganic_fert": 1, "improved_seed": 1, "organic_fert": 1},
 }
+HALF_LIFE = None     # years; set by --recency-half-life: older survey years get less weight in training
 MIN_EVIDENCE = 200   # plots with and without a lever (per crop) needed before its scenario is reported
+RECENT_YEARS = 4     # ... both over all years AND within the latest RECENT_YEARS survey years (current evidence)
 
 
 # ------------------------------------------------------------------ data
@@ -109,6 +111,8 @@ class Model:
             self.feats = keep
             self.cats = {c: v for c, v in self.cats.items() if c in keep}
         X, y = self.X(d), d.log_yield.values
+        # recency weighting: a plot's weight halves every HALF_LIFE years before the latest year
+        w = 0.5 ** ((d.year.max() - d.year.values) / HALF_LIFE) if HALF_LIFE else None
         if HAVE_LGB:
             self.m = lgb.LGBMRegressor(n_estimators=self.n, learning_rate=0.04, num_leaves=63, min_child_samples=40,
                                        subsample=0.8, subsample_freq=1, colsample_bytree=0.8, reg_lambda=1.0,
@@ -119,8 +123,8 @@ class Model:
                 max_iter=self.n, learning_rate=0.06, max_leaf_nodes=63, min_samples_leaf=40, l2_regularization=1.0,
                 categorical_features=[f in self.cats for f in self.feats], monotonic_cst=self.mono,
                 early_stopping=False, random_state=1)
-        self.m.fit(X, y)
-        self.smear = float(np.mean(np.exp(y - self.m.predict(X))))     # back-transform bias correction
+        self.m.fit(X, y, sample_weight=w)
+        self.smear = float(np.average(np.exp(y - self.m.predict(X)), weights=w))  # back-transform bias correction
         return self
 
     def predict(self, d):
@@ -161,7 +165,7 @@ def evaluate(d, feats, cats, a, log):
     splits = {
         "random (segments held out)": list(GroupKFold(5).split(d, groups=d.segment_id)),
         "district (districts held out)": list(GroupKFold(6).split(d, groups=d.district)),
-        "temporal (train 2022-24, test 2025)": [(np.where(d.year < 2025)[0], np.where(d.year == 2025)[0])],
+        f"temporal (train {d.year.min()}-24, test 2025)": [(np.where(d.year < 2025)[0], np.where(d.year == 2025)[0])],
     }
     rows, oof_district = [], None
     for name, folds in splits.items():
@@ -228,11 +232,15 @@ def drivers(m, d, feats, a, log):
 # ------------------------------------------------------------------ scenarios
 def scenarios(m, d, year, log):
     base = d[d.year == year].copy()
-    users = d[(d.inorganic_fert == 1) & (d.inorganic_kg_ha > 0)]
+    recent_d = d[d.year > d.year.max() - RECENT_YEARS]
+    users = recent_d[(recent_d.inorganic_fert == 1) & (recent_d.inorganic_kg_ha > 0)]   # current practice
     dose = users.groupby("crop").inorganic_kg_ha.median()
     base["p0"] = m.predict(base)
-    # a lever is scored for a crop only if the survey has enough plots with AND without it (all years)
-    ev = {c: (d.groupby("crop")[c].apply(lambda x: (x == 1).sum() >= MIN_EVIDENCE and (x == 0).sum() >= MIN_EVIDENCE))
+    # a lever is scored for a crop only if the survey has enough plots with AND without it, over all years
+    # and in the recent years
+    enough = lambda x: (x == 1).sum() >= MIN_EVIDENCE and (x == 0).sum() >= MIN_EVIDENCE
+    recent = d[d.year > d.year.max() - RECENT_YEARS]
+    ev = {c: (d.groupby("crop")[c].apply(enough) & recent.groupby("crop")[c].apply(enough)).reindex(d.crop.unique(), fill_value=False)
           for c in ["inorganic_fert", "improved_seed", "organic_fert", "lime", "anti_erosion"]}
     out, skipped = [], []
     for name, change in SCENARIOS.items():
@@ -254,7 +262,8 @@ def scenarios(m, d, year, log):
             adopter = b[list(ch)].eq(1).all(axis=1).astype(float)
             out.append(b.assign(scenario=name, ratio=np.exp(m.predict(s) - b.p0), adopter=adopter,
                                 levers="+".join(ch)))
-    log.append(f"Levers not scored (fewer than {MIN_EVIDENCE} plots with or without them): " + ", ".join(skipped))
+    log.append(f"Levers not scored (fewer than {MIN_EVIDENCE} plots with or without them, over all years or in "
+               f"{recent.year.min()}-{recent.year.max()}): " + ", ".join(skipped))
     r = pd.concat(out, ignore_index=True)
     r["prod_t"] = r.yield_kg_ha * r.w_area_ha / 1000
     r["extra_t"] = r.prod_t * (r.ratio - 1)
@@ -304,14 +313,19 @@ def main():
     ap.add_argument("--no-monotone", action="store_true")
     ap.add_argument("--quick", action="store_true", help="fast test run")
     ap.add_argument("--skip-validation", action="store_true")
+    ap.add_argument("--recency-half-life", type=float, default=None,
+                    help="weight older survey years less: weight halves every N years (default: equal weights)")
     a = ap.parse_args()
+    global HALF_LIFE
+    HALF_LIFE = a.recency_half_life
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     log, t0 = [], time.time()
 
     d, feats = load(a.data, [c.strip() for c in a.exclude_crops.split(",") if c.strip()])
     cats = {c: d[c].unique() for c in CAT if c in feats}
     engine = "LightGBM" if HAVE_LGB else f"scikit-learn HistGradientBoosting (LightGBM not loaded: {LGB_ERROR})"
-    log.append(f"Engine: {engine} | monotone effects: {not a.no_monotone} | {len(d):,} plots, {len(feats)} features")
+    log.append(f"Engine: {engine} | monotone effects: {not a.no_monotone} | {len(d):,} plots, {len(feats)} features"
+               + (f" | recency half-life {HALF_LIFE:g} years" if HALF_LIFE else ""))
     log.append(f"Crops: {', '.join(sorted(d.crop.unique()))} | years {d.year.min()}-{d.year.max()}")
     print(log[0]); print(log[1])
 

@@ -6,7 +6,7 @@
 <title>Rwanda Yield Gap Explorer</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: NISR-blue side navigation + two columns. On desktop (>= 1100px) the left column (title, filters, in brief,
    map) is fixed to the viewport and the right column (KPIs, charts) scrolls on its own; below that the page is one
@@ -26,8 +26,8 @@
   --soil: #0a2f6b;        /* potential gain, targets */
   --good: #1f5fae; --bad: #a9c4e2;
   --shadow: 0 1px 3px rgba(11, 78, 162, .08);
-  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --f-body: "Source Sans 3", "Segoe UI", Roboto, Arial, sans-serif;
+  --f-display: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  --f-body: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
   --f-data: "IBM Plex Mono", ui-monospace, Menlo, monospace;
   color-scheme: light;
 }
@@ -174,6 +174,229 @@ footer { color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--lin
   .lang { margin: 0; max-width: 220px; }
   .col { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 }
+/* Logo = link to Home */
+a.logo { color: #fff; text-decoration: none; border-radius: 10px; }
+a.logo:hover b { text-decoration: underline; }
+.rail-hint { display: none; }
+/* Computer with a mouse: the side menu folds into a thin blue strip that keeps only the logo (Home);
+   it opens over the page when the pointer is on it (or when it has keyboard focus). */
+@media (min-width: 901px) and (hover: hover) {
+  .app { grid-template-columns: 70px minmax(0, 1fr); }
+  aside.side { width: 70px; z-index: 45; overflow: hidden; transition: width .18s ease, box-shadow .18s ease; }
+  aside.side:hover, aside.side:focus-within { width: 268px; box-shadow: 6px 0 24px rgba(8, 58, 122, .28); }
+  aside.side > * { min-width: 232px; }
+  aside.side .logo > div, aside.side nav.tabs, aside.side .lang, aside.side .src { opacity: 0; visibility: hidden; transition: opacity .12s ease, visibility .12s; }
+  aside.side:hover .logo > div, aside.side:hover nav.tabs, aside.side:hover .lang, aside.side:hover .src,
+  aside.side:focus-within .logo > div, aside.side:focus-within nav.tabs, aside.side:focus-within .lang, aside.side:focus-within .src { opacity: 1; visibility: visible; }
+  aside.side nav.tabs a, aside.side nav.tabs .ask-nav, .logo b, .logo small { white-space: nowrap; }
+  .rail-hint { display: flex; padding: 0 0 0 13px; color: #cfe4f7; margin-top: -8px; }
+  aside.side:hover .rail-hint, aside.side:focus-within .rail-hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { aside.side, aside.side * { transition: none !important; } }
+/* Home page: overview panel (left, static) + story (right, scrolls) + 'Go deeper' row (full width, last) */
+.home { width: 100%; }
+.cols.full #map-col:has(.home) { padding: 0; background: var(--bg); }
+.hsplit { display: grid; grid-template-columns: minmax(0, 1fr); }
+.hero { position: relative; color: #fff; display: grid; align-content: center; gap: 16px; padding: 40px 40px 32px;
+  background: linear-gradient(160deg, rgba(8, 58, 122, .95) 0%, rgba(11, 78, 162, .86) 45%, rgba(11, 78, 162, .55) 100%), url("img/field.jpg") 40% center / cover no-repeat; }
+.hero .kick { font: 700 12px var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--sky); }
+.hero h2 { font: 800 clamp(26px, 2.5vw, 38px)/1.12 var(--f-display); margin: 0; text-wrap: balance; }
+.hero p.intro { margin: 0; font-size: 16px; line-height: 1.6; color: #fff; max-width: 62ch; }
+.hero p.intro b { color: var(--sky); font-weight: 700; }
+.hero .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.hero .tags span { font: 700 12px var(--f-body); padding: 4px 11px; border-radius: 999px; background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .45); }
+.hero .cta { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 700 14px var(--f-body); padding: 9px 16px; border-radius: 999px; text-decoration: none; cursor: pointer; border: 1px solid transparent; }
+.btn.light { background: #fff; color: var(--nisr); }
+.btn.ghost { background: rgba(8, 58, 122, .35); color: #fff; border-color: rgba(255, 255, 255, .7); }
+.btn:hover { filter: brightness(1.08); }
+.hstats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: rgba(255, 255, 255, .25); border: 1px solid rgba(255, 255, 255, .3); border-radius: 12px; overflow: hidden; }
+.hstats div { background: rgba(8, 58, 122, .6); padding: 10px 14px; }
+.hstats b { display: block; font: 800 22px/1.15 var(--f-display); font-variant-numeric: tabular-nums; }
+.hstats span { font-size: 12.5px; color: var(--pale); }
+/* right column: one type scale everywhere */
+.hright { min-width: 0; }
+.hsec { padding: 30px 36px; display: grid; gap: 14px; border-bottom: 1px solid var(--line); }
+.hsec.dark { background: linear-gradient(135deg, var(--nisr-dark), var(--nisr)); color: #fff; border-bottom: 0; }
+.hsec .eyebrow { font: 700 12px var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--nisr); }
+.hsec.dark .eyebrow { color: var(--sky); }
+.hsec h2 { font: 800 24px/1.2 var(--f-display); margin: 0; text-wrap: balance; }
+.hsec p.txt { margin: 0; font-size: 16px; line-height: 1.6; }
+.hsec h3 { font: 700 16px/1.3 var(--f-display); margin: 0; }
+.hsec .num { font: 800 24px/1.15 var(--f-display); color: var(--nisr); font-variant-numeric: tabular-nums; }
+.hsec .small { margin: 0; font-size: 14px; line-height: 1.5; }
+.hsec .muted { color: var(--muted); }
+.factors { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 12px; }
+.factor { background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--nisr); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); display: grid; gap: 8px; align-content: start; }
+.factor:nth-child(2) { border-top-color: #5aa3e0; } .factor:nth-child(3) { border-top-color: #a9c4e2; } .factor:nth-child(4) { border-top-color: var(--soil); }
+.factor .fh { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.factor .bar { height: 6px; border-radius: 3px; background: var(--pale); overflow: hidden; }
+.factor .bar i { display: block; height: 100%; background: var(--nisr); border-radius: 3px; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chips span { font-size: 12.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--pale); color: var(--nisr-dark); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; }
+.tiles.four { grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); }
+.tile2 { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); display: grid; gap: 4px; align-content: start; }
+.tile2 .num small { font-size: 16px; color: var(--muted); }
+.tile2.q { background: var(--nisr); border-color: var(--nisr); color: #fff; align-content: center; }
+.pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.pillar { background: rgba(255, 255, 255, .09); border: 1px solid rgba(255, 255, 255, .25); border-radius: 12px; padding: 16px; display: grid; gap: 8px; align-content: start; }
+.pillar .pi { width: 40px; height: 40px; border-radius: 10px; background: #fff; color: var(--nisr); display: grid; place-items: center; }
+.pillar .small { color: var(--pale); }
+.pillar .chips span { background: rgba(255, 255, 255, .14); color: #fff; }
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font: 700 14px var(--f-body); }
+.flow span { background: #fff; color: var(--nisr); padding: 6px 12px; border-radius: 8px; }
+.flow i { font-style: normal; color: var(--sky); }
+.hsec.dark .chal { color: var(--pale); border-left: 3px solid var(--sky); padding-left: 12px; }
+.hsec.dark .chal a { color: #fff; font-weight: 700; }
+.honest { background: var(--pale); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
+/* last part of the scroll: full-width row of page links */
+.hexplore { padding: 26px 36px 30px; display: grid; gap: 14px; background: var(--panel); border-top: 1px solid var(--line); }
+.explore { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; }
+.card { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: start; text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; text-decoration: none; color: var(--ink); box-shadow: var(--shadow); font: inherit; cursor: pointer; width: 100%; }
+.card:hover { border-color: var(--nisr); background: var(--pale); }
+.card .ic { grid-row: span 2; width: 40px; height: 40px; border-radius: 10px; background: var(--nisr); color: #fff; display: grid; place-items: center; }
+.card b { font: 700 16px var(--f-display); color: var(--nisr); }
+.card span { font-size: 13.5px; color: var(--muted); line-height: 1.4; }
+@media (min-width: 1100px) {
+  .hsplit { grid-template-columns: minmax(0, 42fr) minmax(0, 58fr); align-items: start; }
+  .hsplit .hero { position: sticky; top: 0; height: 100vh; height: 100dvh; overflow-y: auto; }
+  .explore { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .factors { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tiles.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1100px) and (max-width: 1299px) { .explore { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1100px) and (max-height: 820px) { .hero { gap: 12px; padding: 26px 32px 22px; } .hero p.intro { font-size: 15px; } .hero .tags { display: none; } }
+@media (max-width: 900px) { .hero { padding: 30px 20px 24px; } .hsec, .hexplore { padding: 24px 18px; } }
+/* Home v4: the field photo sits behind the whole Home page (fixed while the text scrolls); a deep navy tint keeps
+   contrast; panels are frosted glass that blur the photo behind them. */
+.cols.full #map-col:has(.home), .home-bg {
+  background: linear-gradient(115deg, rgba(4, 22, 52, .84) 0%, rgba(6, 36, 82, .74) 42%, rgba(8, 50, 110, .62) 100%), url("img/field.jpg") center / cover no-repeat;
+  background-attachment: scroll; color: #fff; }
+@media (max-width: 1099px) { .home { background: linear-gradient(115deg, rgba(4, 22, 52, .86), rgba(8, 50, 110, .72)), url("img/field.jpg") center / cover no-repeat; } }
+.hero { background: none; }
+.hero h2 { font: 800 clamp(28px, 2.4vw, 40px)/1.12 var(--f-display); letter-spacing: -.02em; }
+.hero p.intro { font-size: 16px; line-height: 1.65; color: rgba(255, 255, 255, .92); }
+.hero p.intro b { color: #fff; font-weight: 700; }
+.hero .tags span, .glass, .factor, .tile2, .pillar, .card, .honest, .hstats {
+  background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .22); color: #fff;
+  -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%); box-shadow: 0 8px 28px rgba(0, 12, 40, .25); }
+.hstats { gap: 0; }
+.hstats div { background: transparent; border-right: 1px solid rgba(255, 255, 255, .16); border-bottom: 1px solid rgba(255, 255, 255, .16); }
+.hstats span, .hero .kick { color: rgba(255, 255, 255, .78); }
+.hsec { border-bottom: 1px solid rgba(255, 255, 255, .14); }
+.hsec.dark { background: none; }
+.hsec .eyebrow, .hsec.dark .eyebrow { color: var(--sky); }
+.hsec h2 { font: 700 24px/1.25 var(--f-display); letter-spacing: -.01em; color: #fff; }
+.hsec h3 { font: 600 16px/1.3 var(--f-display); color: #fff; }
+.hsec p.txt { color: rgba(255, 255, 255, .88); }
+.hsec .num { font: 700 24px/1.15 var(--f-display); color: #fff; letter-spacing: -.01em; }
+.hsec .num small { color: var(--sky); }
+.hsec .small { color: rgba(255, 255, 255, .86); }
+.hsec .muted, .factor .small.muted { color: rgba(255, 255, 255, .66); }
+.factor { border-top: 3px solid var(--sky); }
+.factor:nth-child(2) { border-top-color: #5aa3e0; } .factor:nth-child(3) { border-top-color: #cfe4f7; } .factor:nth-child(4) { border-top-color: #7fb6e8; }
+.factor .bar { background: rgba(255, 255, 255, .15); }
+.factor .bar i { background: var(--sky); }
+.chips span, .pillar .chips span { background: rgba(255, 255, 255, .12); color: #fff; border: 1px solid rgba(255, 255, 255, .18); font-weight: 500; }
+.tile2.q { background: rgba(169, 211, 242, .22); border-color: rgba(169, 211, 242, .55); }
+.pillar { background: rgba(255, 255, 255, .14); border-color: rgba(169, 211, 242, .5); }
+.pillar .pi { background: var(--sky); color: var(--nisr-dark); }
+.flow span { background: rgba(255, 255, 255, .92); color: var(--nisr-dark); font-weight: 600; }
+.honest { background: rgba(255, 255, 255, .08); }
+.honest b, .hsec.dark .chal b { color: #fff; }
+.hsec.dark .chal { color: rgba(255, 255, 255, .8); }
+.hexplore { background: rgba(4, 22, 52, .35); border-top: 1px solid rgba(255, 255, 255, .14); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.hexplore h2 { color: #fff; }
+.card b { font: 600 16px var(--f-display); color: #fff; }
+.card span { color: rgba(255, 255, 255, .74); }
+.card .ic { background: var(--sky); color: var(--nisr-dark); }
+.card:hover { background: rgba(255, 255, 255, .2); border-color: rgba(255, 255, 255, .5); }
+.btn { font-weight: 600; }
+.btn.ghost { background: rgba(255, 255, 255, .08); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .factor, .tile2, .pillar, .card, .honest, .hstats { background: rgba(8, 40, 92, .78); } }
+/* Home v5: larger type for readability (applied last) */
+.hero .kick, .hsec .eyebrow { font-size: 13.5px; }
+.hero h2 { font-size: clamp(32px, 2.7vw, 46px); }
+.hero p.intro { font-size: 18.5px; line-height: 1.65; }
+.hero .tags span { font-size: 14px; padding: 5px 13px; }
+.btn { font-size: 16px; padding: 11px 19px; }
+.hstats b { font-size: 28px; }
+.hstats span { font-size: 15px; }
+.hsec h2 { font-size: 30px; }
+.hsec p.txt { font-size: 18px; }
+.hsec h3 { font-size: 19.5px; }
+.hsec .num { font-size: 30px; }
+.hsec .small { font-size: 16.5px; line-height: 1.55; }
+.hsec .muted, .factor .small.muted { font-size: 15px; }
+.chips span, .pillar .chips span { font-size: 14.5px; padding: 4px 11px; }
+.flow { font-size: 16px; } .flow span { padding: 8px 14px; }
+.card b { font-size: 18px; }
+.card span { font-size: 15.5px; }
+.card .ic { width: 46px; height: 46px; }
+.tile2.q p.small { font-size: 18px !important; }
+/* Home v6: all Home text 20% larger than v5 */
+.hero .kick, .hsec .eyebrow { font-size: 16px; }
+.hero h2 { font-size: clamp(36px, 3.1vw, 54px); }
+.hero p.intro { font-size: 22px; line-height: 1.6; }
+.hero .tags span { font-size: 17px; }
+.btn { font-size: 19px; padding: 12px 22px; }
+.hstats b { font-size: 34px; }
+.hstats span { font-size: 18px; }
+.hsec h2 { font-size: 36px; }
+.hsec p.txt { font-size: 21.5px; }
+.hsec h3 { font-size: 23.5px; }
+.hsec .num { font-size: 36px; }
+.hsec .small { font-size: 20px; }
+.hsec .muted, .factor .small.muted { font-size: 18px; }
+.chips span, .pillar .chips span { font-size: 17.5px; }
+.flow { font-size: 19px; }
+.card b { font-size: 21.5px; }
+.card span { font-size: 18.5px; }
+.tile2.q p.small { font-size: 21.5px !important; }
+@media (min-width: 1100px) {
+  .hsplit { grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); }
+  .hsplit .hero { align-content: start; padding-top: 34px; }
+}
+/* Home v7: photo only behind the left overview; the right column and the 'Go deeper' row use the dashboard's
+   white-and-blue style (white cards, blue accents), like the other pages. */
+.hright, .hexplore { background: var(--bg); color: var(--ink); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.hexplore { background: var(--panel); border-top: 1px solid var(--line); }
+.hright .hsec { border-bottom: 1px solid var(--line); }
+.hright .hsec .eyebrow, .hexplore .eyebrow { color: var(--nisr); }
+.hright .hsec h2, .hexplore h2 { color: var(--ink); }
+.hright .hsec h3 { color: var(--ink); }
+.hright .hsec p.txt { color: var(--ink); }
+.hright .hsec .num { color: var(--nisr); }
+.hright .hsec .num small { color: var(--muted); }
+.hright .hsec .small { color: var(--ink); }
+.hright .hsec .muted, .hright .factor .small.muted { color: var(--muted); }
+.hright .factor, .hright .tile2, .hright .honest, .hexplore .card {
+  background: var(--panel); border: 1px solid var(--line); color: var(--ink); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: var(--shadow); }
+.hright .factor { border-top: 4px solid var(--nisr); }
+.hright .factor:nth-child(2) { border-top-color: #5aa3e0; } .hright .factor:nth-child(3) { border-top-color: #a9c4e2; } .hright .factor:nth-child(4) { border-top-color: var(--soil); }
+.hright .factor .bar { background: var(--pale); } .hright .factor .bar i { background: var(--nisr); }
+.hright .chips span { background: var(--pale); color: var(--nisr-dark); border: 0; font-weight: 600; }
+.hright .tile2.q { background: var(--nisr); border-color: var(--nisr); color: #fff; }
+.hright .tile2.q .small { color: #fff; }
+.hright .honest { background: var(--pale); }
+.hright .honest b { color: var(--nisr); }
+.hright .tnote { margin: 0; font-size: 16px; color: var(--muted); }
+/* the 'what makes this unique' band stays NISR blue */
+.hright .hsec.dark { background: linear-gradient(135deg, var(--nisr-dark), var(--nisr)); color: #fff; border-bottom: 0; }
+.hright .hsec.dark .eyebrow { color: var(--sky); }
+.hright .hsec.dark h2, .hright .hsec.dark h3 { color: #fff; }
+.hright .hsec.dark .small { color: var(--pale); }
+.hright .pillar { background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .28); box-shadow: none; }
+.hright .pillar .chips span { background: rgba(255, 255, 255, .14); color: #fff; border: 1px solid rgba(255, 255, 255, .25); }
+.hright .hsec.dark .chal { color: var(--pale); }
+.hright .hsec.dark .chal b, .hright .hsec.dark .chal a { color: #fff; }
+.hexplore .card b { color: var(--nisr); }
+.hexplore .card span { color: var(--muted); }
+.hexplore .card .ic { background: var(--nisr); color: #fff; }
+.hexplore .card:hover { background: var(--pale); border-color: var(--nisr); }
+.hright .tiles.four .num { font-size: 30px; white-space: nowrap; }
 /* "Ask the data" assistant (docs/assistant.js) */
 #ask-panel { position: fixed; z-index: 50; top: 0; right: 0; bottom: 0; width: 400px; max-width: 100vw; padding-right: env(safe-area-inset-right, 0px); display: flex; flex-direction: column; background: var(--panel); border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(13, 43, 78, .18); overflow: hidden; }
 #ask-panel[hidden] { display: none; }
@@ -204,11 +427,13 @@ footer { color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--lin
 <body>
 <div class="app">
   <aside class="side">
-    <div class="logo">
+    <a class="logo" href="#home" title="Home">
       <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#fff"/><path d="M6 25c4-7 8-10 11-10s6 2 11-4" fill="none" stroke="#0b4ea2" stroke-width="2.6" stroke-linecap="round"/><path d="M6 28h22" stroke="#a9d3f2" stroke-width="2.6" stroke-linecap="round"/><circle cx="17" cy="15" r="2.6" fill="#0b4ea2"/></svg>
       <div><b data-t="nav_title">Yield Gap Explorer</b><small data-t="nav_sub">NISR Big Data Hackathon 2026 · Track 1</small></div>
-    </div>
+    </a>
+    <div class="rail-hint" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
     <nav class="tabs" aria-label="Sections">
+      <a href="#home" data-tab="home"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span data-t="tab_home">Home</span></a>
       <a href="#trends" data-tab="trends"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg><span data-t="tab_trends">Yield trends</span></a>
       <a href="#actions" data-tab="actions"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span data-t="tab_actions">What to do</span></a>
       <a href="#drivers" data-tab="drivers"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-t="tab_drv">What drives yield</span></a>
@@ -258,7 +483,46 @@ const TXT = {
     title: "Rwanda Yield Gap Explorer",
     subtitle: "Where fertilizer, improved seed and manure would raise harvests most",
     crop: "Crop", season: "Season", district: "District", baseline: "Baseline year",
-    tab_trends: "Yield trends", tab_scen: "Yield gap & scenarios", tab_drv: "What drives yield", tab_model: "How reliable", tab_about: "About",
+    tab_trends: "Yield trends", tab_scen: "Yield gap & scenarios", tab_drv: "What drives yield", tab_model: "How reliable", tab_about: "About", tab_home: "Home",
+    h_kick: "NISR Big Data Hackathon 2026 · Track 1: Agricultural productivity",
+    h_title: "Which factor holds back yield, for which crop, and where?",
+    h_lead: "Rwanda's strategies, NST2 and PSTA 5, aim to raise harvests with the best use of limited effort. The Yield Gap Explorer combines {plots} surveyed fields with satellite data and machine learning to show what drives yield in every district.",
+    h_tag1: "Satellite data", h_tag2: "Machine learning", h_tag3: "SHAP explanations", h_tag4: "NISR survey {y0}–{y1}",
+    h_s_plots: "survey fields analysed", h_s_years: "survey years, Seasons A and B", h_s_dist: "districts", h_s_crops: "main crops", h_s_sat: "satellite and soil sources",
+    h_f_eye: "The challenge", h_f_h: "Yield depends on many factors at once",
+    h_f_t: "Government strategy and policy try to maximize yield with optimal effort. But a field's yield is shaped by four groups of factors together. Our model measures how much each group explains of the yield differences within a crop:",
+    h_f_share: "of explained yield differences",
+    h_f_src_g_mgmt: "NISR survey: what the farmer did on the plot", h_f_src_g_weather: "Satellite: MODIS, CHIRPS, ERA5-Land, Sentinel-1", h_f_src_g_plot: "NISR survey: the plot and the farmer", h_f_src_g_soil: "Soil and terrain maps: iSDAsoil, SRTM",
+    h_t_eye: "{y0} to {y1}", h_t_h: "Inputs grew, but the effect of each factor was unknown",
+    h_t_t: "Since {y0}, farmers and stakeholders have improved several of these factors. But there was no statistical or technological way to know how much each factor adds to yield, for which crop and where. More inputs did not always mean more harvest:",
+    h_t_mfert: "of maize plots with inorganic fertilizer", h_t_mseed: "of maize plots with improved seed", h_t_bfert: "of bush bean plots with inorganic fertilizer",
+    h_t_note: "Season A, smallholder plots, survey-weighted: the same definition as NISR's Seasonal Agricultural Survey reports.", h_t_note_area: "Season A, share of the crop's area, survey-weighted.", h_t_byield: "bush bean yield (kg/ha, Season A)",
+    h_t_q: "So which factor really matters, for which crop, and where? That is the gap this platform fills.",
+    h_a_eye: "What makes this unique", h_a_h: "Satellite data + machine learning + SHAP",
+    h_a_t: "To fill this gap, we built a platform that learns the patterns in {plots} surveyed fields and explains them, crop by crop and district by district.",
+    h_p1: "Satellite eyes on every season", h_p1_t: "For every district and season since 2017, Google Earth Engine measures the season as it happened, over cropland only: crop greenness, rainfall, temperature, soil moisture and radar, plus soil and terrain.",
+    h_p2: "Machine learning on {plots} fields", h_p2_t: "A LightGBM model learns how yield responds to all factors together. Inputs are only allowed to help, never to hurt, and the model is tested on districts and seasons it has never seen.",
+    h_p3: "SHAP shows which factor matters", h_p3_t: "Shapley values (SHAP) split every predicted yield into the contribution of each factor. So we can say which factor limits which crop, and where, and what to improve next season.",
+    h_flow1: "Survey + satellite", h_flow2: "Machine learning", h_flow3: "SHAP", h_flow4: "What to improve, where",
+    h_chal_t: "<b>The district-level data challenge:</b> NISR's public microdata have no plot GPS or sector codes, so satellite values are district averages (one per district and season). With plot locations, the same pipeline could work field by field.",
+    h_more: "Read more in About",
+    h_res_eye: "Key results", h_res_h: "What the data say",
+    h_r1_t: "extra {crop} harvest if farmers who do not use them adopted fertilizer + improved seed + manure ({sy}, Seasons A + B): +{p}% of production.",
+    h_r2_t: "of that from fertilizer alone.",
+    h_r3_t: "districts with the largest {crop} gain.",
+    h_r4_t: "of yield differences within a crop come from inputs and practices; the strongest input is {f}.",
+    h_r5_t: "maize yield with 75 kg/ha of fertilizer, +{d150}% with 150 kg/ha: the first kilograms do the most.",
+    h_r6_t: "district yield error in districts the model never saw, against {b}% for the crop average.",
+    h_honest: "<b>Honest limit:</b> for a new season, a district's own previous result ({wf}% error) estimates its yield better than any model ({wm}%). Use the platform to compare factors and districts, not to replace survey estimates.",
+    h_exp_eye: "Explore", h_exp_h: "Go deeper",
+    h_c_trends: "How yields moved, and how far each district is from the PSTA 5 target.",
+    h_c_actions: "The input to promote in each district, and how much harvest it would add.",
+    h_c_drivers: "Which factors matter most, crop by crop (SHAP).",
+    h_c_model: "How the model was tested, and how far to trust it.",
+    h_c_about: "Data, satellite sources, method, limits, team and use of AI.",
+    h_c_ask_b: "Ask AI", h_c_ask: "Ask questions in English or Kinyarwanda.",
+    h_intro: "Rwanda's national strategies, NST2 and PSTA 5, aim to raise crop yields with the best use of limited resources. But yield depends on many factors at once: <b>inputs and practices</b>, <b>season weather and climate</b>, <b>plot and farmer traits</b>, and <b>soil and terrain</b>. Since {y0}, farmers and partners have improved several of these factors, without a statistical way to know how much each one adds, for which crop and where. The Yield Gap Explorer fills this gap: it links {plots} NISR survey fields with <b>satellite data</b>, and uses <b>machine learning and SHAP</b> to show which factor limits which crop, in which district, and what to improve next season.",
+    h_f_h2: "Four groups of factors shape yield", h_f_t2: "Share of the yield differences within a crop that each group explains (SHAP), with the factors the model uses:",
     seasonA: "Season A (Sep–Feb)", seasonB: "Season B (Mar–Jun)",
     kgha: "kg/ha", t: "t", national_avg: "Average of all districts", range: "Range across districts",
     yield_trend: "Yield trend", from_to: "from {a} to {b}",
@@ -289,7 +553,7 @@ const TXT = {
     wf: "Season-by-season test (walk-forward)", wf_sub: "District yield error when each season 2024A–2025B is predicted from earlier seasons only. Lower is better.",
     wf_read: "A district's own past yield is the best guide to its next yield; the model adds the most when comparing inputs on similar plots.",
     m_last_year: "District, same season last year", m_district_history: "District history", m_national_mean: "National crop average", m_ridge: "Ridge regression", m_random_forest: "Random forest", m_sk_gbm: "Gradient boosting (scikit-learn)", m_sk_gbm_district: "Gradient boosting + district", m_lightgbm: "LightGBM", m_lightgbm_district: "LightGBM + district", m_xgboost: "XGBoost", m_catboost: "CatBoost", m_ensemble: "Ensemble of tree models", m_hybrid: "History × model anomaly",
-    foot: "Data: NISR Seasonal Agricultural Survey 2017–2026 (published tables) and microdata 2022–2025; iSDAsoil, SRTM, MODIS, CHIRPS, ERA5-Land, Sentinel-1 via Google Earth Engine. Model: {engine}. Generated {date}. NISR Big Data Hackathon 2026, Track 1.",
+    foot: "Data: NISR Seasonal Agricultural Survey 2017–2026 (published tables) and microdata {y0}–{y1}; iSDAsoil, SRTM, MODIS, CHIRPS, ERA5-Land, Sentinel-1 via Google Earth Engine. Model: {engine}. Generated {date}. NISR Big Data Hackathon 2026, Track 1.",
     schematic: "Schematic map: districts placed by their approximate position, not to scale.",
     plots: "plots",
     psta: "PSTA 5 target 2028/29", k_target: "PSTA 5 target (2028/29)", target_s: "{d} is at {p}% of the national target",
@@ -348,7 +612,46 @@ const TXT = {
     title: "Isesengura ry'icyuho cy'umusaruro mu Rwanda",
     subtitle: "Aho ifumbire, imbuto z'indobanure n'ifumbire y'imborera byazamura umusaruro kurusha ahandi",
     crop: "Igihingwa", season: "Igihembwe", district: "Akarere", baseline: "Umwaka fatizo",
-    tab_trends: "Uko umusaruro uhagaze", tab_scen: "Icyuho n'ingamba", tab_drv: "Ibigena umusaruro", tab_model: "Kwizerwa", tab_about: "Ibyerekeye",
+    tab_trends: "Uko umusaruro uhagaze", tab_scen: "Icyuho n'ingamba", tab_drv: "Ibigena umusaruro", tab_model: "Kwizerwa", tab_about: "Ibyerekeye", tab_home: "Ahabanza",
+    h_kick: "NISR Big Data Hackathon 2026 · Track 1: Umusaruro w'ubuhinzi",
+    h_title: "Ni ikihe kintu kibuza umusaruro kwiyongera, ku kihe gihingwa, kandi he?",
+    h_lead: "Ingamba z'u Rwanda, NST2 na PSTA 5, zigamije kongera umusaruro hakoreshejwe neza imbaraga nke zihari. Yield Gap Explorer ihuza imirima {plots} yakozweho ubushakashatsi n'amakuru y'icyogajuru n'ubwenge bw'ubukorano (machine learning) kugira ngo yerekane ibigena umusaruro muri buri karere.",
+    h_tag1: "Amakuru y'icyogajuru", h_tag2: "Machine learning", h_tag3: "Ibisobanuro bya SHAP", h_tag4: "Ubushakashatsi bwa NISR {y0}–{y1}",
+    h_s_plots: "imirima y'ubushakashatsi yasesenguwe", h_s_years: "imyaka y'ubushakashatsi, ibihembwe A na B", h_s_dist: "uturere", h_s_crops: "ibihingwa by'ingenzi", h_s_sat: "inkomoko z'amakuru y'icyogajuru n'ubutaka",
+    h_f_eye: "Ikibazo", h_f_h: "Umusaruro uterwa n'ibintu byinshi icyarimwe",
+    h_f_t: "Ingamba na politiki za Leta bigamije kongera umusaruro ku buryo bwiza hakoreshejwe imbaraga zikwiye. Ariko umusaruro w'umurima uterwa n'amatsinda ane y'ibintu icyarimwe. Icyitegererezo cyacu gipima uruhare rwa buri tsinda mu itandukaniro ry'umusaruro ku gihingwa kimwe:",
+    h_f_share: "by'itandukaniro ry'umusaruro risobanurwa",
+    h_f_src_g_mgmt: "Ubushakashatsi bwa NISR: ibyo umuhinzi yakoreye umurima", h_f_src_g_weather: "Icyogajuru: MODIS, CHIRPS, ERA5-Land, Sentinel-1", h_f_src_g_plot: "Ubushakashatsi bwa NISR: umurima n'umuhinzi", h_f_src_g_soil: "Amakarita y'ubutaka n'imiterere yabwo: iSDAsoil, SRTM",
+    h_t_eye: "{y0} kugeza {y1}", h_t_h: "Inyongeramusaruro ziyongereye, ariko uruhare rwa buri kintu ntirwari ruzwi",
+    h_t_t: "Kuva {y0}, abahinzi n'abafatanyabikorwa bongereye bimwe muri ibi bintu. Ariko nta buryo bw'ibarurishamibare cyangwa bw'ikoranabuhanga bwari buhari bwo kumenya uko buri kintu kongera umusaruro, ku kihe gihingwa n'aho. Inyongeramusaruro nyinshi ntizahoraga zizana umusaruro mwinshi:",
+    h_t_mfert: "by'imirima y'ibigori ikoreshwamo ifumbire mvaruganda", h_t_mseed: "by'imirima y'ibigori ihinzemo imbuto z'indobanure", h_t_bfert: "by'imirima y'ibishyimbo bigufi ikoreshwamo ifumbire mvaruganda",
+    h_t_note: "Igihembwe A, imirima y'abahinzi bato, hakoreshejwe uburemere bw'ubushakashatsi: ibisobanuro bimwe n'ibyo muri raporo za NISR z'Ubushakashatsi ku Buhinzi bw'Ibihembwe.", h_t_note_area: "Igihembwe A, igice cy'ubuso bw'igihingwa, hakoreshejwe uburemere bw'ubushakashatsi.", h_t_byield: "umusaruro w'ibishyimbo bigufi (kg/ha, igihembwe A)",
+    h_t_q: "None se ni ikihe kintu gifite akamaro koko, ku kihe gihingwa, kandi he? Icyo ni cyo cyuho iki gikoresho cyuzuza.",
+    h_a_eye: "Igituma iki gikoresho cyihariye", h_a_h: "Icyogajuru + machine learning + SHAP",
+    h_a_t: "Kugira ngo twuzuze iki cyuho, twubatse igikoresho cyiga imiterere y'amakuru y'imirima {plots} kandi kikayisobanura, igihingwa ku kindi n'akarere ku kandi.",
+    h_p1: "Icyogajuru kireba buri gihembwe", h_p1_t: "Kuri buri karere na buri gihembwe kuva 2017, Google Earth Engine ipima uko igihembwe cyagenze ku butaka buhingwa gusa: icyatsi cy'ibihingwa, imvura, ubushyuhe, ubuhehere bw'ubutaka na radar, hamwe n'ubutaka n'imiterere yabwo.",
+    h_p2: "Machine learning ku mirima {plots}", h_p2_t: "Icyitegererezo cya LightGBM cyiga uko umusaruro uhinduka bitewe n'ibintu byose icyarimwe. Inyongeramusaruro zemerewe gufasha gusa, ntizishobora kwangiza, kandi icyitegererezo kigeragezwa ku turere no ku bihembwe kitigeze kibona.",
+    h_p3: "SHAP yerekana ikintu gifite akamaro", h_p3_t: "Agaciro ka Shapley (SHAP) gacamo umusaruro wahanuwe uruhare rwa buri kintu. Bityo tubasha kuvuga ikintu kibuza buri gihingwa kwera, aho ari ho, n'icyo kunoza mu gihembwe gitaha.",
+    h_flow1: "Ubushakashatsi + icyogajuru", h_flow2: "Machine learning", h_flow3: "SHAP", h_flow4: "Icyo kunoza, n'aho",
+    h_chal_t: "<b>Imbogamizi y'amakuru ku rwego rw'akarere:</b> imibare y'ibanze ya NISR iboneka ku mugaragaro ntigira GPS y'imirima cyangwa kode z'imirenge, bityo amakuru y'icyogajuru ni impuzandengo z'akarere (imwe kuri buri karere n'igihembwe). Haramutse hari aho imirima iherereye, uburyo nk'ubu bwakora umurima ku wundi.",
+    h_more: "Soma byinshi mu Byerekeye",
+    h_res_eye: "Ibisubizo by'ingenzi", h_res_h: "Icyo amakuru agaragaza",
+    h_r1_t: "umusaruro w'inyongera wa {crop} abatabikoresha baramutse bakoresheje ifumbire mvaruganda + imbuto z'indobanure + ifumbire y'imborera ({sy}, ibihembwe A + B): +{p}% by'umusaruro.",
+    h_r2_t: "muri wo uturuka ku ifumbire mvaruganda yonyine.",
+    h_r3_t: "uturere dufite inyongera nini ya {crop}.",
+    h_r4_t: "by'itandukaniro ry'umusaruro ku gihingwa kimwe biva ku nyongeramusaruro n'imikorere; inyongeramusaruro ikomeye kurusha izindi ni {f}.",
+    h_r5_t: "ku musaruro w'ibigori hakoreshejwe kg 75/ha z'ifumbire mvaruganda, +{d150}% kuri kg 150/ha: ibiro bya mbere ni byo bitanga byinshi.",
+    h_r6_t: "ikosa ku musaruro w'uturere icyitegererezo kitigeze kibona, ugereranyije na {b}% ku mpuzandengo y'igihingwa.",
+    h_honest: "<b>Aho bigarukira:</b> ku gihembwe gishya, umusaruro w'akarere wabanje (ikosa {wf}%) uhanura neza kurusha icyitegererezo icyo ari cyo cyose ({wm}%). Koresha iki gikoresho mu kugereranya ibintu n'uturere, si mu gusimbura imibare y'ubushakashatsi.",
+    h_exp_eye: "Sura", h_exp_h: "Menya byinshi",
+    h_c_trends: "Uko umusaruro wahindutse, n'intera buri karere gasigaje ku ntego ya PSTA 5.",
+    h_c_actions: "Inyongeramusaruro ikwiye gushyirwa imbere muri buri karere, n'umusaruro yakongera.",
+    h_c_drivers: "Ibintu bifite akamaro kurusha ibindi, ku gihingwa (SHAP).",
+    h_c_model: "Uko icyitegererezo cyagenzuwe, n'aho kizerwa.",
+    h_c_about: "Amakuru, inkomoko z'icyogajuru, uburyo, aho bigarukira, itsinda n'ikoreshwa rya AI.",
+    h_c_ask_b: "Baza AI", h_c_ask: "Baza ibibazo mu Kinyarwanda cyangwa mu Cyongereza.",
+    h_intro: "Ingamba z'igihugu, NST2 na PSTA 5, zigamije kongera umusaruro w'ibihingwa hakoreshejwe neza ubushobozi buke buhari. Ariko umusaruro uterwa n'ibintu byinshi icyarimwe: <b>inyongeramusaruro n'imikorere</b>, <b>ikirere cy'igihembwe n'imihindagurikire yacyo</b>, <b>imiterere y'umurima n'umuhinzi</b>, n'<b>ubutaka n'imiterere yabwo</b>. Kuva {y0}, abahinzi n'abafatanyabikorwa bongereye bimwe muri ibi bintu, nta buryo bw'ibarurishamibare bwo kumenya uruhare rwa buri kimwe, ku kihe gihingwa n'aho. Yield Gap Explorer yuzuza iki cyuho: ihuza imirima {plots} y'ubushakashatsi bwa NISR n'<b>amakuru y'icyogajuru</b>, igakoresha <b>machine learning na SHAP</b> kugira ngo yerekane ikintu kibuza buri gihingwa kwera, mu kahe karere, n'icyo kunoza mu gihembwe gitaha.",
+    h_f_h2: "Amatsinda ane y'ibintu agena umusaruro", h_f_t2: "Uruhare rwa buri tsinda mu itandukaniro ry'umusaruro ku gihingwa kimwe (SHAP), n'ibintu icyitegererezo gikoresha:",
     seasonA: "Igihembwe A (Nzeri–Gashyantare)", seasonB: "Igihembwe B (Werurwe–Kamena)",
     kgha: "kg/ha", t: "t", national_avg: "Impuzandengo y'uturere twose", range: "Itandukaniro hagati y'uturere",
     yield_trend: "Uko umusaruro wagiye uhinduka", from_to: "kuva {a} kugeza {b}",
@@ -379,7 +682,7 @@ const TXT = {
     wf: "Igerageza ku gihembwe ku kindi", wf_sub: "Ikosa ku musaruro w'akarere iyo buri gihembwe 2024A–2025B gihanurwa hifashishijwe ibihembwe byabanje gusa.",
     wf_read: "Umusaruro w'akarere wabanje ni wo uyobora neza kurusha; icyitegererezo gifasha cyane mu kugereranya inyongeramusaruro.",
     m_last_year: "Akarere, igihembwe nk'iki umwaka ushize", m_district_history: "Amateka y'akarere", m_national_mean: "Impuzandengo y'igihugu", m_ridge: "Ridge", m_random_forest: "Random forest", m_sk_gbm: "Gradient boosting", m_sk_gbm_district: "Gradient boosting + akarere", m_lightgbm: "LightGBM", m_lightgbm_district: "LightGBM + akarere", m_xgboost: "XGBoost", m_catboost: "CatBoost", m_ensemble: "Ibyitegererezo byose hamwe", m_hybrid: "Amateka × icyitegererezo",
-    foot: "Amakuru: NISR, Ubushakashatsi ku buhinzi bw'ibihembwe 2017–2026 n'imibare y'ibanze 2022–2025; iSDAsoil, SRTM, MODIS, CHIRPS, ERA5-Land, Sentinel-1. Icyitegererezo: {engine}. Byakozwe {date}. NISR Big Data Hackathon 2026.",
+    foot: "Amakuru: NISR, Ubushakashatsi ku buhinzi bw'ibihembwe 2017–2026 n'imibare y'ibanze {y0}–{y1}; iSDAsoil, SRTM, MODIS, CHIRPS, ERA5-Land, Sentinel-1. Icyitegererezo: {engine}. Byakozwe {date}. NISR Big Data Hackathon 2026.",
     schematic: "Ikarita y'incamake: uturere dushyizwe hafi y'aho turi, ntabwo ari ku gipimo.",
     plots: "imirima",
     psta: "Intego ya PSTA 5 (2028/29)", k_target: "Intego ya PSTA 5 (2028/29)", target_s: "{d} igeze kuri {p}% by'intego y'igihugu",
@@ -467,7 +770,7 @@ const TILES = {
 
 let LANG = "en";
 try { LANG = localStorage.getItem("yg-lang") || "en"; } catch (e) { /* storage unavailable */ }
-const S = { crop: "Maize", season: "A", district: "Nyagatare", base: 2018, lever: "best", tab: "trends" };
+const S = { crop: "Maize", season: "A", district: "Nyagatare", base: 2018, lever: "best", tab: "home" };
 
 const tr = (k, vars) => { let s = (TXT[LANG][k] ?? TXT.en[k] ?? k); for (const [a, b] of Object.entries(vars || {})) s = s.replaceAll("{" + a + "}", b); return s; };
 const cropName = c => LANG === "rw" ? (CROP_RW[c] || c) : c;
@@ -483,6 +786,8 @@ const DRV = tbl(D.drivers), DRVC = tbl(D.drivers_crop), VAL = tbl(D.validation),
 const CROPS = ["Maize", "Bush bean", "Climbing bean", "Irish potato", "Sweet potato", "Cassava", "Sorghum", "Soybean", "Wheat"].filter(c => TREND.some(r => r.crop === c) || SCEN.some(r => r.crop === c));
 const DISTRICTS = Object.keys(D.provinces).sort();
 const YEARS = [...new Set(TREND.map(r => r.year))].sort((a, b) => a - b);
+const SURVEY_YEARS = [...new Set(ADOPT.map(r => r.year))].sort((a, b) => a - b);  // plot microdata years
+const SY0 = SURVEY_YEARS[0], SY1 = SURVEY_YEARS.at(-1);
 
 /* ------------------------------------------------------------------ tooltip */
 const tip = document.getElementById("tip");
@@ -844,7 +1149,7 @@ function viewModel() {
     stats: brief(tr("inbrief"), txt) + kpis(
         kpi(tr("v_district"), dv ? pct(100 * dv.district_MAPE_model) : "–", `${tr("v_base")}: ${dv ? pct(100 * dv.district_MAPE_baseline) : "–"}`, ICON.target),
         kpi(tr("k_wf"), bestBase ? pct(bestBase["MAPE_%"]) : "–", bestML ? `${tr("m_" + bestML.model)}: ${pct(bestML["MAPE_%"])}` : "", ICON.up),
-        kpi(tr("k_plots"), nf(D.meta.plots), `NISR SAS 2022–2025 · ${esc(D.meta.engine || "")}`, ICON.seed))
+        kpi(tr("k_plots"), nf(D.meta.plots), `NISR SAS ${SY0}–${SY1} · ${esc(D.meta.engine || "")}`, ICON.seed))
       + `<div class="panel"><h2>${tr("v_corr")}</h2><p class="sub">${tr("v_corr_sub")}</p>${corr.length ? corrChart : `<p class="empty">${tr("noData")}</p>`}</div>`
       + `<div class="panel"><h2>${tr("val_table")}</h2><p class="sub">${esc(D.meta.engine || "")} · ${nf(D.meta.plots)} ${tr("plots")}</p>
         <table><thead><tr><th>${tr("v_test")}</th><th class="n">${tr("v_mape")}</th><th class="n">${tr("v_base")}</th></tr></thead><tbody>${rowsV}</tbody></table>
@@ -853,8 +1158,115 @@ function viewModel() {
 }
 
 function viewAbout() {
-  return { stats: "", map: `<div class="panel prose">${ABOUT[LANG]}<p class="note">${tr("about_rw_note")}</p></div>` };
+  const r2 = VAL.filter(v => !v.validation.startsWith("temporal")).map(v => v.plot_R2_within_crop).filter(v => v != null);
+  const html = ABOUT[LANG].replaceAll("{y0}", SY0).replaceAll("{y1}", SY1).replaceAll("{plots}", nf(D.meta.plots))
+    .replaceAll("{r2lo}", nf(Math.min(...r2), 2)).replaceAll("{r2hi}", nf(Math.max(...r2), 2));
+  return { stats: "", map: `<div class="panel prose">${html}<p class="note">${tr("about_rw_note")}</p></div>` };
 }
+
+/* ------------------------------------------------------------------ 0. Home */
+function homeNumbers() {
+  const PKG = "package_fert_seed_manure";
+  const pk = {};
+  SNAT.filter(r => r.scenario === PKG).forEach(r => { const o = pk[r.crop] = pk[r.crop] || { t: 0, p: 0 }; o.t += r.extra_production_t || 0; o.p += r.current_production_t || 0; });
+  const [crop, top] = Object.entries(pk).sort((a, c) => c[1].t - a[1].t)[0] || ["Maize", { t: 0, p: 0 }];
+  const fert = SNAT.filter(r => r.scenario === "fertilizer" && r.crop === crop).reduce((a, r) => a + (r.extra_production_t || 0), 0);
+  const byD = {};
+  SCEN.filter(r => r.scenario === PKG && r.crop === crop).forEach(r => { byD[r.district] = (byD[r.district] || 0) + (r.extra_production_t || 0); });
+  const dists = Object.entries(byD).sort((a, c) => c[1] - a[1]).slice(0, 5).map(x => x[0]);
+  const g = groupShares(DRV), f = DRV.filter(r => r.share_pct != null && GROUP_KEY[r.group] === "g_mgmt").sort((a, c) => c.share_pct - a.share_pct)[0];  // strongest input
+  const dose = kg => (DOSE.find(r => r.crop === "Maize" && r.kg_per_ha === kg) || {}).yield_gain_pct;
+  const dv = VAL.find(v => v.validation.startsWith("district"));
+  const w = WF.slice().sort((a, c) => a["MAPE_%"] - c["MAPE_%"]);
+  const rule = w.find(x => ["last_year", "district_history"].includes(x.model)), ml = w.find(x => !["last_year", "district_history", "national_mean"].includes(x.model));
+  return { crop, pkgT: top.t, pkgP: top.p ? 100 * top.t / top.p : null, fert, dists, g, f, d75: dose(75), d150: dose(150), dv, rule, ml };
+}
+function viewHome() {
+  const n = homeNumbers(), sy = D.meta.scenario_year, plots = nf(D.meta.plots);
+  const card = (href, icon, title, text) => `<a class="card" href="${href}"><span class="ic">${icon}</span><b>${title}</b><span>${text}</span></a>`;
+  const navIcon = tab => { const a = document.querySelector(`nav.tabs a[data-tab="${tab}"] svg`); return a ? a.outerHTML : ICON.dot; };
+  const askIcon = (document.querySelector("#ask-btn svg") || {}).outerHTML || ICON.dot;
+  const tile = (num, text, cls = "") => `<div class="tile2 ${cls}"><div class="num">${num}</div><p class="small">${text}</p></div>`;
+  const byGroup = k => DRV.filter(r => GROUP_KEY[r.group] === k && r.share_pct != null).sort((a, c) => c.share_pct - a.share_pct);
+  const factor = k => { const fs = byGroup(k), sh = n.g[k] || 0;
+    return `<div class="factor"><div class="fh"><h3>${tr(k)}</h3><span class="num">${pct(sh, 1)}</span></div>
+      <div class="bar"><i style="width:${Math.min(100, 2 * sh)}%"></i></div><p class="small muted">${tr("h_f_src_" + k)}</p>
+      <div class="chips">${fs.slice(0, 7).map(r => `<span>${esc(featName(r.feature))}</span>`).join("")}</div></div>`; };
+  const nat = (crop, y) => ADOPT.find(r => r.district === "Rwanda" && r.crop === crop && r.season === "A" && r.year === y) || {};
+  const m0 = nat("Maize", SY0), m1 = nat("Maize", SY1), b0 = nat("Bush bean", SY0), b1 = nat("Bush bean", SY1);
+  const arrow = (a, b, f) => `${f(a)} <small>→</small> ${f(b)}`, p100 = v => pct(100 * v);
+  const html = `<div class="home">
+   <div class="hsplit">
+    <section class="hero">
+      <div class="kick">${tr("h_kick")}</div>
+      <h2>${tr("h_title")}</h2>
+      <p class="intro">${tr("h_intro", { y0: SY0, plots })}</p>
+      <div class="tags"><span>${tr("h_tag1")}</span><span>${tr("h_tag2")}</span><span>${tr("h_tag3")}</span><span>${tr("h_tag4", { y0: SY0, y1: SY1 })}</span></div>
+      <div class="cta"><a class="btn light" href="#actions">${tr("tab_actions")} →</a><a class="btn ghost" href="#drivers">${tr("tab_drv")}</a><a class="btn ghost" href="#trends">${tr("tab_trends")}</a></div>
+      <div class="hstats">
+        <div><b>${plots}</b><span>${tr("h_s_plots")}</span></div>
+        <div><b>${SY0}–${SY1}</b><span>${tr("h_s_years")}</span></div>
+        <div><b>${nf(DISTRICTS.length)}</b><span>${tr("h_s_dist")}</span></div>
+        <div><b>${nf(CROPS.length)}</b><span>${tr("h_s_crops")}</span></div>
+      </div>
+    </section>
+    <div class="hright">
+      <section class="hsec">
+        <div class="eyebrow">${tr("h_f_eye")}</div><h2>${tr("h_f_h2")}</h2>
+        <p class="txt">${tr("h_f_t2")}</p>
+        <div class="factors">${["g_mgmt", "g_weather", "g_plot", "g_soil"].map(factor).join("")}</div>
+      </section>
+      <section class="hsec">
+        <div class="eyebrow">${tr("h_t_eye", { y0: SY0, y1: SY1 })}</div><h2>${tr("h_t_h")}</h2>
+        <div class="tiles four">
+          ${tile(arrow(m0.fert_p ?? m0.fert, m1.fert_p ?? m1.fert, p100), tr("h_t_mfert"))}
+          ${tile(arrow(m0.seed_p ?? m0.seed, m1.seed_p ?? m1.seed, p100), tr("h_t_mseed"))}
+          ${tile(arrow(b0.fert_p ?? b0.fert, b1.fert_p ?? b1.fert, p100), tr("h_t_bfert"))}
+          ${tile(arrow(b0.yield_kg_ha, b1.yield_kg_ha, v => nf(v)), tr("h_t_byield"))}
+        </div>
+        <p class="tnote">${tr(m1.fert_p != null ? "h_t_note" : "h_t_note_area")}</p>
+        <div class="tile2 q"><p class="small" style="font-size:16px;font-weight:700">${tr("h_t_q")}</p></div>
+      </section>
+      <section class="hsec dark">
+        <div class="eyebrow">${tr("h_a_eye")}</div><h2>${tr("h_a_h")}</h2>
+        <div class="pillars">
+          <div class="pillar"><div class="pi">${ICON.dot}</div><h3>${tr("h_p1")}</h3><p class="small">${tr("h_p1_t")}</p>
+            <div class="chips"><span>MODIS NDVI/EVI</span><span>MODIS LST</span><span>CHIRPS</span><span>ERA5-Land</span><span>Sentinel-1</span><span>iSDAsoil</span><span>SRTM</span></div></div>
+          <div class="pillar"><div class="pi">${ICON.up}</div><h3>${tr("h_p2", { plots })}</h3><p class="small">${tr("h_p2_t")}</p></div>
+          <div class="pillar"><div class="pi">${ICON.pct}</div><h3>${tr("h_p3")}</h3><p class="small">${tr("h_p3_t")}</p></div>
+        </div>
+        <div class="flow"><span>${tr("h_flow1")}</span><i>→</i><span>${tr("h_flow2")}</span><i>→</i><span>${tr("h_flow3")}</span><i>→</i><span>${tr("h_flow4")}</span></div>
+        <p class="small chal">${tr("h_chal_t")} <a href="#about">${tr("h_more")} →</a></p>
+      </section>
+      <section class="hsec">
+        <div class="eyebrow">${tr("h_res_eye")}</div><h2>${tr("h_res_h")}</h2>
+        <div class="tiles three">
+          ${tile("+" + nf(n.pkgT) + " t", tr("h_r1_t", { crop: esc(cropName(n.crop)).toLowerCase(), sy, p: nf(n.pkgP) }))}
+          ${tile(nf(n.fert) + " t", tr("h_r2_t"))}
+          ${tile(pct(n.g.g_mgmt), tr("h_r4_t", { f: n.f ? esc(featName(n.f.feature)).toLowerCase() : "–" }))}
+          ${tile("+" + pct(n.d75), tr("h_r5_t", { d150: nf(n.d150) }))}
+          ${n.dv ? tile(pct(100 * n.dv.district_MAPE_model), tr("h_r6_t", { b: nf(100 * n.dv.district_MAPE_baseline) })) : ""}
+          ${tile(n.dists.map(esc).join(", "), tr("h_r3_t", { crop: esc(cropName(n.crop)).toLowerCase() }))}
+        </div>
+        ${n.rule && n.ml ? `<p class="small honest">${tr("h_honest", { wf: nf(n.rule["MAPE_%"]), wm: nf(n.ml["MAPE_%"]) })}</p>` : ""}
+      </section>
+    </div>
+   </div>
+   <section class="hexplore">
+     <div class="hsec" style="padding:0;border:0"><div class="eyebrow">${tr("h_exp_eye")}</div><h2>${tr("h_exp_h")}</h2></div>
+     <div class="explore">
+       ${card("#trends", navIcon("trends"), tr("tab_trends"), tr("h_c_trends"))}
+       ${card("#actions", navIcon("actions"), tr("tab_actions"), tr("h_c_actions"))}
+       ${card("#drivers", navIcon("drivers"), tr("tab_drv"), tr("h_c_drivers"))}
+       ${card("#model", navIcon("model"), tr("tab_model"), tr("h_c_model"))}
+       ${card("#about", navIcon("about"), tr("tab_about"), tr("h_c_about"))}
+       <button type="button" class="card" id="home-ask"><span class="ic">${askIcon}</span><b>${tr("h_c_ask_b")}</b><span>${tr("h_c_ask")}</span></button>
+     </div>
+   </section>
+  </div>`;
+  return { stats: "", map: html };
+}
+
 const ABOUT = {
   en: `<h2>What this dashboard is for</h2><p>It helps MINAGRI, RAB and district agronomists decide where to promote fertilizer, improved seed, manure, lime and anti-erosion works, for which crop and season, to raise harvests towards the PSTA 5 targets.</p>
     <h2>How to read it</h2><ul>
@@ -864,10 +1276,10 @@ const ABOUT = {
       <li><b>How reliable:</b> how the model was tested.</li>
       <li><b>Ask AI</b> (in the side menu): ask questions in English or Kinyarwanda. It runs in your browser: keyword rules plus a small intent classifier trained on example questions pick the question type, and every number comes from the results shown here. No external AI service is called.</li></ul>
     <h2>Data and method</h2><ul>
-      <li>NISR Seasonal Agricultural Survey: published district tables 2017–2026 and plot microdata 2022–2025 (152,835 plot records).</li>
+      <li>NISR Seasonal Agricultural Survey: published district tables 2017–2026 and plot microdata {y0}–{y1} ({plots} plot records).</li>
       <li>A LightGBM yield model compares similar fields with and without each input; gains are added up with survey weights per district. Targets: MINAGRI PSTA 5 (2024/25–2028/29).</li></ul>
     <h2>Satellite and geospatial data</h2><p>For every district and season from 2017 to 2026 we extracted, with Google Earth Engine, seasonal anomalies (difference from the district's normal) from: <b>MODIS</b> NDVI/EVI crop greenness (250 m, 16-day) and land surface temperature; <b>CHIRPS</b> rainfall; <b>ERA5-Land</b> soil moisture and air temperature; <b>Sentinel-1</b> radar (10 m). Soil pH, carbon and nitrogen come from <b>iSDAsoil</b>, elevation and slope from <b>SRTM</b>, all inside a consensus cropland mask. These values are joined to the 152,835 surveyed fields. Season weather from satellites explains about 27% of within-crop yield differences, and soil and terrain about 18%.</p>
-    <h2>The district-level data challenge</h2><p>NISR's public survey microdata contain no plot GPS coordinates and no sector codes, so satellite, soil and terrain variables can only be attached at district level (one value per district and season). This limits how much plot-to-plot variation the model can explain (within-crop plot R² about 0.13–0.19) and is why results are reported per district. With GPS-linked plots (available to NISR internally), the same pipeline could use field-level satellite data (10 m Sentinel-2/Sentinel-1, terrain wetness, curvature, NDWI) and give field-level recommendations. <b>That is our main recommendation to NISR.</b></p>
+    <h2>The district-level data challenge</h2><p>NISR's public survey microdata contain no plot GPS coordinates and no sector codes, so satellite, soil and terrain variables can only be attached at district level (one value per district and season). This limits how much plot-to-plot variation the model can explain (within-crop plot R² about {r2lo}–{r2hi}) and is why results are reported per district. With GPS-linked plots (available to NISR internally), the same pipeline could use field-level satellite data (10 m Sentinel-2/Sentinel-1, terrain wetness, curvature, NDWI) and give field-level recommendations. <b>That is our main recommendation to NISR.</b></p>
     <h2>Limits</h2><ul>
       <li>Gains are estimates from survey data, not field trials; they show where inputs are likely to pay off.</li>
       <li>For a new season, a district's own past yield predicts its yield better than the model: use the model to compare inputs, not to replace the survey.</li>
@@ -882,10 +1294,10 @@ const ABOUT = {
       <li><b>Kwizerwa:</b> uko icyitegererezo cyagenzuwe.</li>
       <li><b>Baza AI</b> (mu ruhande rw'ibumoso): baza mu Kinyarwanda cyangwa mu Cyongereza. Ikorera muri mudasobwa yawe: amategeko y'amagambo n'icyitegererezo gito cyatojwe ku ngero z'ibibazo bimenya ubwoko bw'ikibazo, kandi imibare yose iva mu bisubizo bigaragara hano. Nta serivisi ya AI yo hanze ikoreshwa.</li></ul>
     <h2>Amakuru n'uburyo</h2><ul>
-      <li>Ubushakashatsi bwa NISR ku buhinzi bw'ibihembwe: imbonerahamwe z'uturere 2017–2026 n'imibare y'ibanze y'imirima 2022–2025 (imirima 152,835).</li>
+      <li>Ubushakashatsi bwa NISR ku buhinzi bw'ibihembwe: imbonerahamwe z'uturere 2017–2026 n'imibare y'ibanze y'imirima {y0}–{y1} (imirima {plots}).</li>
       <li>Icyitegererezo cya LightGBM kigereranya imirima isa ikoresha n'idakoresha buri nyongeramusaruro; inyongera zibarwa ku karere hakoreshejwe uburemere bw'ubushakashatsi. Intego: MINAGRI PSTA 5 (2024/25–2028/29).</li></ul>
     <h2>Amakuru y'icyogajuru n'ay'imiterere y'ubutaka</h2><p>Kuri buri karere na buri gihembwe kuva 2017 kugeza 2026, twakoresheje Google Earth Engine dukuramo itandukaniro n'ibisanzwe muri: <b>MODIS</b> (icyatsi cy'ibihingwa NDVI/EVI, m 250, iminsi 16, n'ubushyuhe bw'ubutaka); imvura ya <b>CHIRPS</b>; ubuhehere bw'ubutaka n'ubushyuhe bw'umwuka bya <b>ERA5-Land</b>; radar ya <b>Sentinel-1</b> (m 10). pH, karubone na azote by'ubutaka biva muri <b>iSDAsoil</b>, ubutumburuke n'ubuhaname biva muri <b>SRTM</b>, byose ku butaka buhingwa. Aya makuru yahujwe n'imirima 152,835 yakozweho ubushakashatsi. Ikirere cy'igihembwe (icyogajuru) gisobanura hafi 27% by'itandukaniro ry'umusaruro ku gihingwa kimwe, ubutaka n'imiterere yabwo hafi 18%.</p>
-    <h2>Imbogamizi y'amakuru ku rwego rw'akarere</h2><p>Imibare y'ibanze ya NISR iboneka ku mugaragaro ntigira aho imirima iherereye (GPS) cyangwa kode z'imirenge, bityo amakuru y'icyogajuru, ubutaka n'imiterere yabwo ashobora guhuzwa n'imirima ku rwego rw'akarere gusa (agaciro kamwe kuri buri karere n'igihembwe). Ibi bigabanya ubushobozi bw'icyitegererezo bwo gusobanura itandukaniro hagati y'umurima n'undi (R² ku murima, ku gihingwa kimwe, hafi 0.13–0.19), ni yo mpamvu ibisubizo bitangwa ku karere. NISR ifite GPS y'imirima imbere mu kigo; hamwe nayo, uburyo bumwe bwakoresha amakuru y'icyogajuru ku rwego rw'umurima (Sentinel-2/Sentinel-1 ya m 10, ubuhehere bw'imiterere y'ubutaka, imiterere y'ubuso, NDWI) bugatanga inama ku murima. <b>Iki ni cyo cyifuzo cyacu cy'ingenzi kuri NISR.</b></p>
+    <h2>Imbogamizi y'amakuru ku rwego rw'akarere</h2><p>Imibare y'ibanze ya NISR iboneka ku mugaragaro ntigira aho imirima iherereye (GPS) cyangwa kode z'imirenge, bityo amakuru y'icyogajuru, ubutaka n'imiterere yabwo ashobora guhuzwa n'imirima ku rwego rw'akarere gusa (agaciro kamwe kuri buri karere n'igihembwe). Ibi bigabanya ubushobozi bw'icyitegererezo bwo gusobanura itandukaniro hagati y'umurima n'undi (R² ku murima, ku gihingwa kimwe, hafi {r2lo}–{r2hi}), ni yo mpamvu ibisubizo bitangwa ku karere. NISR ifite GPS y'imirima imbere mu kigo; hamwe nayo, uburyo bumwe bwakoresha amakuru y'icyogajuru ku rwego rw'umurima (Sentinel-2/Sentinel-1 ya m 10, ubuhehere bw'imiterere y'ubutaka, imiterere y'ubuso, NDWI) bugatanga inama ku murima. <b>Iki ni cyo cyifuzo cyacu cy'ingenzi kuri NISR.</b></p>
     <h2>Aho bigarukira</h2><ul>
       <li>Inyongera ni ibigereranyo bivuye mu bushakashatsi, si ibisubizo by'igerageza mu mirima; byerekana aho inyongeramusaruro zishobora kunguka.</li>
       <li>Ku gihembwe gishya, umusaruro w'akarere wabanje uhanura neza kurusha icyitegererezo: icyitegererezo gikoreshwe mu kugereranya inyongeramusaruro, si mu gusimbura ubushakashatsi.</li>
@@ -895,8 +1307,8 @@ const ABOUT = {
 };
 
 /* ------------------------------------------------------------------ controls + routing */
-const TABS = ["trends", "actions", "drivers", "model", "about"];
-const TAB_KEY = { trends: "tab_trends", actions: "tab_actions", drivers: "tab_drv", model: "tab_model", about: "tab_about" };
+const TABS = ["home", "trends", "actions", "drivers", "model", "about"];
+const TAB_KEY = { home: "title", trends: "tab_trends", actions: "tab_actions", drivers: "tab_drv", model: "tab_model", about: "tab_about" };
 function fillControls() {
   const fc = document.getElementById("f-crop"), fs = document.getElementById("f-season"), fd = document.getElementById("f-district"), fb = document.getElementById("f-base");
   fc.innerHTML = CROPS.map(c => `<option value="${c}">${esc(cropName(c))}</option>`).join("");
@@ -911,7 +1323,7 @@ function applyLang() {
   document.title = tr("title");
   document.getElementById("lang-en").setAttribute("aria-pressed", LANG === "en");
   document.getElementById("lang-rw").setAttribute("aria-pressed", LANG === "rw");
-  document.getElementById("foot").textContent = tr("foot", { engine: D.meta.engine || "", date: D.meta.generated });
+  document.getElementById("foot").textContent = tr("foot", { engine: D.meta.engine || "", date: D.meta.generated, y0: SY0, y1: SY1 });
   fillControls();
 }
 let shownTab = null;
@@ -921,19 +1333,22 @@ function render() {
   const newTab = shownTab !== S.tab, keep = statsCol.scrollTop; shownTab = S.tab;
   document.querySelectorAll("nav.tabs a").forEach(a => a.setAttribute("aria-current", a.dataset.tab === S.tab ? "page" : "false"));
   document.getElementById("baseline-field").hidden = S.tab !== "trends";
+  document.querySelector("header.bar").hidden = S.tab === "home";
   document.getElementById("page-title").textContent = tr(TAB_KEY[S.tab]);
   hideTip();
-  const v = ({ trends: viewTrends, actions: viewActions, drivers: viewDrivers, model: viewModel, about: viewAbout })[S.tab]();
+  const v = ({ home: viewHome, trends: viewTrends, actions: viewActions, drivers: viewDrivers, model: viewModel, about: viewAbout })[S.tab]();
   mv.innerHTML = v.map; sv.innerHTML = v.stats;
   document.getElementById("cols").classList.toggle("full", !v.stats);
   statsCol.hidden = !v.stats;
   statsCol.scrollTop = newTab ? 0 : keep;
   if (newTab) { mapCol.scrollTop = 0; scrollTo(0, 0); }
+  const ha = document.getElementById("home-ask");
+  if (ha) ha.addEventListener("click", () => document.getElementById("ask-btn").click());
   mv.querySelectorAll("[data-lever]").forEach(b => b.addEventListener("click", () => { S.lever = b.dataset.lever; render(); }));
   [mv, sv].forEach(el => { bindTips(el); bindTiles(el); });
   if (typeof Ask !== "undefined") Ask.refresh(); // assistant chips follow the selection and language
 }
-function route() { const h = location.hash.replace("#", ""); S.tab = TABS.includes(h) ? h : "trends"; render(); }
+function route() { const h = location.hash.replace("#", ""); S.tab = TABS.includes(h) ? h : "home"; render(); }
 
 document.getElementById("f-crop").addEventListener("change", e => { S.crop = e.target.value; render(); });
 document.getElementById("f-season").addEventListener("change", e => { S.season = e.target.value; render(); });

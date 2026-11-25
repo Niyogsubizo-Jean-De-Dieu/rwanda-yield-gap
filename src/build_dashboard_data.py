@@ -6,7 +6,7 @@ Run on your PC after build_model_dataset.py, train_model.py (and optionally comp
 
 Inputs (defaults; all are aggregated / district level, no microdata goes into the dashboard)
     data/sas_district_yield_panel.csv         NISR published district yields 2017-2026 (trend baseline)
-    data/model_data/district_crop_summary.csv    survey-weighted adoption rates and yields 2022-2025
+    data/model_data/district_crop_summary.csv    survey-weighted adoption rates and yields 2017-2025
     data/model_outputs/                       scenario_*, dose_response, feature_importance, importance_by_crop,
                                               driver_groups, validation_metrics, model_features.json
     data/model_outputs/walk_forward/          scores_by_model.csv, scores_by_season.csv (optional)
@@ -66,6 +66,9 @@ def main():
     keep = {"inorganic_fert_share_area": "fert", "improved_seed_share_area": "seed",
             "organic_fert_share_area": "manure", "lime_share_area": "lime", "anti_erosion_share_area": "antierosion"}
     s = s.rename(columns=keep)
+    keep_p = {"inorganic_fert_share_plots": "fert_p", "improved_seed_share_plots": "seed_p", "organic_fert_share_plots": "manure_p"}
+    keep_p = {k: v for k, v in keep_p.items() if k in s.columns}          # older summaries do not have them
+    s = s.rename(columns=keep_p)
 
     def nat(g):
         w = g.weighted_area_ha
@@ -73,11 +76,15 @@ def main():
         for c in keep.values():
             m = g[c].notna()
             r[c] = np.average(g.loc[m, c], weights=w[m]) if m.any() else np.nan
+        for c in keep_p.values():                                        # NISR definition: weight = plot weights
+            m = g[c].notna() & (g.plot_weight_sum > 0)
+            r[c] = np.average(g.loc[m, c], weights=g.loc[m, "plot_weight_sum"]) if m.any() else np.nan
+        r["plot_weight_sum"] = g.plot_weight_sum.sum() if "plot_weight_sum" in g else np.nan
         return pd.Series(r)
     n = s.groupby(["year", "season", "crop"]).apply(nat).reset_index().assign(district="Rwanda")
     ad = pd.concat([s, n], ignore_index=True)
     D["adoption"] = rows(ad[["year", "season", "district", "crop", "plots", "weighted_area_ha", "yield_kg_ha"]
-                            + list(keep.values())])
+                            + list(keep.values()) + list(keep_p.values())])
 
     # ---- scenarios, dose-response
     sd = pd.read_csv(o / "scenario_district.csv")

@@ -62,6 +62,7 @@
   "stratum": [
    "10",
    "10 Intensive cropland on hillsides",
+   "11",
    "20",
    "20 Intensive cropland in marshlands",
    "30",
@@ -83,7 +84,7 @@
   ]
  },
  "engine": "LightGBM",
- "smearing": 1.144181877369304,
+ "smearing": 1.1682301200000065,
  "monotone_up": [
   "improved_seed",
   "organic_fert",

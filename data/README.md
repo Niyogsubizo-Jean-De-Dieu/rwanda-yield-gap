@@ -8,7 +8,7 @@ Everything in this folder is a district-level aggregate and can be shared. Plot-
 | `gee_exports/static_district_features.csv` | Soil pH, organic carbon, nitrogen (iSDAsoil), elevation, slope (SRTM) over district cropland |
 | `gee_exports/cropland_area.csv` | District cropland area from a consensus satellite cropland mask |
 | `gee_exports/timeseries_<year>.csv` | 16-day NDVI, EVI, rainfall, land temperature, soil moisture, air temperature and Sentinel-1 radar per district and season |
-| `model_data/district_crop_summary.csv` | Survey-weighted yield and input adoption (fertilizer, seed, manure, lime, anti-erosion) per district, crop and season, 2022–2025 |
+| `model_data/district_crop_summary.csv` | Survey-weighted yield and input adoption (fertilizer, seed, manure, lime, anti-erosion) per district, crop and season, 2017–2025, as share of crop area and as share of plots (NISR's definition) |
 | `model_data/data_dictionary.csv` | Meaning of every model variable |
 | `model_outputs/scenario_district.csv` | Yield gain, attainable yield and extra production per district, crop, season and input |
 | `model_outputs/scenario_national.csv` | The same, national totals |
@@ -18,6 +18,6 @@ Everything in this folder is a district-level aggregate and can be shared. Plot-
 
 ## Raw data (not included: too large, and governed by NISR access terms)
 
-- **NISR Seasonal Agricultural Survey microdata 2022, 2023, 2024, 2025** (Seasons A, B, C): https://microdata.statistics.gov.rw/index.php/catalog (catalog IDs 103, 111, 113, 124). Register, request access ("Get Microdata"), then unzip each year into `data/microdata/<year>/` as downloaded.
+- **NISR Seasonal Agricultural Survey microdata 2017–2025** (Seasons A, B, C): https://microdata.statistics.gov.rw/index.php/catalog (catalog IDs 88, 86, 93, 99, 102 for 2017–2021; 103, 111, 113, 124 for 2022–2025). Register, request access ("Get Microdata"), then unzip each year into `data/microdata/<year>/` as downloaded.
 - **NISR SAS report tables 2017–2026:** https://www.statistics.gov.rw (Agriculture → Seasonal Agricultural Survey). Put them in `data/sas_published_tables/` to rebuild the yield panel.
 - **Satellite features:** re-extract with the scripts in `gee/` (Google Earth Engine account needed).

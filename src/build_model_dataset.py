@@ -2,7 +2,7 @@
 Build the final model dataset for the Rwanda yield-gap project (run on your own PC).
 
 It combines
-  1. NISR Seasonal Agricultural Survey microdata 2022-2025 (plot level), via prepare_microdata.py
+  1. NISR Seasonal Agricultural Survey microdata 2017-2025 (plot level), via prepare_microdata.py (2017-2021: legacy_sas.py)
   2. District soil and terrain (iSDAsoil, SRTM) from the Earth Engine export static_district_features.csv
   3. Seasonal satellite and climate anomalies per district (NDVI, EVI, rainfall, temperature, soil moisture,
      radar) from the Earth Engine exports timeseries_<year>.csv
@@ -37,6 +37,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import prepare_microdata as pm  # noqa: E402
 
+EXCLUDE_CELLS = {(2019, "A", "Maize"): "survey yields 0.73x NISR published, district correlation 0.14"}
 MAIN_CROPS = ["Maize", "Bush bean", "Climbing bean", "Irish potato", "Sweet potato", "Cassava", "Sorghum",
               "Paddy rice", "Soybean", "Wheat"]
 DYN = ["ndvi", "evi", "lst_day_c", "rain_mm", "soil_moisture", "t2m_c", "s1_vv_db", "s1_vh_db"]
@@ -167,6 +168,13 @@ def main():
     crops = [c.strip() for c in a.crops.split(",")]
     d = plots[(plots.is_lsf == 0) & (plots.usable_yield == 1) & (plots.extreme_yield == 0)
               & plots.crop.isin(crops)].copy()
+    # cells whose survey yields disagree with NISR's published district tables are kept out of the model
+    # (they stay in plot_crop_dataset / district_crop_summary)
+    for (yy, ss, cc), why in EXCLUDE_CELLS.items():
+        drop = (d.year == yy) & (d.season == ss) & (d.crop == cc)
+        if drop.any():
+            log.append(f"Excluded from model: {yy}{ss} {cc} ({int(drop.sum()):,} plots) - {why}")
+            d = d[~drop]
     d["log_yield"] = np.log(d.yield_kg_ha)
     d["crop_share"] = (d.crop_area_ha / d.plot_area_ha).clip(upper=1)
     d = d[MODEL_COLS]

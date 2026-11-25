@@ -1,4 +1,24 @@
 Crop-share reference: 6 complete screening files, 259,638 plot-crops
+2017A: legacy reader | weight found 100% | fertilizer match 100% | harvested area known 100%
+2017A: 28,484 crop records | usable yield 28,480 | fertilizer-file match 100% | LSF 2.6% | inorganic known 100% | manure known 100%
+2017B: legacy reader | weight found 100% | fertilizer match 100% | harvested area known 100%
+2017B: 27,120 crop records | usable yield 26,631 | fertilizer-file match 100% | LSF 5.9% | inorganic known 100% | manure known 100%
+2018A: legacy reader | weight found 100% | fertilizer match 100% | harvested area known 100%
+2018A: 18,255 crop records | usable yield 17,765 | fertilizer-file match 100% | LSF 7.4% | inorganic known 100% | manure known 100%
+2018B: legacy reader | weight found 100% | fertilizer match 100% | harvested area known 100%
+2018B: 19,576 crop records | usable yield 19,263 | fertilizer-file match 100% | LSF 7.4% | inorganic known 93% | manure known 100%
+2019A: legacy reader | weight found 100% | fertilizer match 100% | harvested area known 100%
+2019A: 32,906 crop records | usable yield 32,523 | fertilizer-file match 100% | LSF 3.9% | inorganic known 100% | manure known 100%
+2019B: legacy reader | weight found 100% | fertilizer match 100% | harvested area known 100%
+2019B: 30,493 crop records | usable yield 30,380 | fertilizer-file match 100% | LSF 3.1% | inorganic known 100% | manure known 100%
+2020A: legacy reader | weight found 100% | fertilizer match 100% | harvested area known 91%
+2020A: 41,313 crop records | usable yield 37,224 | fertilizer-file match 100% | LSF 3.3% | inorganic known 100% | manure known 100%
+2020B: legacy reader | weight found 100% | fertilizer match 100% | harvested area known 96%
+2020B: 35,773 crop records | usable yield 34,013 | fertilizer-file match 100% | LSF 3.4% | inorganic known 100% | manure known 100%
+2021A: legacy reader | weight found 100% | fertilizer match 100% | harvested area known 90%
+2021A: 41,634 crop records | usable yield 37,060 | fertilizer-file match 100% | LSF 3.6% | inorganic known 100% | manure known 100%
+2021B: legacy reader | weight found 100% | fertilizer match 100% | harvested area known 96%
+2021B: 35,869 crop records | usable yield 34,309 | fertilizer-file match 100% | LSF 3.6% | inorganic known 100% | manure known 100%
 2022A: 41,589 crop records | usable yield 35,889 | fertilizer-file match 100% | LSF 3.8% | inorganic known 100% | manure known 100%
 2022B: 36,005 crop records | usable yield 34,589 | fertilizer-file match 100% | LSF 3.3% | inorganic known 100% | manure known 100%
 2023A: 39,038 crop records | usable yield 33,041 | fertilizer-file match 100% | LSF 3.2% | inorganic known 100% | manure known 100%
@@ -12,6 +32,113 @@ Crop-share reference: 6 complete screening files, 259,638 plot-crops
 2025B: 32,920 crop records | usable yield 31,970 | fertilizer-file match 100% | LSF 4.6% | inorganic known 100% | manure known 100%
 
 Validation against NISR published district yields (smallholders; microdata / published):
+  2017A Bush bean      districts 30 | median ratio 0.97 | correlation 0.88
+  2017A Cassava        districts 30 | median ratio 1.00 | correlation 0.81
+  2017A Climbing bean  districts 30 | median ratio 1.00 | correlation 0.87
+  2017A Cooking banana districts 30 | median ratio 0.98 | correlation 0.92
+  2017A Dessert banana districts 30 | median ratio 0.97 | correlation 0.94
+  2017A Irish potato   districts 29 | median ratio 1.01 | correlation 0.98
+  2017A Maize          districts 30 | median ratio 0.97 | correlation 0.84
+  2017A Paddy rice     districts 14 | median ratio 1.00 | correlation 0.98
+  2017A Sorghum        districts 23 | median ratio 1.00 | correlation 0.99
+  2017A Soybean        districts 30 | median ratio 0.97 | correlation 0.68
+  2017A Sweet potato   districts 30 | median ratio 0.97 | correlation 0.95
+  2017A Wheat          districts 11 | median ratio 1.00 | correlation 0.99
+  2017B Bush bean      districts 29 | median ratio 1.01 | correlation 0.97
+  2017B Cassava        districts 30 | median ratio 1.00 | correlation 0.97
+  2017B Climbing bean  districts 30 | median ratio 0.99 | correlation 0.98
+  2017B Cooking banana districts 30 | median ratio 0.99 | correlation 0.79
+  2017B Dessert banana districts 30 | median ratio 0.98 | correlation 0.95
+  2017B Irish potato   districts 29 | median ratio 1.00 | correlation 0.98
+  2017B Maize          districts 30 | median ratio 1.07 | correlation 0.82
+  2017B Paddy rice     districts 16 | median ratio 1.00 | correlation 0.87
+  2017B Sorghum        districts 27 | median ratio 1.00 | correlation 0.86
+  2017B Soybean        districts 30 | median ratio 0.99 | correlation 0.62
+  2017B Sweet potato   districts 30 | median ratio 0.99 | correlation 0.97
+  2017B Wheat          districts 12 | median ratio 1.00 | correlation 0.99
+  2018A Bush bean      districts 29 | median ratio 1.01 | correlation 0.94
+  2018A Cassava        districts 29 | median ratio 1.00 | correlation 0.86
+  2018A Climbing bean  districts 28 | median ratio 1.00 | correlation 0.98
+  2018A Cooking banana districts 30 | median ratio 1.01 | correlation 0.54
+  2018A Dessert banana districts 30 | median ratio 1.01 | correlation 0.95
+  2018A Irish potato   districts 29 | median ratio 0.99 | correlation 0.95
+  2018A Maize          districts 30 | median ratio 0.92 | correlation 0.64
+  2018A Paddy rice     districts 15 | median ratio 0.94 | correlation 0.56
+  2018A Sorghum        districts 18 | median ratio 1.00 | correlation 0.96
+  2018A Soybean        districts 28 | median ratio 0.98 | correlation 0.97
+  2018A Sweet potato   districts 30 | median ratio 0.98 | correlation 0.92
+  2018B Bush bean      districts 29 | median ratio 1.00 | correlation 0.93
+  2018B Cassava        districts 29 | median ratio 1.00 | correlation 0.98
+  2018B Climbing bean  districts 30 | median ratio 0.99 | correlation 0.95
+  2018B Cooking banana districts 30 | median ratio 0.99 | correlation 0.94
+  2018B Dessert banana districts 30 | median ratio 0.99 | correlation 0.97
+  2018B Irish potato   districts 29 | median ratio 0.99 | correlation 0.98
+  2018B Maize          districts 30 | median ratio 0.99 | correlation 0.83
+  2018B Paddy rice     districts 17 | median ratio 1.00 | correlation 0.92
+  2018B Sorghum        districts 26 | median ratio 1.00 | correlation 0.95
+  2018B Soybean        districts 28 | median ratio 1.00 | correlation 0.85
+  2018B Sweet potato   districts 30 | median ratio 1.00 | correlation 0.78
+  2018B Wheat          districts 12 | median ratio 1.00 | correlation 1.00
+  2019A Cassava        districts 29 | median ratio 1.00 | correlation 0.92
+  2019A Irish potato   districts 30 | median ratio 0.96 | correlation 0.94
+  2019A Maize          districts 30 | median ratio 0.73 | correlation 0.14
+  2019A Paddy rice     districts 13 | median ratio 0.70 | correlation 0.08
+  2019A Sorghum        districts 18 | median ratio 1.00 | correlation 0.99
+  2019A Soybean        districts 28 | median ratio 0.95 | correlation 0.40
+  2019A Sweet potato   districts 30 | median ratio 1.00 | correlation 0.88
+  2019A Wheat          districts 10 | median ratio 1.00 | correlation 1.00
+  2019B Cassava        districts 29 | median ratio 1.00 | correlation 0.99
+  2019B Irish potato   districts 30 | median ratio 1.00 | correlation 1.00
+  2019B Maize          districts 30 | median ratio 0.99 | correlation 0.97
+  2019B Paddy rice     districts 14 | median ratio 0.76 | correlation 0.60
+  2019B Sorghum        districts 27 | median ratio 1.00 | correlation 0.96
+  2019B Soybean        districts 29 | median ratio 1.00 | correlation 0.90
+  2019B Sweet potato   districts 30 | median ratio 1.00 | correlation 0.99
+  2019B Wheat          districts 15 | median ratio 1.00 | correlation 1.00
+  2020A Bush bean      districts 22 | median ratio 0.89 | correlation 0.73
+  2020A Cassava        districts 29 | median ratio 0.87 | correlation 0.87
+  2020A Climbing bean  districts 23 | median ratio 0.88 | correlation 0.78
+  2020A Cooking banana districts 30 | median ratio 0.96 | correlation 0.95
+  2020A Dessert banana districts 29 | median ratio 0.98 | correlation 0.68
+  2020A Irish potato   districts 30 | median ratio 1.00 | correlation 0.95
+  2020A Maize          districts 30 | median ratio 0.94 | correlation 0.79
+  2020A Sorghum        districts 19 | median ratio 1.00 | correlation 0.96
+  2020A Soybean        districts 29 | median ratio 0.89 | correlation 0.86
+  2020A Sweet potato   districts 30 | median ratio 0.92 | correlation 0.89
+  2020A Wheat          districts 12 | median ratio 1.00 | correlation 0.96
+  2020B Bush bean      districts 21 | median ratio 1.00 | correlation 1.00
+  2020B Cassava        districts 30 | median ratio 1.00 | correlation 0.83
+  2020B Climbing bean  districts 23 | median ratio 1.00 | correlation 1.00
+  2020B Cooking banana districts 30 | median ratio 0.64 | correlation 0.62
+  2020B Dessert banana districts 29 | median ratio 0.67 | correlation 0.70
+  2020B Irish potato   districts 29 | median ratio 1.00 | correlation 0.99
+  2020B Maize          districts 30 | median ratio 1.00 | correlation 0.84
+  2020B Sorghum        districts 29 | median ratio 1.00 | correlation 1.00
+  2020B Soybean        districts 28 | median ratio 1.00 | correlation 0.97
+  2020B Sweet potato   districts 30 | median ratio 1.00 | correlation 0.97
+  2020B Wheat          districts 12 | median ratio 1.00 | correlation 0.99
+  2021A Bush bean      districts 30 | median ratio 0.90 | correlation 0.90
+  2021A Cassava        districts 28 | median ratio 0.99 | correlation 0.97
+  2021A Climbing bean  districts 30 | median ratio 0.91 | correlation 0.83
+  2021A Cooking banana districts 30 | median ratio 0.98 | correlation 0.99
+  2021A Dessert banana districts 30 | median ratio 0.99 | correlation 0.96
+  2021A Irish potato   districts 30 | median ratio 0.97 | correlation 0.97
+  2021A Maize          districts 30 | median ratio 0.90 | correlation 0.75
+  2021A Sorghum        districts 19 | median ratio 1.00 | correlation 0.98
+  2021A Soybean        districts 28 | median ratio 0.84 | correlation 0.95
+  2021A Sweet potato   districts 30 | median ratio 0.94 | correlation 0.85
+  2021A Wheat          districts 12 | median ratio 0.94 | correlation 0.56
+  2021B Bush bean      districts 29 | median ratio 0.90 | correlation 0.84
+  2021B Cassava        districts 29 | median ratio 0.98 | correlation 0.96
+  2021B Climbing bean  districts 30 | median ratio 0.92 | correlation 0.83
+  2021B Cooking banana districts 30 | median ratio 1.01 | correlation 0.97
+  2021B Dessert banana districts 30 | median ratio 1.00 | correlation 0.99
+  2021B Irish potato   districts 29 | median ratio 0.98 | correlation 0.96
+  2021B Maize          districts 30 | median ratio 0.91 | correlation 0.61
+  2021B Sorghum        districts 28 | median ratio 0.96 | correlation 0.85
+  2021B Soybean        districts 29 | median ratio 0.87 | correlation 0.76
+  2021B Sweet potato   districts 30 | median ratio 0.93 | correlation 0.97
+  2021B Wheat          districts 13 | median ratio 0.94 | correlation 0.94
   2022A Bush bean      districts 30 | median ratio 0.93 | correlation 0.70
   2022A Cassava        districts 29 | median ratio 0.96 | correlation 0.91
   2022A Climbing bean  districts 30 | median ratio 0.90 | correlation 0.92
@@ -95,15 +222,26 @@ Validation against NISR published district yields (smallholders; microdata / pub
   2025B Soybean        districts 30 | median ratio 0.92 | correlation 0.31
   2025B Sweet potato   districts 30 | median ratio 0.96 | correlation 0.91
   2025B Wheat          districts 13 | median ratio 1.00 | correlation 0.91
-Satellite files read from data/gee_exports/ (10 time-series files)
+Excluded from model: 2019A Maize (6,816 plots) - survey yields 0.73x NISR published, district correlation 0.14
+Satellite files read from data\gee_exports/ (10 time-series files)
 Satellite features: 30 districts static; anomalies for 20 seasons (2017-2026)
 Satellite context joined to 100% of rows (soil) and 100% (seasonal anomalies); rows unchanged: True
 
-FINAL model_dataset.csv: 152,835 rows x 54 columns
+FINAL model_dataset.csv: 336,627 rows x 54 columns
 
 Rows by season and crop:
 crop         Bush bean  Cassava  Climbing bean  Irish potato  Maize  Paddy rice  Sorghum  Soybean  Sweet potato  Wheat
 year season                                                                                                           
+2017 A            4411      937           1579          1428   6095         432      774      993          2341     88
+     B            3552     1137           1267           933   3513         491     1665      680          1721     92
+2018 A            3092      470           1010           898   4468         403      374      429          1128     44
+     B            2489     1263           1137           946   2391         397     1509      494          1641     83
+2019 A            5571     1741           2271          1864      0         140      834      853          2388    118
+     B            4654     2020           2566          1715   3483         147     2952      991          1730    192
+2020 A            5643     1953           3002          1716   7742          20      646     1060          2119     99
+     B            4019     2289           2667           954   3266          38     2867     1006          2483    272
+2021 A            5705     1220           3326          1715   7979          27      596     1122          2302     84
+     B            4753     1838           3390          1684   3016          47     2615     1129          2138    220
 2022 A            5255     1794           3173          1860   6980          26      679      978          1593     73
      B            4088     2192           2832          1593   3262          41     2706     1558          1863    158
 2023 A            4071     1366           2764          1644   6910          38      693     1113          1795     57
@@ -114,10 +252,14 @@ year season
      B            4858     2381           2969          1359   2838          50     1745     1038          1649     92
 
 Share missing per column (only columns with any missing):
-inorganic_kg_ha      0.004
-erosion_degree       0.279
-anti_erosion         0.279
-consolidated_site    0.279
-mechanized           0.550
-irrigated            0.279
-farmer_age           0.003
+inorganic_kg_ha      0.005
+lime                 0.546
+micronutrient        0.546
+pesticide            0.175
+erosion_degree       0.302
+anti_erosion         0.317
+consolidated_site    0.673
+mechanized           0.796
+irrigated            0.248
+farmer_age           0.284
+s1_vh_anom_mean      0.101
